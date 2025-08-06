@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rant2Me - Home</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="home">
+    <header>
+        <h1>Welcome to Rant2Me</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="chat.html">Chat</a>
+            <a href="help.html">Help Centre</a>
+            <a href="faq.html">FAQ</a>
+            <a href="token.html">Tokens</a>
+            <a href="about.html">About Us</a>
+            <a href="services.html">Services</a>
+        </nav>
+    </header>
+
+    <section class="welcome">
+        <img src="images/counselling_black_people.jpg" alt="Counselling Session">
+        <h2 id="typing-text"></h2>
+    </section>    
+    <script src="script.js"></script>
+</body>
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
+      authDomain: "rant2me-ab36b.firebaseapp.com",
+      projectId: "rant2me-ab36b",
+      storageBucket: "rant2me-ab36b.firebasestorage.app",
+      messagingSenderId: "245661393279",
+      appId: "1:245661393279:web:b31483f57a40cf2c807a4a",
+      measurementId: "G-KPCSJTSMT9"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
+</html>
+<p class="quote">"Sometimes all we need is for someone to listen."</p>
+
+<section class="gallery">
+    <h2>Our Moments</h2>
+    <p>More pictures and stories coming soon!</p>
+    <div class="image-grid">
+        <img src="images/Pic1.jpeg" alt="Coming soon image">
+        <img src="images/Pic2.jpeg" alt="Coming soon image">
+    </div>
+</section>

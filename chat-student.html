@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nutrition Chat</title>
+  <link rel="stylesheet" href="chat-style.css" />
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">Chat with Chidera (Lifestyle)</div>
+    
+    <div class="chat-messages" id="chat-box">
+      <div class="message bot">
+        <img src="assets/avatars/Chi.png" alt="Dorcas" class="avatar" />
+        <div class="bubble">Hi, Chidera here, student and lifestyle enthusiast. How can I help you today?</div>
+      </div>
+    </div>
+    
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    let hasReplied = false;
+
+    function sendMessage() {
+      const input = document.getElementById('userInput');
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      const chatBox = document.getElementById('chat-box');
+
+      // Append user message
+      const userMessage = document.createElement('div');
+      userMessage.classList.add('message', 'user');
+      userMessage.innerHTML = `<div class="bubble">${msg}</div>`;
+      chatBox.appendChild(userMessage);
+
+      input.value = "";
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Only reply once
+      if (!hasReplied) {
+        hasReplied = true;
+        setTimeout(() => {
+          const botMessage = document.createElement('div');
+          botMessage.classList.add('message', 'bot');
+          botMessage.innerHTML = `
+            <img src="assets/avatars/Chi.png" alt="Dorcas" class="avatar" />
+            <div class="bubble">Thanks for your message! I’ll get back to you shortly.</div>`;
+          chatBox.appendChild(botMessage);
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }, 800);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  body {
+    background: #f9f9fb;
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  header {
+    background: #4a90e2;
+    padding: 20px;
+    color: white;
+    text-align: center;
+  }
+  
+  header h1 {
+    margin-bottom: 10px;
+  }
+  
+  nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 4px;
+  }
+  
+  nav a:hover,
+  nav a.active {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .faq-section {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+  
+  .faq-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .faq {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .faq:hover {
+    transform: scale(1.01);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+  }
+  
+  .question {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  
+  .question::after {
+    content: '+';
+    float: right;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+  }
+  
+  .faq.open .question::after {
+    content: '-';
+  }
+  
+  .answer {
+    max-height: 0;
+    overflow: hidden;
+    font-size: 0.95rem;
+    color: #555;
+    transition: max-height 0.4s ease, opacity 0.4s ease;
+    opacity: 0;
+  }
+  
+  .faq.open .answer {
+    max-height: 300px;
+    opacity: 1;
+    margin-top: 10px;
+  }
+  

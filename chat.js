@@ -34,4 +34,35 @@ function sendMessage(section) {
       chatBox.scrollTop = chatBox.scrollHeight;
     }, 1000);
   }
-  
+  import { db } from './firebase.js'; // adjust path as needed
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+
+const form = document.getElementById("messageForm");
+const messageInput = document.getElementById("messageInput");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const text = messageInput.value.trim();
+  if (text) {
+    await addDoc(collection(db, "messages"), {
+      text,
+      timestamp: serverTimestamp(),
+    });
+    messageInput.value = "";
+  }
+});
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+
+const messageList = document.getElementById("messageList");
+
+const q = query(collection(db, "messages"), orderBy("timestamp"));
+
+onSnapshot(q, (snapshot) => {
+  messageList.innerHTML = "";
+  snapshot.forEach((doc) => {
+    const message = doc.data();
+    const li = document.createElement("li");
+    li.textContent = message.text;
+    messageList.appendChild(li);
+  });
+});

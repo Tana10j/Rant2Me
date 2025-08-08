@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rant2Me - Home</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="home">
+    <header>
+        <h1>Welcome to Rant2Me</h1>
+        <nav>
+            <a href="home.html">Home</a>
+            <a href="chat.html">Chat</a>
+            <a href="help.html">Help Centre</a>
+            <a href="faq.html">FAQ</a>
+            <a href="token.html">Tokens</a>
+            <a href="about.html">About Us</a>
+            <a href="services.html">Services</a>
+            <button id="logoutBtn" style="margin-left: 10px;">Logout</button>
+        </nav>
+    </header>
+
+    <section class="welcome">
+        <img src="images/counselling_black_people.jpg" alt="Counselling Session">
+        <h2 id="typing-text"></h2>
+    </section>    
+
+    <p class="quote">"Sometimes all we need is for someone to listen."</p>
+
+    <section class="gallery">
+        <h2>Our Moments</h2>
+        <p>More pictures and stories coming soon!</p>
+        <div class="image-grid">
+            <img src="images/Pic1.jpeg" alt="Coming soon image">
+            <img src="images/Pic2.jpeg" alt="Coming soon image">
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+
+    <!-- ✅ Combined Firebase Auth logic in one script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
+            authDomain: "rant2me-ab36b.firebaseapp.com",
+            projectId: "rant2me-ab36b",
+            storageBucket: "rant2me-ab36b.firebasestorage.app",
+            messagingSenderId: "245661393279",
+            appId: "1:245661393279:web:b31483f57a40cf2c807a4a",
+            measurementId: "G-KPCSJTSMT9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+
+        // ✅ Restrict access if not logged in
+       onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // User is logged in, do nothing
+        console.log("User is authenticated:", user.email);
+    } else {
+        // Wait a bit before redirecting to be sure Firebase finished initializing
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 100); // short delay to avoid false redirect
+            }
+        });
+
+        // ✅ Logout functionality
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => {
+                signOut(auth)
+                    .then(() => {
+                        window.location.href = "index.html"; // redirect after logout
+                    })
+                    .catch((error) => {
+                        alert("Error signing out: " + error.message);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

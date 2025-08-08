@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin — Counselling (Tana)</title>
+  <link rel="stylesheet" href="admin-style.css" />
+</head>
+<body>
+  <div class="admin-panel">
+    <div class="threads">
+      <h2>Counselling — Chats</h2>
+      <div id="threadsList">Loading chats…</div>
+    </div>
+
+    <div class="chat-area">
+      <div class="chat-header">
+        <div id="chatHeaderTitle" class="title">Select a chat</div>
+        <div style="margin-left:auto">
+          <button id="signOutBtn" style="background:#eee;border:none;padding:8px 10px;border-radius:8px;cursor:pointer;">Sign out</button>
+        </div>
+      </div>
+
+      <div id="messages" class="messages">
+        <div style="color:#777">No chat selected</div>
+      </div>
+
+      <div class="input-area">
+        <input id="replyInput" placeholder="Type your reply..." />
+        <button id="sendReplyBtn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db, auth } from './firebase.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import {
+      collection, query, where, orderBy, onSnapshot,
+      doc, getDoc, addDoc, serverTimestamp, updateDoc
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    // CONFIG for this admin page
+    const ADMIN_SECTION = 'counselling'; // change for other admin pages
+    const ADMIN_DISPLAY_NAME = 'Tana';
+
+    // UI refs
+    const threadsListEl = document.getElementById('threadsList');
+    const messagesEl = document.getElementById('messages');
+    const chatHeaderTitle = document.getElementById('chatHeaderTitle');
+    const replyInput = document.getElementById('replyInput');
+    const sendReplyBtn = document.getElementById('sendReplyBtn');
+    const signOutBtn = document.getElementById('signOutBtn');
+
+    let currentUser = null;
+    let currentChatId = null;
+    let messagesUnsub = null;
+
+    // Require auth + custom claim check
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+      currentUser = user;
+
+      // ensure the token has fresh claims
+      const idTokenResult = await user.getIdTokenResult(true);
+      const roleClaim = idTokenResult.claims.role || null;
+
+      if (roleClaim !== ADMIN_SECTION) {
+        alert("Access denied: you are not assigned to this admin section.");
+        window.location.href = "home.html";
+        return;
+      }
+
+      // load chat threads for this section
+      startThreadsListener();
+    });
+
+    // Sign out
+    signOutBtn.addEventListener('click', () => {
+      signOut(auth).then(()=> window.location.href = "index.html");
+    });
+
+    // Listen for chats in this section (real-time)
+    function startThreadsListener() {
+      const chatsColl = collection(db, 'chats');
+      const q = query(chatsColl, where('section', '==', ADMIN_SECTION), orderBy('lastUpdated', 'desc'));
+      onSnapshot(q, snap => {
+        threadsListEl.innerHTML = '';
+        if (snap.empty) {
+          threadsListEl.innerHTML = '<div style="color:#777;padding:8px">No chats yet</div>';
+          return;
+        }
+        snap.forEach(docSnap => {
+          const data = docSnap.data();
+          const id = docSnap.id;
+          const preview = data.lastMessagePreview || '';
+          const time = data.lastUpdated ? new Date(data.lastUpdated.toMillis()).toLocaleString() : '';
+          const name = data.userName || data.userId || 'Anonymous';
+
+          const item = document.createElement('div');
+          item.className = 'thread-item';
+          item.innerHTML = `
+            <div class="thread-avatar"></div>
+            <div class="thread-meta">
+              <div class="name">${escapeHtml(name)}</div>
+              <div class="preview">${escapeHtml(preview)}</div>
+            </div>
+            <div class="thread-time">${time}</div>
+          `;
+          item.onclick = () => openChat(id, data);
+          threadsListEl.appendChild(item);
+        });
+      }, err => {
+        console.error("Error listening to chats:", err);
+      });
+    }
+
+    // Open a chat thread: subscribe to messages subcollection
+    async function openChat(chatId, chatMeta) {
+      if (messagesUnsub) messagesUnsub(); // unsubscribe previous
+      currentChatId = chatId;
+      chatHeaderTitle.textContent = (chatMeta.userName || chatMeta.userId || 'Anonymous');
+
+      messagesEl.innerHTML = '<div style="color:#777">Loading messages…</div>';
+
+      const msgsRef = collection(db, 'chats', chatId, 'messages');
+      const q = query(msgsRef, orderBy('timestamp', 'asc'));
+      messagesUnsub = onSnapshot(q, snap => {
+        messagesEl.innerHTML = '';
+        snap.forEach(m => {
+          const d = m.data();
+          const el = document.createElement('div');
+          el.className = 'msg ' + (d.senderType === 'user' ? 'user' : 'admin');
+          if (d.senderType === 'admin') {
+            el.innerHTML = `<div class="avatar"></div><div class="bubble">${escapeHtml(d.text)}</div>`;
+          } else {
+            el.innerHTML = `<div class="bubble">${escapeHtml(d.text)}</div>`;
+          }
+          messagesEl.appendChild(el);
+        });
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }, err => console.error("Message listener error:", err));
+    }
+
+    // Send reply
+    sendReplyBtn.addEventListener('click', async () => {
+      const text = replyInput.value.trim();
+      if (!text || !currentChatId) return;
+      const msgsRef = collection(db, 'chats', currentChatId, 'messages');
+
+      // add message doc
+      try {
+        await addDoc(msgsRef, {
+          text,
+          senderType: 'admin',
+          senderId: currentUser.uid,
+          senderName: ADMIN_DISPLAY_NAME,
+          timestamp: serverTimestamp()
+        });
+
+        // update chat metadata
+        const chatRef = doc(db, 'chats', currentChatId);
+        await updateDoc(chatRef, {
+          lastUpdated: serverTimestamp(),
+          lastMessagePreview: text
+        });
+
+        replyInput.value = '';
+      } catch (e) {
+        console.error("Failed to send reply:", e);
+        alert("Failed to send reply — check console.");
+      }
+    });
+
+    // small helper to avoid XSS in chat preview (basic)
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, (m) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+    }
+  </script>
+</body>
+</html>

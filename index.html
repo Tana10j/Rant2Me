@@ -1,61 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Rant2Me - Home</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | Rant2Me</title>
+  <link rel="stylesheet" href="login.css" />
 </head>
-<body class="home">
-    <header>
-        <h1>Welcome to Rant2Me</h1>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="chat.html">Chat</a>
-            <a href="help.html">Help Centre</a>
-            <a href="faq.html">FAQ</a>
-            <a href="token.html">Tokens</a>
-            <a href="about.html">About Us</a>
-            <a href="services.html">Services</a>
-        </nav>
-    </header>
+<body>
+  <div class="login-container">
+    <h1 class="site-title">Rant<span>2</span>Me</h1>
+    <p class="tagline">Speak Freely. Be Heard.</p>
 
-    <section class="welcome">
-        <img src="images/counselling_black_people.jpg" alt="Counselling Session">
-        <h2 id="typing-text"></h2>
-    </section>    
-    <script src="script.js"></script>
-</body>
-<script type="module">
-    // Import the functions you need from the SDKs you need
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
-    // TODO: Add SDKs for Firebase products that you want to use
-    // https://firebase.google.com/docs/web/setup#available-libraries
-  
-    // Your web app's Firebase configuration
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    <div class="tabs">
+      <button id="loginTab" class="active-tab">Login</button>
+      <button id="signupTab">Sign Up</button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="loginForm" class="form active-form">
+      <input type="email" id="loginEmail" placeholder="Email" required />
+      <input type="password" id="loginPassword" placeholder="Password" required />
+      <button onclick="login()">Login</button>
+      <p id="login-error-msg"></p>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="signupForm" class="form">
+      <input type="text" id="signupName" placeholder="Name or Anonymous" required />
+      <input type="text" id="signupCountry" placeholder="Country" required />
+      <input type="email" id="signupEmail" placeholder="Email" required />
+      <input type="password" id="signupPassword" placeholder="Password" required />
+      <button onclick="signup()">Sign Up</button>
+      <p id="signup-error-msg"></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
       authDomain: "rant2me-ab36b.firebaseapp.com",
       projectId: "rant2me-ab36b",
-      storageBucket: "rant2me-ab36b.firebasestorage.app",
+      storageBucket: "rant2me-ab36b.appspot.com",
       messagingSenderId: "245661393279",
-      appId: "1:245661393279:web:b31483f57a40cf2c807a4a",
-      measurementId: "G-KPCSJTSMT9"
+      appId: "1:245661393279:web:b31483f57a40cf2c807a4a"
     };
-  
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-  </script>
-</html>
-<p class="quote">"Sometimes all we need is for someone to listen."</p>
 
-<section class="gallery">
-    <h2>Our Moments</h2>
-    <p>More pictures and stories coming soon!</p>
-    <div class="image-grid">
-        <img src="images/Pic1.jpeg" alt="Coming soon image">
-        <img src="images/Pic2.jpeg" alt="Coming soon image">
-    </div>
-</section>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.login = () => {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+      const errorMsg = document.getElementById("login-error-msg");
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          window.location.href = "home.html";
+        })
+        .catch((error) => {
+          errorMsg.textContent = error.message;
+          errorMsg.style.color = "var(--danger-color)";
+        });
+    };
+
+    window.signup = () => {
+      const name = document.getElementById("signupName").value.trim();
+      const country = document.getElementById("signupCountry").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const password = document.getElementById("signupPassword").value.trim();
+      const errorMsg = document.getElementById("signup-error-msg");
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          return setDoc(doc(db, "users", user.uid), {
+            name,
+            country,
+            email,
+            createdAt: new Date()
+          });
+        })
+        .then(() => {
+          window.location.href = "home.html";
+        })
+        .catch((error) => {
+          errorMsg.textContent = error.message;
+          errorMsg.style.color = "var(--danger-color)";
+        });
+    };
+
+    // Tab switching logic
+    const loginTab = document.getElementById("loginTab");
+    const signupTab = document.getElementById("signupTab");
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
+
+    loginTab.addEventListener("click", () => {
+      loginTab.classList.add("active-tab");
+      signupTab.classList.remove("active-tab");
+      loginForm.classList.add("active-form");
+      signupForm.classList.remove("active-form");
+    });
+
+    signupTab.addEventListener("click", () => {
+      signupTab.classList.add("active-tab");
+      loginTab.classList.remove("active-tab");
+      signupForm.classList.add("active-form");
+      loginForm.classList.remove("active-form");
+    });
+  </script>
+</body>
+</html>

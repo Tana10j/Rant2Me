@@ -3,59 +3,176 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nutrition Chat</title>
+  <title>Lifestyle Chat</title>
   <link rel="stylesheet" href="chat-style.css" />
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-header">Chat with Chidera (Lifestyle)</div>
-    
+    <div class="chat-header">Chat with Chidera (Student)</div>
     <div class="chat-messages" id="chat-box">
       <div class="message bot">
-        <img src="assets/avatars/Chi.png" alt="Dorcas" class="avatar" />
-        <div class="bubble">Hi, Chidera here, student and lifestyle enthusiast. How can I help you today?</div>
+        <img src="assets/avatars/Chi.png" class="avatar" />
+        <div class="bubble">Chidera here, Lifestyle Entustist and Chill Lady. How can I help you today?</div>
       </div>
     </div>
-    
     <div class="chat-input">
       <input type="text" id="userInput" placeholder="Type your message..." />
       <button onclick="sendMessage()">Send</button>
     </div>
   </div>
 
-  <script>
-    let hasReplied = false;
+  <script type="module">
+    import { db } from './firebase.js';
+    import {
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc,
+      arrayUnion,
+      Timestamp
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-    function sendMessage() {
-      const input = document.getElementById('userInput');
-      const msg = input.value.trim();
-      if (!msg) return;
+    const input = document.getElementById("userInput");
+    const chatBox = document.getElementById("chat-box");
+    const section = "student";
+    const adminName = "Chidera";
 
-      const chatBox = document.getElementById('chat-box');
+    const userId = localStorage.getItem("userId") || (() => {
+      const id = crypto.randomUUID();
+      localStorage.setItem("userId", id);
+      return id;
+    })();
 
-      // Append user message
-      const userMessage = document.createElement('div');
-      userMessage.classList.add('message', 'user');
-      userMessage.innerHTML = `<div class="bubble">${msg}</div>`;
-      chatBox.appendChild(userMessage);
+    const docId = `${section}_${userId}`;
+    const docRef = doc(db, "messages", docId);
 
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      display(text, 'user');
       input.value = "";
-      chatBox.scrollTop = chatBox.scrollHeight;
 
-      // Only reply once
-      if (!hasReplied) {
-        hasReplied = true;
-        setTimeout(() => {
-          const botMessage = document.createElement('div');
-          botMessage.classList.add('message', 'bot');
-          botMessage.innerHTML = `
-            <img src="assets/avatars/Chi.png" alt="Dorcas" class="avatar" />
-            <div class="bubble">Thanks for your message! I’ll get back to you shortly.</div>`;
-          chatBox.appendChild(botMessage);
-          chatBox.scrollTop = chatBox.scrollHeight;
+      const messageData = {
+        text: text,
+        sender: "user",
+        timestamp: Timestamp.now()
+      };
+
+      try {
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) {
+          await setDoc(docRef, {
+            section,
+            userId,
+            createdAt: Timestamp.now(),
+            messages: []
+          });
+        }
+
+        await updateDoc(docRef, {
+          messages: arrayUnion(messageData)
+        });
+
+      } catch (e) {
+        console.error("🔥 Firestore write error:", e);
+        return;
+      }
+
+      // Bot replies only once
+      if (!localStorage.getItem("hasReplied")) {
+        localStorage.setItem("hasReplied", "true");
+
+        const botText = `${adminName}: Thanks for your message! I’ll get back to you shortly.`;
+        const botMsg = {
+          text: botText,
+          sender: "admin",
+          timestamp: Timestamp.now()
+        };
+
+        setTimeout(async () => {
+          display(botText, 'bot');
+
+          try {
+            await updateDoc(docRef, {
+              messages: arrayUnion(botMsg)
+            });
+          } catch (e) {
+            console.error("🔥 Bot Firestore write error:", e);
+          }
         }, 800);
       }
     }
+
+    function display(text, sender) {
+      const msg = document.createElement('div');
+      msg.className = `message ${sender}`;
+      msg.innerHTML = sender === 'bot'
+        ? `<img src="assets/avatars/${adminName}.png" class="avatar" /><div class="bubble">${text}</div>`
+        : `<div class="bubble">${text}</div>`;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    window.sendMessage = sendMessage;
   </script>
+  <script type="module">
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
+    authDomain: "rant2me-ab36b.firebaseapp.com",
+    projectId: "rant2me-ab36b",
+    // Add other config
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+import { db, auth } from './firebase.js';
+import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+async function sendMessageUser(section, text) {
+  const user = auth.currentUser;
+  if (!user) { alert("Please login"); return; }
+  const userId = user.uid;
+  const chatId = `${section}_${userId}`; // consistent id pattern
+  const chatRef = doc(db, 'chats', chatId);
+
+  try {
+    const snap = await getDoc(chatRef);
+    if (!snap.exists()) {
+      await setDoc(chatRef, {
+        section,
+        userId,
+        userName: user.email || "Anonymous",
+        createdAt: serverTimestamp(),
+        lastUpdated: serverTimestamp(),
+        lastMessagePreview: text
+      });
+    } else {
+      await updateDoc(chatRef, {
+        lastUpdated: serverTimestamp(),
+        lastMessagePreview: text
+      });
+    }
+
+    // add message to subcollection
+    const msgsRef = collection(db, 'chats', chatId, 'messages');
+    await addDoc(msgsRef, {
+      text,
+      senderType: 'user',
+      senderId: userId,
+      senderName: user.displayName || user.email || 'Anonymous',
+      timestamp: serverTimestamp()
+    });
+
+  } catch (e) {
+    console.error("sendMessageUser error:", e);
+    alert("Failed to send — check console");
+  }
+}
+</script>
 </body>
 </html>

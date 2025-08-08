@@ -8,7 +8,7 @@ if (currentPage === "chat.html") {
 
 
 // Auto-typing Welcome Text (Home Page Only)
-if (currentPage === "" || currentPage === "index.html") {
+if (currentPage === "" || currentPage === "home.html") {
     const welcomeText = "Welcome to Rant2Me. A safe space to be heard.";
     let i = 0;
     const typingTarget = document.getElementById('typing-text');

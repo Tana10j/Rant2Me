@@ -1,60 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nutrition Chat</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Therapy Chat — Tana</title>
   <link rel="stylesheet" href="chat-style.css" />
 </head>
 <body>
   <div class="chat-container">
     <div class="chat-header">Chat with Tana (Therapist)</div>
-    
+
     <div class="chat-messages" id="chat-box">
+      <!-- initial bot line can remain; realtime listener will re-render if there are saved messages -->
       <div class="message bot">
-        <img src="assets/avatars/Tana.png" alt="Dorcas" class="avatar" />
-        <div class="bubble">Hey my name is Tana, therapist and certified listener. Penny for your thoughts?</div>
+        <img src="assets/avatars/Tana.png" class="avatar" />
+        <div class="bubble">Hello — I'm Tana, a professional listener. How can I help?</div>
       </div>
     </div>
-    
+
     <div class="chat-input">
       <input type="text" id="userInput" placeholder="Type your message..." />
-      <button onclick="sendMessage()">Send</button>
+      <button id="sendBtn">Send</button>
     </div>
   </div>
 
-  <script>
-    let hasReplied = false;
+  <script type="module">
+    // Imports
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import {
+      collection,
+      addDoc,
+      serverTimestamp,
+      query,
+      orderBy,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-    function sendMessage() {
-      const input = document.getElementById('userInput');
-      const msg = input.value.trim();
-      if (!msg) return;
+    // Page settings — change per section for other pages
+    const SECTION = "counselling";     // change to "nutrition" or "student" on other pages
+    const ADMIN_NAME = "Tana";         // admin display name for this page
 
-      const chatBox = document.getElementById('chat-box');
+    // DOM
+    const chatBox = document.getElementById('chat-box');
+    const input = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
 
-      // Append user message
-      const userMessage = document.createElement('div');
-      userMessage.classList.add('message', 'user');
-      userMessage.innerHTML = `<div class="bubble">${msg}</div>`;
-      chatBox.appendChild(userMessage);
+    // We'll set these once we have the user from Firebase Auth
+    let currentUid = null;
+    let messagesColRef = null; // will point to collection(db, 'chats', `${SECTION}_${uid}`, 'messages')
+    let unsubscribeSnapshot = null;
 
-      input.value = "";
-      chatBox.scrollTop = chatBox.scrollHeight;
-
-      // Only reply once
-      if (!hasReplied) {
-        hasReplied = true;
-        setTimeout(() => {
-          const botMessage = document.createElement('div');
-          botMessage.classList.add('message', 'bot');
-          botMessage.innerHTML = `
-            <img src="assets/avatars/Tana.png" alt="Dorcas" class="avatar" />
-            <div class="bubble">Thanks for your message! I’ll get back to you shortly.</div>`;
-          chatBox.appendChild(botMessage);
-          chatBox.scrollTop = chatBox.scrollHeight;
-        }, 800);
+    // Require auth: redirect to login if not signed in.
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        // Not signed in -> redirect to login
+        window.location.href = "index.html";
+        return;
       }
+
+      // Signed in: set UID and wire up listeners
+      currentUid = user.uid;
+      initRealtimeListenerForUser(currentUid);
+    });
+
+    // Initialize real-time listener for this user's chat subcollection
+    function initRealtimeListenerForUser(uid) {
+      // Compose path: chats/{section}_{uid}/messages
+      const chatDocId = `${SECTION}_${uid}`;
+      messagesColRef = collection(db, "chats", chatDocId, "messages");
+      const q = query(messagesColRef, orderBy("createdAt"));
+
+      // detach old snapshot if any
+      if (typeof unsubscribeSnapshot === "function") unsubscribeSnapshot();
+
+      unsubscribeSnapshot = onSnapshot(q, snapshot => {
+        // Re-render chat window from scratch (simple approach)
+        chatBox.innerHTML = ""; // clear
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          renderMessageToUI(d);
+        });
+        // keep scroll at bottom
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, err => {
+        console.error("Firestore listener error:", err);
+      });
+    }
+
+    // Render a message object to the chat UI (client-side only)
+    function renderMessageToUI(msg) {
+      // basic shape: { text, sender, userId, displayName, createdAt }
+      const el = document.createElement("div");
+      el.className = "message " + (msg.sender === "user" ? "user" : "bot");
+
+      if (msg.sender === "admin" || msg.sender === "bot") {
+        // bot/admin bubble with avatar
+        const avatarName = (msg.sender === "admin" && msg.adminName) ? msg.adminName : ADMIN_NAME;
+        el.innerHTML = `<img src="assets/avatars/${avatarName}.png" class="avatar" />
+                        <div class="bubble">${escapeHtml(msg.text)}</div>`;
+      } else {
+        el.innerHTML = `<div class="bubble">${escapeHtml(msg.text)}</div>`;
+      }
+      chatBox.appendChild(el);
+    }
+
+    // button handler
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text || !currentUid || !messagesColRef) return;
+
+      // Display immediately
+      renderMessageToUI({ text, sender: "user", userId: currentUid });
+      chatBox.scrollTop = chatBox.scrollHeight;
+      input.value = "";
+
+      // Save to Firestore
+      try {
+        await addDoc(messagesColRef, {
+          text,
+          sender: "user",
+          userId: currentUid,
+          displayName: auth.currentUser?.displayName || null,
+          createdAt: serverTimestamp(),
+          section: SECTION
+        });
+      } catch (err) {
+        console.error("Firestore write error:", err);
+        alert("Failed to send message — check console for details.");
+        return;
+      }
+
+      // Optional: one-time bot reply per session (so it doesn't spam after every user message)
+      // key name is unique to section+uid so other sections / users get their own flag
+      const botFlagKey = `botReplySent_${SECTION}_${currentUid}`;
+      if (!localStorage.getItem(botFlagKey)) {
+        localStorage.setItem(botFlagKey, "true");
+        const botText = `${ADMIN_NAME}: Thanks for your message! I’ll get back to you shortly.`;
+        // display locally quickly:
+        renderMessageToUI({ text: botText, sender: "bot" });
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+          await addDoc(messagesColRef, {
+            text: botText,
+            sender: "admin",    // admin message saved so admin can see it too
+            adminName: ADMIN_NAME,
+            userId: currentUid,
+            createdAt: serverTimestamp(),
+            section: SECTION
+          });
+        } catch (err) {
+          console.error("Firestore write error (bot reply):", err);
+        }
+      }
+    }
+
+    // small helper to prevent HTML injection in displayed messages
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str.replace(/[&<>"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;'
+      }[tag]));
     }
   </script>
 </body>

@@ -145,35 +145,33 @@
       }, err => console.error("Message listener error:", err));
     }
 
-    // Send reply
-    sendReplyBtn.addEventListener('click', async () => {
-      const text = replyInput.value.trim();
-      if (!text || !currentChatId) return;
-      const msgsRef = collection(db, 'chats', currentChatId, 'messages');
+   // Send reply
+sendReplyBtn.addEventListener('click', async () => {
+  const text = replyInput.value.trim();
+  if (!text || !currentChatId) return;
+  const msgsRef = collection(db, 'chats', currentChatId, 'messages');
 
-      // add message doc
-      try {
-        await addDoc(msgsRef, {
-          text,
-          senderType: 'admin',
-          senderId: currentUser.uid,
-          senderName: ADMIN_DISPLAY_NAME,
-          timestamp: serverTimestamp()
-        });
-
-        // update chat metadata
-        const chatRef = doc(db, 'chats', currentChatId);
-        await updateDoc(chatRef, {
-          lastUpdated: serverTimestamp(),
-          lastMessagePreview: text
-        });
-
-        replyInput.value = '';
-      } catch (e) {
-        console.error("Failed to send reply:", e);
-        alert("Failed to send reply — check console.");
-      }
+  try {
+    await addDoc(msgsRef, {
+      text,
+      senderType: 'admin',         // required by rules
+      senderId: currentUser.uid,   // required by rules
+      timestamp: serverTimestamp() // required by rules
     });
+
+    // update chat metadata
+    const chatRef = doc(db, 'chats', currentChatId);
+    await updateDoc(chatRef, {
+      lastUpdated: serverTimestamp(),
+      lastMessagePreview: text
+    });
+
+    replyInput.value = '';
+  } catch (e) {
+    console.error("Failed to send reply:", e);
+    alert("Failed to send reply — check console.");
+  }
+});
 
     // small helper to avoid XSS in chat preview (basic)
     function escapeHtml(str) {

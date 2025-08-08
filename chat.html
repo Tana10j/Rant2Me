@@ -9,7 +9,7 @@
   <header>
     <h1>Anonymous Chat</h1>
     <nav>
-      <a href="index.html">Home</a>
+      <a href="home.html">Home</a>
       <a href="chat.html">Chat</a>
       <a href="help.html">Help Centre</a>
       <a href="faq.html">FAQ</a>
@@ -54,61 +54,66 @@
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
+    authDomain: "rant2me-ab36b.firebaseapp.com",
+    projectId: "rant2me-ab36b",
+    storageBucket: "rant2me-ab36b.firebasestorage.app",
+    messagingSenderId: "245661393279",
+    appId: "1:245661393279:web:b31483f57a40cf2c807a4a"
   };
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  let userRole = "user"; // default
+  let userRole = "user";
+  let userEmail = "";
 
-  // Get the logged-in user's role
   onAuthStateChanged(auth, async (user) => {
     if (user) {
-      const token = await user.getIdTokenResult();
-      userRole = token.claims.role || "user"; // 'counselling', 'nutrition', 'student' or default 'user'
-      console.log("Logged in as role:", userRole);
+      const token = await user.getIdTokenResult(true);
+      userRole = token.claims.role || "user";
+      userEmail = user.email;
+
+      console.log(`Logged in as ${userEmail} with role ${userRole}`);
+
+      // Attach click handlers AFTER we know the role/email
+      document.querySelectorAll(".service-card").forEach(card => {
+        card.addEventListener("click", () => {
+          const service = card.querySelector("h3").innerText.trim().toLowerCase();
+
+          if (service.includes("counselling")) {
+            if (userRole === "counselling" || userEmail === "tana10j@gmail.com") {
+              location.href = "admin-counselling.html";
+            } else {
+              location.href = "chat-counselling.html";
+            }
+          }
+
+          if (service.includes("nutrition")) {
+            if (userRole === "nutrition" || userEmail === "edukdorcas@gmail.com") {
+              location.href = "admin-nutrition.html";
+            } else {
+              location.href = "chat-nutrition.html";
+            }
+          }
+
+          if (service.includes("student")) {
+            if (userRole === "student" || userEmail === "SOME_STUDENT_ADMIN_EMAIL") {
+              location.href = "admin-student.html";
+            } else {
+              location.href = "chat-student.html";
+            }
+          }
+
+          if (service.includes("anonymous")) {
+            location.href = "chat.html";
+          }
+        });
+      });
+    } else {
+      console.log("No user logged in — redirecting to login page");
+      window.location.href = "login.html";
     }
-  });
-
-  // Attach click handlers to each service card
-  document.querySelectorAll(".service-card").forEach(card => {
-    card.addEventListener("click", (e) => {
-      const service = card.querySelector("h3").innerText.trim().toLowerCase();
-
-      if (service.includes("counselling")) {
-        if (userRole === "counselling") {
-          location.href = "admin-counselling.html";
-        } else {
-          location.href = "chat-counselling.html";
-        }
-      }
-
-      if (service.includes("nutrition")) {
-        if (userRole === "nutrition") {
-          location.href = "admin-nutrition.html";
-        } else {
-          location.href = "chat-nutrition.html";
-        }
-      }
-
-      if (service.includes("student")) {
-        if (userRole === "student") {
-          location.href = "admin-student.html";
-        } else {
-          location.href = "chat-student.html";
-        }
-      }
-
-      if (service.includes("anonymous")) {
-        location.href = "chat.html"; // stays same for all
-      }
-    });
   });
 </script>
   <script src="script.js"></script>

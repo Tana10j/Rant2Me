@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin — Counselling (Tana)</title>
+  <title>Admin — Student (Chidera)</title>
   <link rel="stylesheet" href="admin-style.css" />
 </head>
 <body>
   <div class="admin-panel">
     <div class="threads">
-      <h2>Counselling — Chats</h2>
+      <h2>Student — Chats</h2>
       <div id="threadsList">Loading chats…</div>
     </div>
 
@@ -41,8 +41,8 @@
     } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     // CONFIG for this admin page
-    const ADMIN_SECTION = 'counselling'; // change for other admin pages
-    const ADMIN_DISPLAY_NAME = 'Tana';
+    const ADMIN_SECTION = 'student'; // change for other admin pages
+    const ADMIN_DISPLAY_NAME = 'Chidera';
 
     // UI refs
     const threadsListEl = document.getElementById('threadsList');
@@ -145,35 +145,33 @@
       }, err => console.error("Message listener error:", err));
     }
 
-    // Send reply
-    sendReplyBtn.addEventListener('click', async () => {
-      const text = replyInput.value.trim();
-      if (!text || !currentChatId) return;
-      const msgsRef = collection(db, 'chats', currentChatId, 'messages');
+   // Send reply
+sendReplyBtn.addEventListener('click', async () => {
+  const text = replyInput.value.trim();
+  if (!text || !currentChatId) return;
+  const msgsRef = collection(db, 'chats', currentChatId, 'messages');
 
-      // add message doc
-      try {
-        await addDoc(msgsRef, {
-          text,
-          senderType: 'admin',
-          senderId: currentUser.uid,
-          senderName: ADMIN_DISPLAY_NAME,
-          timestamp: serverTimestamp()
-        });
-
-        // update chat metadata
-        const chatRef = doc(db, 'chats', currentChatId);
-        await updateDoc(chatRef, {
-          lastUpdated: serverTimestamp(),
-          lastMessagePreview: text
-        });
-
-        replyInput.value = '';
-      } catch (e) {
-        console.error("Failed to send reply:", e);
-        alert("Failed to send reply — check console.");
-      }
+  try {
+    await addDoc(msgsRef, {
+      text,
+      senderType: 'admin',         // required by rules
+      senderId: currentUser.uid,   // required by rules
+      timestamp: serverTimestamp() // required by rules
     });
+
+    // update chat metadata
+    const chatRef = doc(db, 'chats', currentChatId);
+    await updateDoc(chatRef, {
+      lastUpdated: serverTimestamp(),
+      lastMessagePreview: text
+    });
+
+    replyInput.value = '';
+  } catch (e) {
+    console.error("Failed to send reply:", e);
+    alert("Failed to send reply — check console.");
+  }
+});
 
     // small helper to avoid XSS in chat preview (basic)
     function escapeHtml(str) {

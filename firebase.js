@@ -1,6 +1,5 @@
 // firebase.js
-// Put this file at the project root and import { auth, db } from './firebase.js' in pages.
-
+// single module to initialize firebase and export auth & db
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";

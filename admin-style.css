@@ -61,3 +61,35 @@ body {
   .threads { order:2; height: 40vh; }
   .chat-area { order:1; height: 50vh; }
 }
+.chat-box {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-left: 1px solid #ddd;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.message-form {
+  display: flex;
+  border-top: 1px solid #ddd;
+}
+
+.message-form input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+}
+
+.message-form button {
+  padding: 10px 20px;
+  border: none;
+  background-color: purple;
+  color: white;
+  cursor: pointer;
+}

@@ -28,15 +28,14 @@
   import { auth, db } from './firebase.js';
   import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
   import {
-    getFirestore, 
     collection,
     addDoc,
     serverTimestamp,
     query,
     orderBy,
     onSnapshot,
-    doc,        // ⬅️ ADD THIS
-    setDoc      // ⬅️ AND THIS
+    doc,
+    setDoc
   } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
   const SECTION = "counselling";
@@ -50,6 +49,7 @@
   let messagesColRef = null;
   let unsubscribeSnapshot = null;
 
+  // Auth listener
   onAuthStateChanged(auth, user => {
     if (!user) {
       window.location.href = "index.html";
@@ -59,6 +59,7 @@
     initRealtimeListenerForUser(currentUid);
   });
 
+  // Start Firestore listener for this user
   function initRealtimeListenerForUser(uid) {
     const chatDocId = `${SECTION}_${uid}`;
     messagesColRef = collection(db, "chats", chatDocId, "messages");
@@ -68,9 +69,8 @@
 
     unsubscribeSnapshot = onSnapshot(q, snapshot => {
       chatBox.innerHTML = "";
-      snapshot.forEach(doc => {
-        const d = doc.data();
-        renderMessageToUI(d);
+      snapshot.forEach(docSnap => {
+        renderMessageToUI(docSnap.data());
       });
       chatBox.scrollTop = chatBox.scrollHeight;
     }, err => {
@@ -78,12 +78,19 @@
     });
   }
 
+  // Render message to UI
   function renderMessageToUI(msg) {
     const el = document.createElement("div");
-    el.className = "message " + (msg.senderType === "user" ? "user" : "bot");
+
+    // Normalize sender type
+    let typeClass = "bot";
+    if (msg.senderType === "user") typeClass = "user";
+    if (msg.senderType === "admin") typeClass = "bot";
+
+    el.className = "message " + typeClass;
 
     if (msg.senderType === "admin" || msg.senderType === "bot") {
-      const avatarName = (msg.senderType === "admin" && msg.adminName) ? msg.adminName : ADMIN_NAME;
+      const avatarName = msg.adminName || ADMIN_NAME;
       el.innerHTML = `<img src="assets/avatars/${avatarName}.png" class="avatar" />
                       <div class="bubble">${escapeHtml(msg.text)}</div>`;
     } else {
@@ -92,46 +99,47 @@
     chatBox.appendChild(el);
   }
 
+  // Send message
   sendBtn.addEventListener("click", sendMessage);
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") sendMessage();
   });
 
   async function sendMessage() {
-  const text = input.value.trim();
-  if (!text || !currentUid || !messagesColRef) return;
+    const text = input.value.trim();
+    if (!text || !currentUid || !messagesColRef) return;
+    input.value = "";
 
-  input.value = "";
+    try {
+      // Ensure parent chat doc exists
+      const chatDocId = `${SECTION}_${currentUid}`;
+      const chatDocRef = doc(db, "chats", chatDocId);
+      await setDoc(chatDocRef, {
+        section: SECTION,
+        userId: currentUid,
+        createdAt: serverTimestamp()
+      }, { merge: true });
 
-  try {
-    // Ensure chat doc exists
-    const chatDocId = `${SECTION}_${currentUid}`;
-    const chatDocRef = doc(db, "chats", chatDocId);
-    await setDoc(chatDocRef, {
-      section: SECTION,
-      userId: currentUid,
-      createdAt: serverTimestamp()
-    }, { merge: true });
+      // Add user message
+      await addDoc(messagesColRef, {
+        text,
+        senderType: "user",
+        senderId: currentUid,
+        timestamp: serverTimestamp()
+      });
 
-    // Add user message
-    await addDoc(messagesColRef, {
-      text,
-      senderType: "user",
-      senderId: currentUid,
-      timestamp: serverTimestamp()
-    });
+    } catch (err) {
+      console.error("Firestore write error:", err);
+      alert("Failed to send message — check console for details.");
+      return;
+    }
 
-  } catch (err) {
-    console.error("Firestore write error:", err);
-    alert("Failed to send message — check console for details.");
-    return;
-  }
-
+    // Send first-time auto-reply from bot/admin (per device)
     const botFlagKey = `botReplySent_${SECTION}_${currentUid}`;
     if (!localStorage.getItem(botFlagKey)) {
       localStorage.setItem(botFlagKey, "true");
-      const botText = `${ADMIN_NAME}: Thanks for your message! I’ll get back to you shortly.`;
-      renderMessageToUI({ text: botText, senderType: "bot" });
+      const botText = `Thanks for your message! I’ll get back to you shortly.`;
+      renderMessageToUI({ text: botText, senderType: "admin", adminName: ADMIN_NAME });
       chatBox.scrollTop = chatBox.scrollHeight;
 
       try {

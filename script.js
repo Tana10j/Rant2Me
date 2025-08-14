@@ -106,7 +106,7 @@ if (currentPage === "chat.html") {
 
         setTimeout(() => {
             const botMsg = document.createElement('p');
-            botMsg.textContent = "Anonymous Bot: I'm here for you. 💜";
+            botMsg.textContent = "Anonymous Bot: Hi, and yes I am a bot. While I may not respond in real-time, I'm here to listen and support you. Our admins can also see your rants, so if you would like to Speak on it further, you can choose whichever section works for you below. In 5 minutes, I will delete this conversation to ensure your privacy.";
             chatOutput.appendChild(botMsg);
         }, 800);
 

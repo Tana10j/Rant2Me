@@ -1,178 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lifestyle Chat</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Student Chat — Chidera</title>
   <link rel="stylesheet" href="chat-style.css" />
 </head>
 <body>
   <div class="chat-container">
     <div class="chat-header">Chat with Chidera (Student)</div>
+
     <div class="chat-messages" id="chat-box">
+      <!-- initial bot line can remain; realtime listener will re-render if there are saved messages -->
       <div class="message bot">
         <img src="assets/avatars/Chi.png" class="avatar" />
-        <div class="bubble">Chidera here, Lifestyle Entustist and Chill Lady. How can I help you today?</div>
+        <div class="bubble">Hi my name is Chidera, student and lifestyle enthusist. What is on your mind?</div>
       </div>
     </div>
+
     <div class="chat-input">
       <input type="text" id="userInput" placeholder="Type your message..." />
-      <button onclick="sendMessage()">Send</button>
+      <button id="sendBtn">Send</button>
     </div>
   </div>
 
   <script type="module">
-    import { db } from './firebase.js';
-    import {
-      doc,
-      getDoc,
-      setDoc,
-      updateDoc,
-      arrayUnion,
-      Timestamp
-    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+  import { auth, db } from './firebase.js';
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+  import {
+    collection,
+    addDoc,
+    serverTimestamp,
+    query,
+    orderBy,
+    onSnapshot,
+    doc,
+    setDoc
+  } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-    const input = document.getElementById("userInput");
-    const chatBox = document.getElementById("chat-box");
-    const section = "student";
-    const adminName = "Chidera";
+  const SECTION = "student";
+  const ADMIN_NAME = "Chidera";
 
-    const userId = localStorage.getItem("userId") || (() => {
-      const id = crypto.randomUUID();
-      localStorage.setItem("userId", id);
-      return id;
-    })();
+  const chatBox = document.getElementById('chat-box');
+  const input = document.getElementById('userInput');
+  const sendBtn = document.getElementById('sendBtn');
 
-    const docId = `${section}_${userId}`;
-    const docRef = doc(db, "messages", docId);
+  let currentUid = null;
+  let messagesColRef = null;
+  let unsubscribeSnapshot = null;
 
-    async function sendMessage() {
-      const text = input.value.trim();
-      if (!text) return;
+  // Auth listener
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      window.location.href = "index.html";
+      return;
+    }
+    currentUid = user.uid;
+    initRealtimeListenerForUser(currentUid);
+  });
 
-      display(text, 'user');
-      input.value = "";
+  // Start Firestore listener for this user
+  function initRealtimeListenerForUser(uid) {
+    const chatDocId = `${SECTION}_${uid}`;
+    messagesColRef = collection(db, "chats", chatDocId, "messages");
+    const q = query(messagesColRef, orderBy("timestamp"));
 
-      const messageData = {
-        text: text,
-        sender: "user",
-        timestamp: Timestamp.now()
-      };
+    if (typeof unsubscribeSnapshot === "function") unsubscribeSnapshot();
+
+    unsubscribeSnapshot = onSnapshot(q, snapshot => {
+      chatBox.innerHTML = "";
+      snapshot.forEach(docSnap => {
+        renderMessageToUI(docSnap.data());
+      });
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }, err => {
+      console.error("Firestore listener error:", err);
+    });
+  }
+
+  // Render message to UI
+  function renderMessageToUI(msg) {
+    const el = document.createElement("div");
+
+    // Normalize sender type
+    let typeClass = "bot";
+    if (msg.senderType === "user") typeClass = "user";
+    if (msg.senderType === "admin") typeClass = "bot";
+
+    el.className = "message " + typeClass;
+
+    if (msg.senderType === "admin" || msg.senderType === "bot") {
+      const avatarName = msg.adminName || ADMIN_NAME;
+      el.innerHTML = `<img src="assets/avatars/${avatarName}.png" class="avatar" />
+                      <div class="bubble">${escapeHtml(msg.text)}</div>`;
+    } else {
+      el.innerHTML = `<div class="bubble">${escapeHtml(msg.text)}</div>`;
+    }
+    chatBox.appendChild(el);
+  }
+
+  // Send message
+  sendBtn.addEventListener("click", sendMessage);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text || !currentUid || !messagesColRef) return;
+    input.value = "";
+
+    try {
+      // Ensure parent chat doc exists
+      const chatDocId = `${SECTION}_${currentUid}`;
+      const chatDocRef = doc(db, "chats", chatDocId);
+      await setDoc(chatDocRef, {
+        section: SECTION,
+        userId: currentUid,
+        createdAt: serverTimestamp()
+      }, { merge: true });
+
+      // Add user message
+      await addDoc(messagesColRef, {
+        text,
+        senderType: "user",
+        senderId: currentUid,
+        timestamp: serverTimestamp()
+      });
+
+    } catch (err) {
+      console.error("Firestore write error:", err);
+      alert("Failed to send message — check console for details.");
+      return;
+    }
+
+    // Send first-time auto-reply from bot/admin (per device)
+    const botFlagKey = `botReplySent_${SECTION}_${currentUid}`;
+    if (!localStorage.getItem(botFlagKey)) {
+      localStorage.setItem(botFlagKey, "true");
+      const botText = `Thanks for your message! I’ll get back to you shortly.`;
+      renderMessageToUI({ text: botText, senderType: "admin", adminName: ADMIN_NAME });
+      chatBox.scrollTop = chatBox.scrollHeight;
 
       try {
-        const docSnap = await getDoc(docRef);
-        if (!docSnap.exists()) {
-          await setDoc(docRef, {
-            section,
-            userId,
-            createdAt: Timestamp.now(),
-            messages: []
-          });
-        }
-
-        await updateDoc(docRef, {
-          messages: arrayUnion(messageData)
-        });
-
-      } catch (e) {
-        console.error("🔥 Firestore write error:", e);
-        return;
-      }
-
-      // Bot replies only once
-      if (!localStorage.getItem("hasReplied")) {
-        localStorage.setItem("hasReplied", "true");
-
-        const botText = `${adminName}: Thanks for your message! I’ll get back to you shortly.`;
-        const botMsg = {
+        await addDoc(messagesColRef, {
           text: botText,
-          sender: "admin",
-          timestamp: Timestamp.now()
-        };
-
-        setTimeout(async () => {
-          display(botText, 'bot');
-
-          try {
-            await updateDoc(docRef, {
-              messages: arrayUnion(botMsg)
-            });
-          } catch (e) {
-            console.error("🔥 Bot Firestore write error:", e);
-          }
-        }, 800);
+          senderType: "admin",
+          senderId: "system",
+          adminName: ADMIN_NAME,
+          timestamp: serverTimestamp(),
+          section: SECTION
+        });
+      } catch (err) {
+        console.error("Firestore write error (bot reply):", err);
       }
     }
-
-    function display(text, sender) {
-      const msg = document.createElement('div');
-      msg.className = `message ${sender}`;
-      msg.innerHTML = sender === 'bot'
-        ? `<img src="assets/avatars/${adminName}.png" class="avatar" /><div class="bubble">${text}</div>`
-        : `<div class="bubble">${text}</div>`;
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    window.sendMessage = sendMessage;
-  </script>
-  <script type="module">
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
-    authDomain: "rant2me-ab36b.firebaseapp.com",
-    projectId: "rant2me-ab36b",
-    // Add other config
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-import { db, auth } from './firebase.js';
-import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-async function sendMessageUser(section, text) {
-  const user = auth.currentUser;
-  if (!user) { alert("Please login"); return; }
-  const userId = user.uid;
-  const chatId = `${section}_${userId}`; // consistent id pattern
-  const chatRef = doc(db, 'chats', chatId);
-
-  try {
-    const snap = await getDoc(chatRef);
-    if (!snap.exists()) {
-      await setDoc(chatRef, {
-        section,
-        userId,
-        userName: user.email || "Anonymous",
-        createdAt: serverTimestamp(),
-        lastUpdated: serverTimestamp(),
-        lastMessagePreview: text
-      });
-    } else {
-      await updateDoc(chatRef, {
-        lastUpdated: serverTimestamp(),
-        lastMessagePreview: text
-      });
-    }
-
-    // add message to subcollection
-    const msgsRef = collection(db, 'chats', chatId, 'messages');
-    await addDoc(msgsRef, {
-      text,
-      senderType: 'user',
-      senderId: userId,
-      senderName: user.displayName || user.email || 'Anonymous',
-      timestamp: serverTimestamp()
-    });
-
-  } catch (e) {
-    console.error("sendMessageUser error:", e);
-    alert("Failed to send — check console");
   }
-}
+
+  function escapeHtml(str) {
+    if (!str) return "";
+    return str.replace(/[&<>"]/g, tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;'
+    }[tag]));
+  }
 </script>
 </body>
 </html>

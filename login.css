@@ -1,50 +1,79 @@
 :root {
-  --primary-color: #75105b;
-  --secondary-color: #f5f5f5;
-  --accent-color: #4a90e2;
-  --dark-color: #333;
+  --primary-color: #5a189a; /* Royal Purple */
+  --secondary-color: rgba(255, 255, 255, 0.6);
+  --accent-color: #f6c90e; /* Gold */
+  --dark-color: #1a1a1a;
   --light-color: #fff;
   --danger-color: #e74c3c;
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --border-glow: rgba(246, 201, 14, 0.7);
 }
 
+/* Background Gradient with animation */
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--secondary-color);
+  background: linear-gradient(135deg, #3c096c, #9d4edd, #7b2cbf, #5a189a);
+  background-size: 300% 300%;
+  animation: bgMove 15s ease infinite;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
 }
 
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Glassmorphism Login Card */
 .login-container {
-  background-color: var(--light-color);
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  padding: 40px 30px;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   text-align: center;
+  border: 1px solid rgba(255,255,255,0.2);
+  animation: floatUp 1.5s ease forwards;
 }
 
+@keyframes floatUp {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Title with gold shimmer */
 .site-title {
-  font-size: 2.8rem;
+  font-size: 3rem;
   font-weight: bold;
-  color: var(--primary-color);
-  margin: 0;
-  text-shadow: 1px 1px 2px var(--dark-color);
+  background: linear-gradient(90deg, var(--accent-color), #fff8d6, var(--accent-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: goldShine 4s linear infinite;
+  margin: 0 0 8px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 15px rgba(246, 201, 14, 0.5);
 }
 
-.site-title span {
-  color: var(--accent-color);
+@keyframes goldShine {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
 }
 
 .tagline {
-  font-size: 0.95rem;
-  color: #777;
-  margin-bottom: 30px;
+  font-size: 1rem;
+  color: #f1f1f1;
+  margin-bottom: 25px;
+  font-style: italic;
 }
 
+/* Tabs Styling */
 .tabs {
   display: flex;
   justify-content: space-around;
@@ -52,21 +81,27 @@ body {
 }
 
 .tabs button {
-  padding: 10px 20px;
+  padding: 10px 18px;
   border: none;
-  background: none;
+  background: transparent;
   font-size: 16px;
   cursor: pointer;
+  color: #ddd;
   border-bottom: 2px solid transparent;
   transition: all 0.3s ease;
 }
 
 .tabs button.active-tab {
-  border-bottom: 2px solid var(--primary-color);
+  border-bottom: 2px solid var(--accent-color);
+  color: var(--accent-color);
   font-weight: bold;
-  color: var(--primary-color);
 }
 
+.tabs button:hover {
+  color: var(--accent-color);
+}
+
+/* Forms */
 .form {
   display: none;
   flex-direction: column;
@@ -77,57 +112,52 @@ body {
 }
 
 .form input {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   padding: 12px;
   font-size: 15px;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(255,255,255,0.3);
   border-radius: 8px;
   outline: none;
-  transition: border-color 0.3s ease;
+  background: rgba(255,255,255,0.1);
+  color: var(--light-color);
+  transition: all 0.3s ease;
 }
 
 .form input:focus {
   border-color: var(--accent-color);
+  box-shadow: 0 0 10px var(--border-glow);
+  background: rgba(255,255,255,0.2);
 }
 
+/* Button with pulse glow */
 .form button {
   padding: 12px;
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   color: var(--light-color);
   font-size: 16px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   margin-top: 10px;
+  box-shadow: 0 0 10px rgba(90, 24, 154, 0.5);
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .form button:hover {
-  background-color: #700d65;
+  background: #3c096c;
+  box-shadow: 0 0 15px var(--accent-color), 0 0 25px var(--accent-color);
+  transform: scale(1.05);
 }
 
+/* Error Messages */
 #error-msg,
 #login-error-msg,
 #signup-error-msg {
   margin-top: 12px;
   font-size: 0.9rem;
-}
-.site-title {
-  font-size: 2.8rem;
-  font-weight: bold;
-  color: var(--primary-color);
-  margin: 0;
-  text-shadow: 1px 1px 2px var(--dark-color);
-  background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--primary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shine 3s linear infinite;
-}
-
-@keyframes shine {
-  0% {
-    background-position: -500%;
-  }
-  100% {
-    background-position: 500%;
-  }
+  color: var(--danger-color);
+  background: rgba(231, 76, 60, 0.15);
+  padding: 6px;
+  border-radius: 6px;
 }

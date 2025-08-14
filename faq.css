@@ -1,103 +1,126 @@
+/* Global Reset & Font */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #2c0f4a, #4b1f6f);
+  color: #f5e6c8;
+  line-height: 1.6;
+}
+
+/* Header */
+header {
+  background: linear-gradient(90deg, #4b1f6f, #2c0f4a);
+  padding: 20px;
+  color: #ffd700;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+header h1 {
+  margin-bottom: 10px;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+}
+
+/* Navigation */
+nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+nav a {
+  color: #ffd700;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+nav a:hover,
+nav a.active {
+  background-color: rgba(255, 215, 0, 0.2);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+}
+
+/* FAQ Section */
+.faq-section {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.faq-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* FAQ Card */
+.faq {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease, box-shadow 0.4s ease;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
+}
+
+/* Glow / Pulse Effect */
+.faq:hover {
+  transform: scale(1.02);
+  animation: pulseGlow 1.5s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2), 0 0 30px rgba(255, 215, 0, 0.1);
   }
-  
-  body {
-    background: #f9f9fb;
-    color: #333;
-    line-height: 1.6;
+  100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 215, 0, 0.25);
   }
-  
-  header {
-    background: #4a90e2;
-    padding: 20px;
-    color: white;
-    text-align: center;
-  }
-  
-  header h1 {
-    margin-bottom: 10px;
-  }
-  
-  nav {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-  
-  nav a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 4px;
-  }
-  
-  nav a:hover,
-  nav a.active {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-  
-  .faq-section {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 0 20px;
-  }
-  
-  .faq-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  .faq {
-    background: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .faq:hover {
-    transform: scale(1.01);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-  }
-  
-  .question {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 10px;
-    position: relative;
-  }
-  
-  .question::after {
-    content: '+';
-    float: right;
-    font-size: 1.2rem;
-    transition: transform 0.3s ease;
-  }
-  
-  .faq.open .question::after {
-    content: '-';
-  }
-  
-  .answer {
-    max-height: 0;
-    overflow: hidden;
-    font-size: 0.95rem;
-    color: #555;
-    transition: max-height 0.4s ease, opacity 0.4s ease;
-    opacity: 0;
-  }
-  
-  .faq.open .answer {
-    max-height: 300px;
-    opacity: 1;
-    margin-top: 10px;
-  }
-  
+}
+
+/* Question */
+.question {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  position: relative;
+  color: #ffd700;
+}
+
+.question::after {
+  content: '+';
+  float: right;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+  color: #ffd700;
+}
+
+.faq.open .question::after {
+  content: '-';
+}
+
+/* Answer */
+.answer {
+  max-height: 0;
+  overflow: hidden;
+  font-size: 0.95rem;
+  color: #f5e6c8;
+  transition: max-height 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
+}
+
+.faq.open .answer {
+  max-height: 300px;
+  opacity: 1;
+  margin-top: 10px;
+}

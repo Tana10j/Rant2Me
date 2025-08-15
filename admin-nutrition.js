@@ -1,5 +1,3 @@
-// admin-counselling.js
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import {
   getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp
@@ -8,7 +6,6 @@ import {
   getAuth, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
-// TODO: replace with your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
   authDomain: "rant2me-ab36b.firebaseapp.com",
@@ -22,24 +19,20 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// HTML elements
 const threadsList = document.getElementById("threadsList");
-const messagesContainer = document.getElementById("messagesContainer");
-const messageForm = document.getElementById("messageForm");
-const messageInput = document.getElementById("messageInput");
+const messagesContainer = document.getElementById("messages");
+const replyInput = document.getElementById("replyInput");
+const sendReplyBtn = document.getElementById("sendReplyBtn");
 
 let selectedChatId = null;
 let unsubscribeMessages = null;
 
-// Listen for auth state changes
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     alert("You must be signed in as admin to view this page.");
-    window.location.href = "login.html"; // redirect if not logged in
+    window.location.href = "login.html";
     return;
   }
-
-  // Load nutrition chat threads
   loadNutritionThreads();
 });
 
@@ -64,9 +57,7 @@ function selectChatThread(chatId) {
   selectedChatId = chatId;
   messagesContainer.innerHTML = "";
 
-  if (unsubscribeMessages) {
-    unsubscribeMessages(); // stop previous listener
-  }
+  if (unsubscribeMessages) unsubscribeMessages();
 
   const messagesRef = collection(db, "chats", chatId, "messages");
   const q = query(messagesRef, orderBy("timestamp", "asc"));
@@ -82,15 +73,13 @@ function selectChatThread(chatId) {
   });
 }
 
-// Send message as admin
-messageForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+sendReplyBtn.addEventListener("click", async () => {
   if (!selectedChatId) {
     alert("Please select a chat thread first.");
     return;
   }
 
-  const text = messageInput.value.trim();
+  const text = replyInput.value.trim();
   if (!text) return;
 
   const messagesRef = collection(db, "chats", selectedChatId, "messages");
@@ -101,5 +90,5 @@ messageForm.addEventListener("submit", async (e) => {
     timestamp: serverTimestamp()
   });
 
-  messageInput.value = "";
+  replyInput.value = "";
 });

@@ -1,14 +1,14 @@
-// admin-counselling.js
+// admin-student.js
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import {
   getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import {
-  getAuth, onAuthStateChanged
+  getAuth, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
-// TODO: replace with your Firebase config
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
   authDomain: "rant2me-ab36b.firebaseapp.com",
@@ -22,51 +22,56 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// HTML elements
+// Elements
 const threadsList = document.getElementById("threadsList");
 const messagesContainer = document.getElementById("messagesContainer");
 const messageForm = document.getElementById("messageForm");
 const messageInput = document.getElementById("messageInput");
+const chatHeaderTitle = document.getElementById("chatHeaderTitle");
+const signOutBtn = document.getElementById("signOutBtn");
 
 let selectedChatId = null;
 let unsubscribeMessages = null;
 
-// Listen for auth state changes
+// Auth state listener
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     alert("You must be signed in as admin to view this page.");
-    window.location.href = "login.html"; // redirect if not logged in
+    window.location.href = "login.html";
     return;
   }
-
-  // Load student chat threads
   loadStudentThreads();
 });
 
+// Load student section chats
 function loadStudentThreads() {
   const chatsRef = collection(db, "chats");
   const q = query(chatsRef, where("section", "==", "student"), orderBy("createdAt", "desc"));
 
   onSnapshot(q, (snapshot) => {
     threadsList.innerHTML = "";
+    if (snapshot.empty) {
+      threadsList.innerHTML = "<li>No chats found.</li>";
+      return;
+    }
     snapshot.forEach((doc) => {
       const chatData = doc.data();
       const li = document.createElement("li");
       li.textContent = `User: ${chatData.userId}`;
       li.style.cursor = "pointer";
-      li.onclick = () => selectChatThread(doc.id);
+      li.onclick = () => selectChatThread(doc.id, chatData.userId);
       threadsList.appendChild(li);
     });
   });
 }
 
-function selectChatThread(chatId) {
+// Select and display a chat thread
+function selectChatThread(chatId, userId) {
   selectedChatId = chatId;
+  chatHeaderTitle.textContent = `Chat with ${userId}`;
   messagesContainer.innerHTML = "";
 
-  if (unsubscribeMessages) {
-    unsubscribeMessages(); // stop previous listener
-  }
+  if (unsubscribeMessages) unsubscribeMessages();
 
   const messagesRef = collection(db, "chats", chatId, "messages");
   const q = query(messagesRef, orderBy("timestamp", "asc"));
@@ -76,9 +81,11 @@ function selectChatThread(chatId) {
     snapshot.forEach((doc) => {
       const msg = doc.data();
       const div = document.createElement("div");
+      div.className = msg.senderType === "admin" ? "message admin" : "message user";
       div.textContent = `${msg.senderType}: ${msg.text}`;
       messagesContainer.appendChild(div);
     });
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
   });
 }
 
@@ -95,11 +102,16 @@ messageForm.addEventListener("submit", async (e) => {
 
   const messagesRef = collection(db, "chats", selectedChatId, "messages");
   await addDoc(messagesRef, {
-    text: text,
+    text,
     senderType: "admin",
     senderId: auth.currentUser.uid,
     timestamp: serverTimestamp()
   });
 
   messageInput.value = "";
+});
+
+// Sign out
+signOutBtn.addEventListener("click", () => {
+  signOut(auth);
 });

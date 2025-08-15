@@ -1,14 +1,11 @@
-// admin-counselling.js
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import {
-  getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp
+  getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, getDocs, updateDoc
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import {
   getAuth, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
-// TODO: replace with your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
   authDomain: "rant2me-ab36b.firebaseapp.com",
@@ -22,25 +19,24 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// HTML elements
 const threadsList = document.getElementById("threadsList");
-const messagesContainer = document.getElementById("messagesContainer");
-const messageForm = document.getElementById("messageForm");
-const messageInput = document.getElementById("messageInput");
+const messagesContainer = document.getElementById("messages");
+const replyInput = document.getElementById("replyInput");
+const sendReplyBtn = document.getElementById("sendReplyBtn");
+const globalUnreadEl = document.getElementById("globalUnread");
 
 let selectedChatId = null;
+let selectedUserId = null;
 let unsubscribeMessages = null;
 
-// Listen for auth state changes
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     alert("You must be signed in as admin to view this page.");
-    window.location.href = "login.html"; // redirect if not logged in
+    window.location.href = "login.html";
     return;
   }
-
-  // Load counselling chat threads
   loadCounsellingThreads();
+  listenForUnreadMessages();
 });
 
 function loadCounsellingThreads() {
@@ -52,21 +48,23 @@ function loadCounsellingThreads() {
     snapshot.forEach((doc) => {
       const chatData = doc.data();
       const li = document.createElement("li");
-      li.textContent = `User: ${chatData.userId}`;
       li.style.cursor = "pointer";
-      li.onclick = () => selectChatThread(doc.id);
+
+      // Add user name and badge
+      li.innerHTML = `User: ${chatData.userId} <span class="badge user-badge hidden" data-user="${chatData.userId}">0</span>`;
+      li.onclick = () => selectChatThread(doc.id, chatData.userId);
+
       threadsList.appendChild(li);
     });
   });
 }
 
-function selectChatThread(chatId) {
+function selectChatThread(chatId, userId) {
   selectedChatId = chatId;
+  selectedUserId = userId;
   messagesContainer.innerHTML = "";
 
-  if (unsubscribeMessages) {
-    unsubscribeMessages(); // stop previous listener
-  }
+  if (unsubscribeMessages) unsubscribeMessages();
 
   const messagesRef = collection(db, "chats", chatId, "messages");
   const q = query(messagesRef, orderBy("timestamp", "asc"));
@@ -80,17 +78,18 @@ function selectChatThread(chatId) {
       messagesContainer.appendChild(div);
     });
   });
+
+  // Mark messages as read for this user
+  markMessagesAsRead(chatId);
 }
 
-// Send message as admin
-messageForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+sendReplyBtn.addEventListener("click", async () => {
   if (!selectedChatId) {
     alert("Please select a chat thread first.");
     return;
   }
 
-  const text = messageInput.value.trim();
+  const text = replyInput.value.trim();
   if (!text) return;
 
   const messagesRef = collection(db, "chats", selectedChatId, "messages");
@@ -98,8 +97,63 @@ messageForm.addEventListener("submit", async (e) => {
     text: text,
     senderType: "admin",
     senderId: auth.currentUser.uid,
-    timestamp: serverTimestamp()
+    timestamp: serverTimestamp(),
+    isRead: true // admin's own messages are always "read"
   });
 
-  messageInput.value = "";
+  replyInput.value = "";
 });
+
+async function markMessagesAsRead(chatId) {
+  const messagesRef = collection(db, "chats", chatId, "messages");
+  const unreadSnap = await getDocs(query(messagesRef, where("senderType", "==", "user"), where("isRead", "==", false)));
+  
+  unreadSnap.forEach((docSnap) => {
+    updateDoc(docSnap.ref, { isRead: true });
+  });
+}
+
+function listenForUnreadMessages() {
+  const chatsRef = collection(db, "chats");
+  onSnapshot(chatsRef, (chatSnap) => {
+    let totalUnread = 0;
+    const userUnreadCounts = {};
+
+    chatSnap.forEach((chatDoc) => {
+      const chatId = chatDoc.id;
+      const userId = chatDoc.data().userId;
+
+      const messagesRef = collection(db, "chats", chatId, "messages");
+      const q = query(messagesRef, where("senderType", "==", "user"), where("isRead", "==", false));
+
+      onSnapshot(q, (msgSnap) => {
+        const count = msgSnap.size;
+        if (count > 0) {
+          totalUnread += count;
+          userUnreadCounts[userId] = count;
+        } else {
+          userUnreadCounts[userId] = 0;
+        }
+
+        // Update user badge
+        const badge = document.querySelector(`.user-badge[data-user="${userId}"]`);
+        if (badge) {
+          if (userUnreadCounts[userId] > 0) {
+            badge.textContent = userUnreadCounts[userId];
+            badge.classList.remove("hidden");
+          } else {
+            badge.classList.add("hidden");
+          }
+        }
+
+        // Update global badge
+        if (totalUnread > 0) {
+          globalUnreadEl.textContent = totalUnread;
+          globalUnreadEl.classList.remove("hidden");
+        } else {
+          globalUnreadEl.classList.add("hidden");
+        }
+      });
+    });
+  });
+}

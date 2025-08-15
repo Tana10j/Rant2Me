@@ -8,11 +8,13 @@
 </head>
 <body>
   <div class="admin-panel">
+    <!-- Thread List -->
     <div class="threads">
       <h2>Student — Chats</h2>
-      <div id="threadsList">Loading chats…</div>
+      <ul id="threadsList">Loading chats…</ul>
     </div>
 
+    <!-- Chat Area -->
     <div class="chat-area">
       <div class="chat-header">
         <div id="chatHeaderTitle" class="title">Select a chat</div>
@@ -21,26 +23,17 @@
         </div>
       </div>
 
-      <div id="messages" class="messages">
+      <div id="messagesContainer" class="messages">
         <div style="color:#777">No chat selected</div>
       </div>
 
-      <div class="input-area">
-        <input id="replyInput" placeholder="Type your reply..." />
-        <button id="sendReplyBtn">Send</button>
-      </div>
+      <form id="messageForm" class="input-area">
+        <input type="text" id="messageInput" placeholder="Type your reply..." required />
+        <button type="submit">Send</button>
+      </form>
     </div>
   </div>
 
   <script type="module" src="./admin-student.js"></script>
-<div class="chat-box">
-  <div id="messagesContainer" class="messages"></div>
-
-  <form id="messageForm" class="message-form">
-    <input type="text" id="messageInput" placeholder="Type your reply..." required />
-    <button type="submit">Send</button>
-  </form>
-</div>
-</form>
 </body>
 </html>

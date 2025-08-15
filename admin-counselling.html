@@ -9,13 +9,16 @@
 <body>
   <div class="admin-panel">
     <div class="threads">
-      <h2>Counselling — Chats</h2>
+      <h2>
+        Counselling Chat-list
+        <span id="globalUnread" class="badge hidden">0</span>
+      </h2>
       <div id="threadsList">Loading chats…</div>
     </div>
 
     <div class="chat-area">
       <div class="chat-header">
-        <div id="chatHeaderTitle" class="title">Select a chat</div>
+        <div id="chatHeaderTitle" class="title">Chat Section</div>
         <div style="margin-left:auto">
           <button id="signOutBtn" style="background:#eee;border:none;padding:8px 10px;border-radius:8px;cursor:pointer;">Sign out</button>
         </div>
@@ -33,14 +36,5 @@
   </div>
 
   <script type="module" src="./admin-counselling.js"></script>
-<div class="chat-box">
-  <div id="messagesContainer" class="messages"></div>
-
-  <form id="messageForm" class="message-form">
-    <input type="text" id="messageInput" placeholder="Type your reply..." required />
-    <button type="submit">Send</button>
-  </form>
-</div>
-</form>
 </body>
 </html>

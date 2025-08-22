@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Admin – Beta Access</title>
+  <link rel="stylesheet" href="admin-style.css" />
+</head>
+<body>
+  <div class="admin-panel" style="max-width:800px;grid-template-columns:1fr;">
+    <div class="threads" style="padding:16px;">
+      <h2>Grant Beta Access</h2>
+      <p>Admins only. Enter user email and choose sections to grant beta access.</p>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <input id="email" placeholder="user@example.com" style="flex:1; padding:10px; border-radius:8px;"/>
+        <label><input type="checkbox" id="chkCounselling"> Counselling</label>
+        <label><input type="checkbox" id="chkNutrition"> Nutrition</label>
+        <label><input type="checkbox" id="chkStudent"> Student</label>
+        <button id="grantBtn">Grant</button>
+      </div>
+      <p id="beta-msg" style="margin-top:12px;"></p>
+    </div>
+  </div>
+
+  <script type="module" src="admin-beta.js"></script>
+</body>
+</html>

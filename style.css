@@ -1,27 +1,27 @@
-/* ========= Rant2Me — site-wide theme (Royal Purple + Gold) ========= */
+/* ========= Rant2Me — site-wide theme (Elegant Blue & White) ========= */
 /* Palette & tokens */
 :root{
-  --royal: #6A1B9A;          /* primary royal purple */
-  --royal-600:#5c1787;
-  --royal-700:#4d1473;
-  --plum:#3E1458;            /* deep plum for headers/shadows */
-  --lavender:#efe7f7;        /* soft surface */
-  --cloud:#faf7ff;           /* page wash */
-  --ink:#2a2232;             /* body text */
-  --muted:#7b6f88;           /* secondary text */
-  --gold:#F5C542;            /* accent gold */
-  --gold-600:#e4b22f;
-  --line:#e7dff1;            /* subtle dividers */
+  --blue:#0d1b2a;             /* deep navy */
+  --blue-600:#1b263b; 
+  --blue-700:#243b55; 
+  --sky:#0077b6;              /* primary sky blue */
+  --aqua:#00b4d8;             /* accent aqua */
+  --ice:#e0f0ff;              /* soft surface */
+  --cloud:#f8fbff;            /* page wash */
+  --ink:#1a242f;              /* body text */
+  --muted:#7b8da0;            /* secondary text */
+  --gold:#F5C542;             /* gold accent for highlights */
+  --line:#d6e6f8;             /* subtle dividers */
   --ok:#2ecc71;
   --warn:#f39c12;
   --danger:#e74c3c;
 
   --radius: 12px;
-  --shadow-lg: 0 18px 40px rgba(62,20,88,.18);
-  --shadow-md: 0 10px 24px rgba(62,20,88,.14);
-  --shadow-sm: 0 6px 14px rgba(62,20,88,.10);
+  --shadow-lg: 0 18px 40px rgba(0,43,85,.18);
+  --shadow-md: 0 10px 24px rgba(0,43,85,.14);
+  --shadow-sm: 0 6px 14px rgba(0,43,85,.10);
 
-  --focus: 0 0 0 4px rgba(245,197,66,.25);
+  --focus: 0 0 0 4px rgba(0,180,216,.25);
 }
 
 /* ========= Page base ========= */
@@ -33,17 +33,17 @@ body{
   margin:0;
   color:var(--ink);
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(106,27,154,.12), transparent 60%),
-    radial-gradient(900px 600px at 120% 10%, rgba(245,197,66,.10), transparent 55%),
-    linear-gradient(270deg, #efe7f9, #fff7f0);
+    radial-gradient(1200px 600px at 10% -10%, rgba(0,119,182,.10), transparent 60%),
+    radial-gradient(900px 600px at 120% 10%, rgba(0,180,216,.10), transparent 55%),
+    linear-gradient(270deg, #f5faff, #ffffff);
   background-size: 400% 400%;
-  animation: bgShift 14s ease-in-out infinite;
+  animation: bgShift 16s ease-in-out infinite;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* smooth page fade-in */
-body{opacity:0; animation: fadeInPage .8s ease forwards}
+body{opacity:0; animation: fadeInPage .9s ease forwards}
 @keyframes fadeInPage{to{opacity:1}}
 @keyframes bgShift{
   0%{background-position: 0% 50%}
@@ -54,30 +54,29 @@ body{opacity:0; animation: fadeInPage .8s ease forwards}
 /* ========= Header / Nav ========= */
 header{
   position:sticky; top:0; z-index:50;
-  background: linear-gradient(180deg, var(--royal), var(--royal-700));
+  background: linear-gradient(180deg, var(--blue), var(--blue-600));
   color:#fff; padding:16px 18px;
   text-align:center;
   box-shadow: var(--shadow-sm);
 }
 
-/* Animated brand title (works for either header h1 or .brand-title) */
+/* Animated brand title */
 header h1, .brand-title{
   margin:0;
   font-size: clamp(22px, 4vw, 40px);
   font-weight: 800;
   letter-spacing:.5px;
-  background: linear-gradient(90deg, #fff, var(--gold), #fff);
+  background: linear-gradient(90deg, #fff, var(--aqua), #fff);
   -webkit-background-clip:text; background-clip:text;
   color:transparent;
-  /* animated glow */
   text-shadow:
-    0 0 12px rgba(245,197,66,.35),
-    0 0 24px rgba(245,197,66,.15);
+    0 0 12px rgba(0,180,216,.35),
+    0 0 24px rgba(0,119,182,.15);
   animation: brandGlow 3.2s ease-in-out infinite;
 }
 @keyframes brandGlow{
-  0%,100%{text-shadow:0 0 10px rgba(245,197,66,.28), 0 0 22px rgba(245,197,66,.12)}
-  50%{text-shadow:0 0 18px rgba(245,197,66,.55), 0 0 40px rgba(245,197,66,.28)}
+  0%,100%{text-shadow:0 0 10px rgba(0,180,216,.28), 0 0 22px rgba(0,119,182,.12)}
+  50%{text-shadow:0 0 18px rgba(0,180,216,.55), 0 0 40px rgba(0,119,182,.28)}
 }
 
 nav{margin-top:8px}
@@ -87,7 +86,7 @@ nav a{
 }
 nav a::after{
   content:""; position:absolute; left:0; right:0; bottom:-4px; height:2px;
-  background: linear-gradient(90deg, var(--gold), #fff0);
+  background: linear-gradient(90deg, var(--aqua), #fff0);
   transform:scaleX(0); transform-origin:left; transition:transform .25s ease;
   border-radius:2px;
 }
@@ -100,14 +99,14 @@ section{padding:28px 20px}
   max-width: 1120px; margin:0 auto;
 }
 
-/* Soft cards & glass panels */
+/* Cards & Glass */
 .card{
   background:#fff; border-radius: var(--radius);
   box-shadow: var(--shadow-md); padding:18px;
   border:1px solid var(--line);
 }
 .glass{
-  background: rgba(255,255,255,.7);
+  background: rgba(255,255,255,.75);
   backdrop-filter: blur(10px);
   border-radius: var(--radius);
   box-shadow: var(--shadow-md);
@@ -121,21 +120,18 @@ section{padding:28px 20px}
 }
 .ribbon{
   display:inline-block; padding:6px 12px; border-radius:999px;
-  background: linear-gradient(90deg, var(--gold), #ffd25b);
-  color:#3d2b00; font-weight:700; box-shadow: 0 6px 16px rgba(245,197,66,.25);
+  background: linear-gradient(90deg, var(--aqua), #90e0ef);
+  color:#002233; font-weight:700; box-shadow: 0 6px 16px rgba(0,180,216,.25);
 }
 
 /* ========= Hero/Images ========= */
-/* Constrain oversized hero images without affecting grids */
 section > img{
   width:100%; height:auto; max-height: 62vh;
   object-fit: cover; border-radius: 14px;
   box-shadow: var(--shadow-lg);
 }
-/* Generic IMG safety */
 img{max-width:100%; height:auto; border-radius:10px}
 
-/* Gallery grid you already use */
 .image-grid{
   display:flex; gap:14px; flex-wrap:wrap; justify-content:center;
 }
@@ -152,17 +148,17 @@ img{max-width:100%; height:auto; border-radius:10px}
 
 /* ========= Buttons ========= */
 button{
-  background: linear-gradient(180deg, var(--royal), var(--royal-600));
+  background: linear-gradient(135deg, var(--sky), var(--aqua));
   color:#fff; border:none; padding:12px 20px; border-radius:12px;
   cursor:pointer; transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
   box-shadow: var(--shadow-sm);
   position:relative; overflow:hidden;
 }
-button:hover{transform: translateY(-2px); filter:brightness(1.03); box-shadow: var(--shadow-md)}
+button:hover{transform: translateY(-2px); filter:brightness(1.05); box-shadow: var(--shadow-md)}
 button:active{transform: translateY(0)}
 button:focus-visible{outline:none; box-shadow: var(--shadow-sm), var(--focus)}
-/* Gold accent variant */
-button.gold{background: linear-gradient(180deg, var(--gold), var(--gold-600)); color:#311d00}
+/* Gold variant */
+button.gold{background: linear-gradient(180deg, var(--gold), #e4b22f); color:#311d00}
 
 /* Ripple */
 button::after{
@@ -172,22 +168,22 @@ button::after{
 }
 button:hover::after{opacity:1}
 
-/* ========= FAQ (you already have .question / .answer) ========= */
+/* ========= FAQ ========= */
 .question{
-  cursor:pointer; font-weight:700; margin-top:16px; color:var(--plum);
+  cursor:pointer; font-weight:700; margin-top:16px; color:var(--blue);
   background:#fff; padding:14px 16px; border-radius:12px; border:1px solid var(--line);
   transition: box-shadow .2s ease, transform .15s ease, color .2s ease;
   position:relative;
 }
 .question::after{
   content:"▾"; position:absolute; right:16px; top:50%; transform:translateY(-50%);
-  color: var(--gold); font-size: 18px; transition: transform .2s ease;
+  color: var(--aqua); font-size: 18px; transition: transform .2s ease;
 }
-.question:hover{box-shadow: var(--shadow-sm); transform: translateY(-1px); color:var(--royal)}
+.question:hover{box-shadow: var(--shadow-sm); transform: translateY(-1px); color:var(--sky)}
 .question.open::after{transform: translateY(-50%) rotate(-180deg)}
 
 .answer{
-  display:none; padding:14px 16px; background: var(--lavender);
+  display:none; padding:14px 16px; background: var(--ice);
   border-radius:12px; margin-top:10px; border:1px solid var(--line);
 }
 .answer.show{display:block; animation: fadeIn .35s ease both}
@@ -204,7 +200,7 @@ button:hover::after{opacity:1}
 .team-pic:hover{transform:scale(1.07); box-shadow: var(--shadow-md); filter: saturate(1.08)}
 
 /* ========= Services ========= */
-.services h2{text-align:center; margin-bottom:20px; color:var(--plum)}
+.services h2{text-align:center; margin-bottom:20px; color:var(--blue)}
 .services ul{list-style:none; padding:0; max-width:900px; margin:0 auto}
 .services li{
   background:#fff; margin:12px 0; padding:16px; border-radius:12px;
@@ -218,10 +214,10 @@ button:hover::after{opacity:1}
 }
 .service-item:hover{box-shadow: var(--shadow-md); transform: translateY(-2px)}
 .service-item button{
-  width:100%; background: linear-gradient(180deg, #efe7f9, #e7dbf6);
-  color:#402a59; border:none; padding:16px; font-size:18px; text-align:left;
+  width:100%; background: linear-gradient(180deg, #f3faff, #e7f2fa);
+  color:#002233; border:none; padding:16px; font-size:18px; text-align:left;
 }
-.service-item button:hover{background: linear-gradient(180deg, #e9ddfa, #dac9f4)}
+.service-item button:hover{background: linear-gradient(180deg, #d9efff, #c7e4fa)}
 .description{
   max-height:0; overflow:hidden; padding:0 16px; color:#333; background:#fff;
   transition: max-height .45s ease, padding .45s ease;
@@ -231,24 +227,22 @@ button:hover::after{opacity:1}
 /* Pills / meta */
 .badge{
   display:inline-block; padding:4px 10px; border-radius:999px; font-weight:700;
-  background: rgba(106,27,154,.12); color: var(--royal); border:1px solid rgba(106,27,154,.18);
+  background: rgba(0,119,182,.12); color: var(--sky); border:1px solid rgba(0,119,182,.18);
 }
 .badge.gold{background: rgba(245,197,66,.12); color:#5a4200; border-color: rgba(245,197,66,.35)}
 
-/* ========= Quotes / callouts ========= */
+/* ========= Quotes ========= */
 .quote{
-  text-align:center; font-style:italic; margin-top:22px; color:var(--royal);
+  text-align:center; font-style:italic; margin-top:22px; color:var(--sky);
   background:#fff; padding:14px 16px; border-radius:12px; box-shadow: var(--shadow-sm);
   border:1px solid var(--line);
 }
 
-/* ========= Chat / helper panels you already use ========= */
+/* ========= Chat panels ========= */
 .bot-message{
-  background: #f6f0ff; color: var(--plum); padding: 15px; border-radius: 12px;
+  background: #f0faff; color: var(--blue-700); padding: 15px; border-radius: 12px;
   margin: 20px auto; max-width: 680px; animation: fadeIn 0.6s ease-in; box-shadow: var(--shadow-sm);
 }
-
-/* Central content shells */
 .chat-box{
   max-width: 860px; margin: 30px auto; padding: 20px; background:#fff;
   border-radius: 14px; box-shadow: var(--shadow-md); border:1px solid var(--line);
@@ -260,25 +254,25 @@ button:hover::after{opacity:1}
 /* Hoverable service cards */
 .service-list{display:flex; flex-wrap:wrap; justify-content:center; gap:20px}
 .service-card{
-  width:260px; padding:20px; background-color:#f6f1ff; border-radius:12px;
+  width:260px; padding:20px; background-color:#f4faff; border-radius:12px;
   box-shadow: var(--shadow-sm); cursor:pointer; transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
   border:1px solid var(--line); position:relative; overflow:hidden;
 }
 .service-card::before{
   content:""; position:absolute; inset:-40% -40% auto auto; height:160px; width:160px; border-radius:50%;
-  background: radial-gradient(closest-side, rgba(245,197,66,.35), rgba(245,197,66,0));
+  background: radial-gradient(closest-side, rgba(0,180,216,.35), rgba(0,180,216,0));
   transform: translate(35%, -35%); filter: blur(6px); pointer-events:none;
 }
-.service-card:hover{transform:translateY(-3px); background:#efe7f9; box-shadow: var(--shadow-md)}
+.service-card:hover{transform:translateY(-3px); background:#e9f5ff; box-shadow: var(--shadow-md)}
 .service-card h3, .service-card p{text-shadow:none}
 
-/* ========= Forms / Inputs / Textareas ========= */
+/* ========= Forms ========= */
 textarea, input[type="text"], input[type="email"], input[type="password"]{
   width:100%; padding:12px; border-radius:12px; border:1px solid var(--line);
   transition: box-shadow .15s ease, border-color .15s ease; background:#fff;
 }
 textarea{height:150px; resize:vertical; margin-bottom:10px}
-textarea:focus, input:focus{outline:none; border-color: var(--gold); box-shadow: var(--focus)}
+textarea:focus, input:focus{outline:none; border-color: var(--aqua); box-shadow: var(--focus)}
 
 /* ========= Utilities ========= */
 .muted{color:var(--muted)}
@@ -301,7 +295,80 @@ textarea:focus, input:focus{outline:none; border-color: var(--gold); box-shadow:
   section > img{max-height: 44vh}
 }
 
-/* ========= Legacy overrides from your original CSS (kept, but themed) ========= */
+/* ========= Legacy overrides ========= */
 .services ul{list-style:none; padding:0}
-button:hover{background: linear-gradient(180deg, var(--royal-600), var(--royal)); transform: scale(1.03)}
-/* preserve your original fadeIn keyframes name for .answer.show and .bot-message */
+button:hover{background: linear-gradient(135deg, var(--aqua), var(--sky)); transform: scale(1.03)}
+
+.newsletter {
+  text-align: center;
+  padding: 40px;
+  background: #f9f9f9;
+}
+
+.newsletter h2 {
+  color: var(--primary-color);
+  font-size: 28px;
+}
+
+.newsletter p {
+  color: #333;
+  margin-bottom: 15px;
+}
+.newsletter-embed {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.newsletter-embed iframe {
+  width: 100%;
+  max-width: 480px;
+  height: 320px;
+}
+header h1 {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 2.5rem;  /* bigger for stylish effect */
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.9);
+  letter-spacing: 2px;
+}
+.banner {
+  background: linear-gradient(90deg, #551fd2, #187ae2);
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  padding: 15px;
+  animation: pulse 2s infinite alternate;
+}
+
+@keyframes pulse {
+  0%   { letter-spacing: 1px; opacity: 0.8; }
+  100% { letter-spacing: 5px; opacity: 1; }
+}
+.slideshow {
+  position: relative;
+  width: 100%;
+  height: 400px; /* adjust height */
+  overflow: hidden;
+}
+
+.slideshow img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: fade 12s infinite;
+  opacity: 0;
+}
+
+.slideshow img:nth-child(1) { animation-delay: 0s; }
+.slideshow img:nth-child(2) { animation-delay: 4s; }
+.slideshow img:nth-child(3) { animation-delay: 8s; }
+
+@keyframes fade {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  30%  { opacity: 1; }
+  40%  { opacity: 0; }
+  100% { opacity: 0; }
+}

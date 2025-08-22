@@ -1,19 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <title>Rant2Me - Home</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="home">
+  <div class="banner">
+  <span>✨ Statement of the Week Coming Soon✨</span>
+</div>
     <header>
        <h1 class="brand-title">Welcome to Rant2Me</h1>
+       <!-- Daily Mood Modal -->
+<div id="moodModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:20px; max-width:400px; width:90%; border-radius:8px; text-align:center;">
+    <h2>Daily Mood Check-In</h2>
+    <p>How are you feeling today?</p>
+    <div style="margin:15px 0;">
+      <button class="moodBtn" data-mood="😊">😊 Good</button>
+      <button class="moodBtn" data-mood="😐">😐 Okay</button>
+      <button class="moodBtn" data-mood="😔">😔 Bad</button>
+    </div>
+    <button onclick="closeMoodModal()" style="padding:8px 16px; background:#007BFF; color:#fff; border:none; border-radius:4px;">Skip</button>
+  </div>
+</div>
         <nav>
             <a href="home.html">Home</a>
             <a href="chat.html">Chat</a>
             <a href="help.html">Help Centre</a>
             <a href="faq.html">FAQ</a>
-            <a href="token.html">Tokens</a>
+            <a href="pay.html">Plans</a>
             <a href="about.html">About Us</a>
             <a href="services.html">Services</a>
             <button id="logoutBtn" style="margin-left: 10px;">Logout</button>
@@ -30,11 +49,29 @@
     <section class="gallery">
         <h2>Our Moments</h2>
         <p>More pictures and stories coming soon!</p>
-        <div class="image-grid">
-            <img src="images/Pic1.jpeg" alt="Coming soon image">
-            <img src="images/Pic2.jpeg" alt="Coming soon image">
+        <div class="slideshow">
+  <img src="images/forest-3804001_1920.jpg" class="slide" />
+  <img src="images/horse-7993644_1920.jpg" class="slide" />
+  <img src="images/landscape-9556563_1920.jpg" class="slide" />
+  <img src="images/milky-way-8149815_1920.jpg" class="slide" />
+  <img src="images/mountains-5112952_1920.jpg" class="slide" />
+  <img src="images/landscape-7373484_1920.jpg" class="slide" />
+  <img src="images/rice-field-3490060_1920.jpg" class="slide" />
+  <img src="images/autumn-7541345_1920.jpg" class="slide" />
+</div>
+    </section>
+
+    <section class="newsletter">
+        <h2>📩 Subscribe to Our Weekly Newsletter</h2>
+        <p>Get infonomics insights, lifestyle hacks, and wellness tips from Rant2Me.</p>
+        <div class="newsletter-embed">
+            <iframe src="https://rant2me.substack.com/embed" 
+                    width="480" height="320" 
+                    style="border:1px solid #EEE; background:white;" 
+                    frameborder="0" scrolling="no"></iframe>
         </div>
     </section>
+    <!-- ✅ End Newsletter -->
 
     <script src="script.js"></script>
 
@@ -121,6 +158,48 @@
 <script>
   function showDisclaimer() {
     document.getElementById("disclaimerModal").style.display = "flex";
+  }
+</script>
+<script>
+   // ✅ Mood Tracker logic
+  document.addEventListener("DOMContentLoaded", function() {
+    const today = new Date().toISOString().split('T')[0];
+
+    if (localStorage.getItem("moodCheckDate") !== today) {
+      document.getElementById("moodModal").style.display = "flex";
+    }
+
+    document.querySelectorAll(".moodBtn").forEach(btn => {
+      btn.addEventListener("click", async function() {
+        const mood = this.dataset.mood;
+        localStorage.setItem("moodCheckDate", today);
+        localStorage.setItem("mood", mood);
+        
+        // ✅ Save to Firestore
+        const user = auth.currentUser;
+        if (user) {
+          try {
+            await addDoc(collection(db, "moods"), {
+              mood: mood,
+              userId: user.uid,
+              userEmail: user.email,
+              createdAt: serverTimestamp()
+            });
+            alert("Thanks for checking in! Mood saved: " + mood);
+          } catch (err) {
+            console.error("Error saving mood:", err);
+          }
+        } else {
+          alert("You must be logged in to save mood.");
+        }
+
+        closeMoodModal();
+      });
+    });
+  });
+
+  function closeMoodModal() {
+    document.getElementById("moodModal").style.display = "none";
   }
 </script>
 </body>

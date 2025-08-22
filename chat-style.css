@@ -1,37 +1,40 @@
-/* Premium WhatsApp-inspired Chat UI */
+/* Premium Dark-Themed Chat UI */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #f6f0ff, #f0f3ff);
+  background: linear-gradient(135deg, #0a192f, #112240);
   margin: 0;
   padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  color: #e6f1ff;
 }
 
 .chat-container {
   width: 90%;
   max-width: 450px;
   height: 90vh;
-  background-color: #fff;
+  background: rgba(17, 34, 64, 0.95);
   border-radius: 18px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border: 1px solid rgba(100, 255, 218, 0.2);
 }
 
 /* Header */
 .chat-header {
-  background: linear-gradient(90deg, #5a189a, #9d4edd);
-  color: white;
+  background: linear-gradient(90deg, #112240, #0a192f);
+  color: #64ffda;
   padding: 15px;
   text-align: center;
   font-size: 20px;
   font-weight: bold;
   letter-spacing: 0.5px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+  text-shadow: 0 0 8px rgba(100, 255, 218, 0.8);
 }
 
 /* Messages Area */
@@ -39,7 +42,7 @@ body {
   flex: 1;
   padding: 15px;
   overflow-y: auto;
-  background: linear-gradient(180deg, #f9f6ff, #f5f2ff);
+  background: linear-gradient(180deg, #0a192f, #112240);
 }
 
 /* Message Styles */
@@ -63,21 +66,24 @@ body {
   border-radius: 20px;
   font-size: 14px;
   line-height: 1.4;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   transition: transform 0.2s ease;
 }
 
+/* User messages */
 .user .bubble {
-  background: linear-gradient(135deg, #d9fdd3, #c4f5bc);
-  color: #000;
+  background: linear-gradient(135deg, #64ffda, #46c9a7);
+  color: #0a192f;
   border-bottom-right-radius: 4px;
 }
 
+/* Bot messages */
 .bot .bubble {
-  background-color: #fff;
-  color: #000;
+  background: rgba(255, 255, 255, 0.05);
+  color: #e6f1ff;
   border-bottom-left-radius: 4px;
   margin-left: 10px;
+  border: 1px solid rgba(100, 255, 218, 0.2);
 }
 
 /* Avatar */
@@ -88,35 +94,39 @@ body {
   object-fit: cover;
   margin-right: 10px;
   align-self: flex-end;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
 /* Input Area */
 .chat-input {
   padding: 10px;
-  border-top: 1px solid #e2e2e2;
+  border-top: 1px solid rgba(100, 255, 218, 0.2);
   display: flex;
   gap: 10px;
-  background-color: #fff;
+  background: #0a192f;
 }
 
 .chat-input input {
   flex: 1;
   padding: 10px;
   border-radius: 20px;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(100, 255, 218, 0.4);
+  background: rgba(17, 34, 64, 0.8);
+  color: #e6f1ff;
   outline: none;
   font-size: 14px;
   transition: border-color 0.2s ease;
 }
 
 .chat-input input:focus {
-  border-color: #9d4edd;
+  border-color: #64ffda;
+  box-shadow: 0 0 8px rgba(100, 255, 218, 0.4);
 }
 
 .chat-input button {
-  background: linear-gradient(135deg, #5a189a, #9d4edd);
-  color: white;
+  background: linear-gradient(135deg, #64ffda, #46c9a7);
+  color: #0a192f;
+  font-weight: bold;
   border: none;
   padding: 10px 16px;
   border-radius: 20px;
@@ -126,7 +136,7 @@ body {
 
 .chat-input button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(100, 255, 218, 0.4);
 }
 
 /* Typing Indicator */
@@ -138,8 +148,8 @@ body {
 }
 
 .typing-bubble {
-  background-color: #fff;
-  color: #000;
+  background: rgba(255, 255, 255, 0.05);
+  color: #e6f1ff;
   border-radius: 20px;
   padding: 10px 15px;
   font-size: 14px;
@@ -147,14 +157,15 @@ body {
   align-items: center;
   gap: 5px;
   max-width: 150px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.05);
+  border: 1px solid rgba(100, 255, 218, 0.2);
+  box-shadow: 0 0 5px rgba(100, 255, 218, 0.2);
 }
 
 .typing-dots span {
   display: inline-block;
   width: 6px;
   height: 6px;
-  background-color: #5a189a;
+  background-color: #64ffda;
   border-radius: 50%;
   animation: blink 1.4s infinite both;
   margin-right: 3px;
@@ -177,4 +188,28 @@ body {
     opacity: 1;
     transform: scale(1);
   }
+}
+.home-btn {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #5a189a; /* your theme purple */
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: background 0.3s;
+}
+.home-btn:hover {
+  background: #3c0d6e; /* darker purple on hover */
+}
+header h1 {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 2.5rem;  /* bigger for stylish effect */
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.9);
+  letter-spacing: 2px;
 }

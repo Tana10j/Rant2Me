@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin — Nutrition (Dorcas)</title>
@@ -9,19 +11,33 @@
 <body>
   <div class="admin-panel">
     <div class="threads">
-      <h2>Nutrition — Chats</h2>
+      <h2>Nutrition Chat-list</h2>
       <div id="threadsList">Loading chats…</div>
     </div>
 
     <div class="chat-area">
       <div class="chat-header">
-        <div id="chatHeaderTitle" class="title">Select a chat</div>
+        <div class="title" id="chatHeaderTitle">Chat Section</div>
+
+        <!-- Notification icon + global badge -->
+        <div class="notif" aria-label="Unread messages">
+          <span class="icon-bell" aria-hidden="true"></span>
+          <span id="globalUnread" class="badge hidden">0</span>
+        </div>
+
+<!-- ADDED: Admin-only Mood Logs link (hidden by default) -->
+<div id="adminLinks" style="display:none; margin-right:10px;">
+  <a href="log.html" target="_blank" style="color:#007BFF; text-decoration:none; font-weight:bold;">
+    📊 Mood Logs
+  </a>
+</div>
+
         <div style="margin-left:auto">
           <button id="signOutBtn" style="background:#eee;border:none;padding:8px 10px;border-radius:8px;cursor:pointer;">Sign out</button>
         </div>
       </div>
 
-      <!-- Messages now load here -->
+      <!-- Messages load here (center column) -->
       <div id="messages" class="messages">
         <div style="color:#777">No chat selected</div>
       </div>

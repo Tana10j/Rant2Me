@@ -241,23 +241,41 @@ body {
 .message-form button:hover {
   box-shadow: 0 0 10px rgba(0, 191, 255, 0.8);
 }
+/* === Notifications (global + per-thread) === */
+.notif { position: relative; display: inline-flex; align-items: center; margin-left: 12px; }
+.icon-bell::before { content: "🔔"; font-size: 18px; line-height: 1; }
+
 .badge {
-  background: red;
-  color: white;
-  padding: 3px 7px;
-  border-radius: 50%;
-  font-size: 0.8em;
-  font-weight: bold;
-  display: inline-block;
-  min-width: 20px;
-  text-align: center;
+  background: #ff3b30;
+  color: #fff;
+  padding: 2px 6px;
+  min-width: 18px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
+.badge.hidden { display: none; }
 
-.badge.hidden {
-  display: none;
+/* per-user badge placed after the user’s name */
+.user-badge { margin-left: 8px; background: #ff9500; }
+
+/* make each thread row look like a list item you can click */
+#threadsList .thread-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px; border-radius:10px; cursor:pointer;
+  transition: background .15s, transform .06s;
 }
-
-.user-badge {
-  margin-left: 6px;
-  background: #ff4500;
+#threadsList .thread-item:hover { background:#f3f7ff; transform: translateY(-1px); }
+#threadsList .thread-name { font-weight:600; color:#222; }
+#threadsList .thread-meta { color:#666; font-size:12px; margin-left:auto; 
+}
+header h1 {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 2.5rem;  /* bigger for stylish effect */
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.9);
+  letter-spacing: 2px;
 }

@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Nutrition Chat — Dorcas</title>
   <link rel="stylesheet" href="chat-style.css" />
 </head>
 <body>
+  <button onclick="window.location.href='home.html'" class="home-btn">🏠 Home</button>
   <div class="chat-container">
     <div class="chat-header">Chat with Dorcas (Nutritionist)</div>
 
     <div class="chat-messages" id="chat-box">
-      <!-- initial bot line can remain; realtime listener will re-render if there are saved messages -->
       <div class="message bot">
         <img src="assets/avatars/Dorcas.png" class="avatar" />
-        <div class="bubble">Hello Dorcas here, a certified Nutritionist. How can I help?</div>
+        <div class="bubble">Hello — I'm Dorcas, a certified Nutritionist. How can I help you?</div>
       </div>
     </div>
 
@@ -24,18 +26,12 @@
     </div>
   </div>
 
-  <script type="module">
+<script type="module">
   import { auth, db } from './firebase.js';
   import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
   import {
-    collection,
-    addDoc,
-    serverTimestamp,
-    query,
-    orderBy,
-    onSnapshot,
-    doc,
-    setDoc
+    collection, addDoc, serverTimestamp,
+    query, orderBy, onSnapshot, doc, setDoc, getDoc
   } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
   const SECTION = "nutrition";
@@ -48,48 +44,140 @@
   let currentUid = null;
   let messagesColRef = null;
   let unsubscribeSnapshot = null;
+  let unsubscribeEnt = null;
 
-  // Auth listener
-  onAuthStateChanged(auth, user => {
-    if (!user) {
-      window.location.href = "index.html";
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = "index.html"; return; }
+    currentUid = user.uid;
+
+    // === Access guard ===
+    const ok = await hasAccess(currentUid, SECTION);
+    if (!ok) {
+      alert("Please purchase a plan to access this chat.");
+      window.location.href = "pay.html#nutrition";
       return;
     }
-    currentUid = user.uid;
+
+    // Start an expiry watcher; if it expires while open, lock UI & redirect
+    unsubscribeEnt = watchExpiry(currentUid, SECTION);
+
     initRealtimeListenerForUser(currentUid);
   });
 
-  // Start Firestore listener for this user
+  // IMPORTANT: entitlementId must be "<section>_<uid>"
+  async function hasAccess(uid, section) {
+    try {
+      const entRef = doc(db, "entitlements", `${section}_${uid}`);
+      const entSnap = await getDoc(entRef);
+      if (!entSnap.exists()) return false;
+      const d = entSnap.data();
+      // Accept only if status active and expiresAt in future
+      if (d.status !== "active") return false;
+      if (!d.expiresAt || typeof d.expiresAt.toMillis !== "function") return false;
+      return d.expiresAt.toMillis() > Date.now();
+    } catch (err) {
+      console.warn("hasAccess() entitlement read failed:", err);
+      return false;
+    }
+  }
+
+  /**
+   * watchExpiry:
+   * - attaches onSnapshot (fast notifications when the server updates the doc)
+   * - also sets up a small interval (5s) that reads the document (poll) and
+   *   checks wall-clock expiry. This ensures the page detects expiry even
+   *   when no server write happens exactly at the expiry time.
+   *
+   * Returns an unsubscribe function that clears both the listener and the interval.
+   */
+  function watchExpiry(uid, section) {
+    try {
+      const entRef = doc(db, "entitlements", `${section}_${uid}`);
+      let timedOut = false;
+      let lastData = null;
+
+      // Immediate onSnapshot (fires with current document)
+      const unsubSnap = onSnapshot(entRef, (snap) => {
+        if (!snap.exists()) {
+          lastData = null;
+          return;
+        }
+        lastData = snap.data();
+        evaluateAndMaybeExpire();
+      }, (err) => {
+        console.error("watchExpiry onSnapshot error:", err);
+      });
+
+      // Poll fallback - check every 5s to detect expiry by comparing wall clock
+      const pollMs = 5000;
+      const poll = setInterval(async () => {
+        if (timedOut) return;
+        try {
+          const snap = await getDoc(entRef);
+          if (!snap.exists()) {
+            lastData = null;
+            return;
+          }
+          lastData = snap.data();
+          evaluateAndMaybeExpire();
+        } catch (err) {
+          console.error('watchExpiry poll getDoc error:', err);
+        }
+      }, pollMs);
+
+      // helper to check lastData's expiry & act
+      function evaluateAndMaybeExpire() {
+        if (!lastData) return;
+        const now = Date.now();
+        const expiresAt = lastData.expiresAt;
+        const expiresMs = expiresAt && typeof expiresAt.toMillis === "function" ? expiresAt.toMillis() : null;
+        const active = lastData.status === "active";
+
+        if (!active || (expiresMs !== null && expiresMs <= now)) {
+          // expire the UI and redirect to purchase page
+          input.disabled = true;
+          sendBtn.disabled = true;
+          alert("Your session has expired.");
+          cleanup();
+          setTimeout(() => (window.location.href = "pay.html#" + section), 1200);
+        }
+      }
+
+      // cleanup function to return
+      function cleanup() {
+        timedOut = true;
+        try { unsubSnap(); } catch (_) {}
+        try { clearInterval(poll); } catch (_) {}
+      }
+
+      // Return the unsubscribe so caller can cancel (we store it into unsubscribeEnt)
+      return cleanup;
+    } catch (err) {
+      console.error("watchExpiry init error:", err);
+      // fallback: redirect immediately
+      window.location.href = "pay.html#" + section;
+      return () => {};
+    }
+  }
+
   function initRealtimeListenerForUser(uid) {
-    const chatDocId = `${SECTION}_${uid}`;
+    const chatDocId = `${SECTION}_${uid}`; // chatId format "<section>_<uid>" matches your rules
     messagesColRef = collection(db, "chats", chatDocId, "messages");
-    const q = query(messagesColRef, orderBy("timestamp"));
+    const q = query(messagesColRef, orderBy("timestamp", "asc"));
 
     if (typeof unsubscribeSnapshot === "function") unsubscribeSnapshot();
 
     unsubscribeSnapshot = onSnapshot(q, snapshot => {
       chatBox.innerHTML = "";
-      snapshot.forEach(docSnap => {
-        renderMessageToUI(docSnap.data());
-      });
+      snapshot.forEach(docSnap => renderMessageToUI(docSnap.data()));
       chatBox.scrollTop = chatBox.scrollHeight;
-    }, err => {
-      console.error("Firestore listener error:", err);
-    });
+    }, err => console.error("Firestore listener error:", err));
   }
 
-  // Render message to UI
   function renderMessageToUI(msg) {
     const el = document.createElement("div");
-
-    // Normalize sender type
-    let typeClass = "bot";
-    if (msg.senderType === "user") typeClass = "user";
-    if (msg.senderType === "admin") typeClass = "bot";
-
-    el.className = "message " + typeClass;
-
-    if (msg.senderType === "admin" || msg.senderType === "bot") {
+    el.className = "message " + (msg.senderType === "user" ? "user" : "bot");
+    if (msg.senderType === "admin") {
       const avatarName = msg.adminName || ADMIN_NAME;
       el.innerHTML = `<img src="assets/avatars/${avatarName}.png" class="avatar" />
                       <div class="bubble">${escapeHtml(msg.text)}</div>`;
@@ -99,19 +187,17 @@
     chatBox.appendChild(el);
   }
 
-  // Send message
-  sendBtn.addEventListener("click", sendMessage);
-  input.addEventListener("keydown", (e) => {
+  document.getElementById("sendBtn").addEventListener("click", sendMessage);
+  document.getElementById("userInput").addEventListener("keydown", (e) => {
     if (e.key === "Enter") sendMessage();
   });
 
   async function sendMessage() {
-    const text = input.value.trim();
+    const text = (document.getElementById("userInput").value || "").trim();
     if (!text || !currentUid || !messagesColRef) return;
-    input.value = "";
+    document.getElementById("userInput").value = "";
 
     try {
-      // Ensure parent chat doc exists
       const chatDocId = `${SECTION}_${currentUid}`;
       const chatDocRef = doc(db, "chats", chatDocId);
       await setDoc(chatDocRef, {
@@ -120,7 +206,6 @@
         createdAt: serverTimestamp()
       }, { merge: true });
 
-      // Add user message
       await addDoc(messagesColRef, {
         text,
         senderType: "user",
@@ -133,37 +218,12 @@
       alert("Failed to send message — check console for details.");
       return;
     }
-
-    // Send first-time auto-reply from bot/admin (per device)
-    const botFlagKey = `botReplySent_${SECTION}_${currentUid}`;
-    if (!localStorage.getItem(botFlagKey)) {
-      localStorage.setItem(botFlagKey, "true");
-      const botText = `Thanks for your message! I’ll get back to you shortly.`;
-      renderMessageToUI({ text: botText, senderType: "admin", adminName: ADMIN_NAME });
-      chatBox.scrollTop = chatBox.scrollHeight;
-
-      try {
-        await addDoc(messagesColRef, {
-          text: botText,
-          senderType: "admin",
-          senderId: "system",
-          adminName: ADMIN_NAME,
-          timestamp: serverTimestamp(),
-          section: SECTION
-        });
-      } catch (err) {
-        console.error("Firestore write error (bot reply):", err);
-      }
-    }
   }
 
   function escapeHtml(str) {
     if (!str) return "";
     return str.replace(/[&<>"]/g, tag => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;'
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
     }[tag]));
   }
 </script>

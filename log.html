@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mood Logs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #296ead; /* Royal Purple */
+      --secondary-color: #095bce; /* Gold */
+      --light-bg: #f9f9fc;
+      --dark-text: #1a1a1a;
+      --card-bg: #ffffff;
+      --border-radius: 12px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      background: var(--light-bg);
+      color: var(--dark-text);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: var(--primary-color);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    header img {
+      height: 50px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    header button {
+      background: var(--secondary-color);
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--border-radius);
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    header button:hover {
+      background: #0a2ade;
+    }
+
+    main {
+      padding: 2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+    }
+
+    th {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background: #f3f0fa;
+    }
+
+    tr:hover {
+      background: #ece4f8;
+      transition: 0.2s;
+    }
+
+    .no-access {
+      text-align: center;
+      padding: 3rem;
+      font-size: 1.3rem;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Website Logo"> <!-- Replace with your actual logo path -->
+    <h1>Mood Tracker Logs</h1>
+    <button onclick="window.location.href='home.html'">Home</button>
+  </header>
+
+  <main id="content">
+    <table>
+      <thead>
+        <tr>
+          <th>User Email</th>
+          <th>Mood</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody id="moodTable"></tbody>
+    </table>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      // your Firebase config here
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Allowed admin emails
+    const adminEmails = [
+      "Tana10j@gmail.com",
+      "nutritionadmin@gmail.com",
+      "studentadmin@gmail.com"
+    ];
+
+    async function loadMoods() {
+      const snapshot = await getDocs(collection(db, "moods"));
+      const table = document.getElementById("moodTable");
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const row = `<tr>
+                      <td>${data.userEmail}</td>
+                      <td>${data.mood}</td>
+                      <td>${data.createdAt?.toDate().toLocaleString()}</td>
+                    </tr>`;
+        table.innerHTML += row;
+      });
+    }
+
+    onAuthStateChanged(auth, user => {
+      if (user && adminEmails.includes(user.email)) {
+        loadMoods();
+      } else {
+        document.getElementById("content").innerHTML =
+          "<div class='no-access'><h2>Access Denied</h2><p>You do not have permission to view this page.</p></div>";
+      }
+    });
+  </script>
+</body>
+</html>

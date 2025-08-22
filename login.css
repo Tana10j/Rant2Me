@@ -1,28 +1,28 @@
 :root {
-  --primary-color: #5a189a; /* Royal Purple */
-  --secondary-color: rgba(255, 255, 255, 0.6);
-  --accent-color: #f6c90e; /* Gold */
-  --dark-color: #1a1a1a;
-  --light-color: #fff;
+  --primary-color: #64ffda; /* Cyan Glow */
+  --secondary-color: rgba(255, 255, 255, 0.7);
+  --dark-color: #0a192f; /* Deep Navy */
+  --light-color: #e6f1ff;
   --danger-color: #e74c3c;
-  --glass-bg: rgba(255, 255, 255, 0.15);
-  --border-glow: rgba(246, 201, 14, 0.7);
+  --glass-bg: rgba(17, 34, 64, 0.85);
+  --border-glow: rgba(100, 255, 218, 0.6);
 }
 
-/* Background Gradient with animation */
+/* Background Gradient with subtle animation */
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #3c096c, #9d4edd, #7b2cbf, #5a189a);
-  background-size: 300% 300%;
-  animation: bgMove 15s ease infinite;
+  background: linear-gradient(135deg, #0a192f, #112240, #0a192f);
+  background-size: 200% 200%;
+  animation: bgShift 20s ease infinite;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  color: var(--light-color);
 }
 
-@keyframes bgMove {
+@keyframes bgShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
@@ -31,14 +31,14 @@ body {
 /* Glassmorphism Login Card */
 .login-container {
   background: var(--glass-bg);
-  backdrop-filter: blur(15px);
+  backdrop-filter: blur(20px);
   padding: 40px 30px;
   border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
   width: 100%;
   max-width: 420px;
   text-align: center;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(100, 255, 218, 0.2);
   animation: floatUp 1.5s ease forwards;
 }
 
@@ -47,28 +47,29 @@ body {
   100% { transform: translateY(0); opacity: 1; }
 }
 
-/* Title with gold shimmer */
+/* Title with cyan shimmer */
 .site-title {
   font-size: 3rem;
   font-weight: bold;
-  background: linear-gradient(90deg, var(--accent-color), #fff8d6, var(--accent-color));
+  background: linear-gradient(90deg, var(--primary-color), #a8faff, var(--primary-color));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-size: 200% auto;
-  animation: goldShine 4s linear infinite;
+  animation: cyanShine 5s linear infinite;
   margin: 0 0 8px;
   letter-spacing: 1px;
-  text-shadow: 0 0 15px rgba(246, 201, 14, 0.5);
+  text-shadow: 0 0 15px rgba(100, 255, 218, 0.5);
 }
 
-@keyframes goldShine {
+@keyframes cyanShine {
   0% { background-position: 200% center; }
   100% { background-position: -200% center; }
 }
 
 .tagline {
   font-size: 1rem;
-  color: #f1f1f1;
+  color: var(--secondary-color);
   margin-bottom: 25px;
   font-style: italic;
 }
@@ -86,19 +87,19 @@ body {
   background: transparent;
   font-size: 16px;
   cursor: pointer;
-  color: #ddd;
+  color: var(--secondary-color);
   border-bottom: 2px solid transparent;
   transition: all 0.3s ease;
 }
 
 .tabs button.active-tab {
-  border-bottom: 2px solid var(--accent-color);
-  color: var(--accent-color);
+  border-bottom: 2px solid var(--primary-color);
+  color: var(--primary-color);
   font-weight: bold;
 }
 
 .tabs button:hover {
-  color: var(--accent-color);
+  color: var(--primary-color);
 }
 
 /* Forms */
@@ -115,38 +116,38 @@ body {
   margin-bottom: 14px;
   padding: 12px;
   font-size: 15px;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 1px solid rgba(100, 255, 218, 0.3);
   border-radius: 8px;
   outline: none;
-  background: rgba(255,255,255,0.1);
+  background: rgba(17, 34, 64, 0.6);
   color: var(--light-color);
   transition: all 0.3s ease;
 }
 
 .form input:focus {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 10px var(--border-glow);
-  background: rgba(255,255,255,0.2);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 12px var(--border-glow);
+  background: rgba(17, 34, 64, 0.8);
 }
 
-/* Button with pulse glow */
+/* Button with cyan glow */
 .form button {
   padding: 12px;
-  background: var(--primary-color);
-  color: var(--light-color);
+  background: linear-gradient(135deg, var(--primary-color), #46c9a7);
+  color: #0a192f;
   font-size: 16px;
+  font-weight: bold;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   margin-top: 10px;
-  box-shadow: 0 0 10px rgba(90, 24, 154, 0.5);
+  box-shadow: 0 0 12px rgba(100, 255, 218, 0.4);
   transition: all 0.3s ease;
   position: relative;
 }
 
 .form button:hover {
-  background: #3c096c;
-  box-shadow: 0 0 15px var(--accent-color), 0 0 25px var(--accent-color);
+  box-shadow: 0 0 15px var(--primary-color), 0 0 30px var(--primary-color);
   transform: scale(1.05);
 }
 
@@ -157,7 +158,21 @@ body {
   margin-top: 12px;
   font-size: 0.9rem;
   color: var(--danger-color);
-  background: rgba(231, 76, 60, 0.15);
+  background: rgba(231, 76, 60, 0.1);
   padding: 6px;
   border-radius: 6px;
+}
+header h1 {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 2.5rem;  /* bigger for stylish effect */
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.9);
+  letter-spacing: 2px;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background: url('images/76824.jpg') no-repeat center center fixed;
+  background-size: cover;
+  font-family: Arial, sans-serif;
 }

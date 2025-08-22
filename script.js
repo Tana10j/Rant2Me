@@ -116,3 +116,4 @@ if (currentPage === "chat.html") {
         }, 5 * 60 * 1000);
     });
 }
+

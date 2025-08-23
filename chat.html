@@ -6,6 +6,46 @@
   <meta charset="utf-8" />
   <title>Rant2Me - Chat</title>
   <link rel="stylesheet" href="style.css">
+
+  <style>
+  /* Slideshow container */
+  .slideshow-container {
+    max-width: 80%; /* smaller width than full screen */
+    max-height: 250px; /* control the slideshow height */
+    position: relative;
+    margin: 20px auto;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000; /* fills background if images don't cover */
+  }
+
+  .mySlides {
+    display: none;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+  }
+
+  .mySlides img {
+    max-width: 100%;
+    max-height: 250px;
+    object-fit: contain; /* show full image */
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* Fading animation */
+  .fade {
+    animation-name: fade;
+    animation-duration: 1.5s;
+  }
+
+  @keyframes fade {
+    from {opacity: .4}
+    to {opacity: 1}
+  }
+</style>
+
 </head>
 <body>
   <header>
@@ -41,6 +81,16 @@ function shareOnWhatsApp(snippet) {
 }
 </script>
 
+  <!-- Slideshow Section -->
+  <section class="slideshow-container">
+    <div class="mySlides fade">
+      <img src="images/ChatGPT Image Aug 23, 2025, 07_41_59 PM.png" alt="Slide 1">
+    </div>
+    <div class="mySlides fade">
+      <img src="images/ChatGPT Image Aug 23, 2025, 07_43_51 PM.png" alt="Slide 2">
+    </div>
+  </section>
+
   <section class="dropdown-services">
     <h2>Choose A Support Service</h2>
     <div class="service-list">
@@ -73,6 +123,22 @@ function shareOnWhatsApp(snippet) {
 <script>
   function showDisclaimer() {
     document.getElementById("disclaimerModal").style.display = "flex";
+  }
+
+  // Slideshow script
+  let slideIndex = 0;
+  showSlides();
+
+  function showSlides() {
+    let i;
+    let slides = document.getElementsByClassName("mySlides");
+    for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";  
+    }
+    slideIndex++;
+    if (slideIndex > slides.length) {slideIndex = 1}    
+    slides[slideIndex-1].style.display = "block";  
+    setTimeout(showSlides, 4000); // Change image every 4 seconds
   }
 </script>
 </body>

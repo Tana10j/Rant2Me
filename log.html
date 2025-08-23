@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <title>Mood Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +12,13 @@
 
   <style>
     :root {
-      --primary-color: #296ead; /* Royal Purple */
-      --secondary-color: #095bce; /* Gold */
-      --light-bg: #f9f9fc;
+      --primary-color: #296ead;
+      --secondary-color: #095bce;
+      --light-bg: #f4f7fb;
       --dark-text: #1a1a1a;
       --card-bg: #ffffff;
-      --border-radius: 12px;
-      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --border-radius: 14px;
+      --shadow: 0 6px 16px rgba(0,0,0,0.08);
     }
 
     body {
@@ -27,26 +29,28 @@
     }
 
     header {
+      padding: 1.5rem 2rem;
+      background: linear-gradient(135deg, #296ead, #0a53b0);
+      color: white;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 2rem;
-      background: var(--primary-color);
-      color: white;
       box-shadow: var(--shadow);
     }
 
     header img {
-      height: 50px;
+      height: 45px;
     }
 
     header h1 {
+      font-size: 1.7rem;
       margin: 0;
-      font-size: 1.5rem;
+      letter-spacing: 1px;
     }
 
     header button {
-      background: var(--secondary-color);
+      background: white;
+      color: var(--primary-color);
       border: none;
       padding: 0.6rem 1.2rem;
       border-radius: var(--border-radius);
@@ -56,21 +60,69 @@
     }
 
     header button:hover {
-      background: #0a2ade;
+      background: #eaf2ff;
     }
 
     main {
       padding: 2rem;
     }
 
+    /* Dashboard cards */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h3 {
+      margin: 0.5rem 0;
+      font-size: 1.2rem;
+      color: var(--primary-color);
+    }
+
+    .card p {
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+
+    /* Filter/Search Bar */
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .filter-bar input {
+      padding: 0.6rem 1rem;
+      border-radius: var(--border-radius);
+      border: 1px solid #ccc;
+      flex: 1;
+      min-width: 200px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1.5rem;
       background: var(--card-bg);
       border-radius: var(--border-radius);
       overflow: hidden;
       box-shadow: var(--shadow);
+      animation: fadeIn 0.6s ease;
     }
 
     th, td {
@@ -84,11 +136,11 @@
     }
 
     tr:nth-child(even) {
-      background: #f3f0fa;
+      background: #f8faff;
     }
 
     tr:hover {
-      background: #ece4f8;
+      background: #eaf2ff;
       transition: 0.2s;
     }
 
@@ -98,16 +150,44 @@
       font-size: 1.3rem;
       color: red;
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Website Logo"> <!-- Replace with your actual logo path -->
-    <h1>Mood Tracker Logs</h1>
+    <img src="images/Rant2Me Favicon.png" alt="Website Logo">
+    <h1>Mood Tracker Dashboard</h1>
     <button onclick="window.location.href='home.html'">Home</button>
   </header>
 
   <main id="content">
+    <section class="stats">
+      <div class="card">
+        <h3>Total Logs</h3>
+        <p id="totalLogs">0</p>
+      </div>
+      <div class="card">
+        <h3>😊 Good</h3>
+        <p id="goodCount">0</p>
+      </div>
+      <div class="card">
+        <h3>😐 Okay</h3>
+        <p id="okayCount">0</p>
+      </div>
+      <div class="card">
+        <h3>😔 Bad</h3>
+        <p id="badCount">0</p>
+      </div>
+    </section>
+
+    <div class="filter-bar">
+      <input type="text" id="searchInput" placeholder="Search by email or mood...">
+    </div>
+
     <table>
       <thead>
         <tr>
@@ -126,31 +206,67 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = {
-      // your Firebase config here
+      apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
+      authDomain: "rant2me-ab36b.firebaseapp.com",
+      projectId: "rant2me-ab36b",
+      storageBucket: "rant2me-ab36b.appspot.com",
+      messagingSenderId: "245661393279",
+      appId: "1:245661393279:web:b31483f57a40cf2c807a4a",
+      measurementId: "G-KPCSJTSMT9"
     };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
     // Allowed admin emails
     const adminEmails = [
-      "Tana10j@gmail.com",
-      "nutritionadmin@gmail.com",
-      "studentadmin@gmail.com"
+      "tana10j@gmail.com",
+      "edukdorcas@gmail.com",
+      "chideraumezurike13@gmail.com"
     ];
 
     async function loadMoods() {
       const snapshot = await getDocs(collection(db, "moods"));
       const table = document.getElementById("moodTable");
 
+      let total = 0, good = 0, okay = 0, bad = 0;
+
       snapshot.forEach(doc => {
         const data = doc.data();
+        total++;
+        if (data.mood === "😊") good++;
+        if (data.mood === "😐") okay++;
+        if (data.mood === "😔") bad++;
+
         const row = `<tr>
                       <td>${data.userEmail}</td>
                       <td>${data.mood}</td>
                       <td>${data.createdAt?.toDate().toLocaleString()}</td>
                     </tr>`;
         table.innerHTML += row;
+      });
+
+      document.getElementById("totalLogs").textContent = total;
+      document.getElementById("goodCount").textContent = good;
+      document.getElementById("okayCount").textContent = okay;
+      document.getElementById("badCount").textContent = bad;
+
+      // Enable search filter
+      document.getElementById("searchInput").addEventListener("keyup", function() {
+        const filter = this.value.toLowerCase();
+        const rows = table.getElementsByTagName("tr");
+        for (let i = 0; i < rows.length; i++) {
+          const cells = rows[i].getElementsByTagName("td");
+          let match = false;
+          for (let j = 0; j < cells.length; j++) {
+            if (cells[j].innerText.toLowerCase().includes(filter)) {
+              match = true;
+              break;
+            }
+          }
+          rows[i].style.display = match ? "" : "none";
+        }
       });
     }
 

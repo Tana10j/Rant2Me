@@ -47,8 +47,8 @@
     <p class="quote">"Sometimes all we need is for someone to listen."</p>
 
     <section class="gallery">
-        <h2>Our Moments</h2>
-        <p>More pictures and stories coming soon!</p>
+        <h2>Find Peace In Nature</h2>
+        <p>More pictures coming soon!</p>
         <div class="slideshow">
   <img src="images/forest-3804001_1920.jpg" class="slide" />
   <img src="images/horse-7993644_1920.jpg" class="slide" />
@@ -85,7 +85,7 @@
             apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
             authDomain: "rant2me-ab36b.firebaseapp.com",
             projectId: "rant2me-ab36b",
-            storageBucket: "rant2me-ab36b.firebasestorage.app",
+            storageBucket: "rant2me-ab36b.appspot.com",
             messagingSenderId: "245661393279",
             appId: "1:245661393279:web:b31483f57a40cf2c807a4a",
             measurementId: "G-KPCSJTSMT9"
@@ -160,27 +160,45 @@
     document.getElementById("disclaimerModal").style.display = "flex";
   }
 </script>
-<script>
-   // ✅ Mood Tracker logic
-  document.addEventListener("DOMContentLoaded", function() {
-    const today = new Date().toISOString().split('T')[0];
+<script type="module">
+  import { getFirestore, collection, addDoc, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    if (localStorage.getItem("moodCheckDate") !== today) {
+  // Reuse the default app initialized in the earlier module
+  const db = getFirestore();     // uses the default app
+  const auth2 = getAuth();        // uses the default app
+
+  function showMoodModalIfNeeded(user) {
+    const today = new Date().toISOString().split('T')[0];
+    const alreadyChecked = localStorage.getItem("moodCheckDate") === today;
+    if (user && !alreadyChecked) {
       document.getElementById("moodModal").style.display = "flex";
     }
+  }
+
+  function closeMoodModal() {
+    document.getElementById("moodModal").style.display = "none";
+  }
+  // Make it callable from the inline onclick on the Skip button
+  window.closeMoodModal = closeMoodModal;
+
+  // Wire up buttons once the DOM is ready
+  document.addEventListener("DOMContentLoaded", () => {
+    const today = new Date().toISOString().split('T')[0];
 
     document.querySelectorAll(".moodBtn").forEach(btn => {
-      btn.addEventListener("click", async function() {
+      btn.addEventListener("click", async function () {
         const mood = this.dataset.mood;
         localStorage.setItem("moodCheckDate", today);
         localStorage.setItem("mood", mood);
-        
-        // ✅ Save to Firestore
-        const user = auth.currentUser;
+
+        const user = auth2.currentUser;
         if (user) {
           try {
             await addDoc(collection(db, "moods"), {
-              mood: mood,
+              mood,
               userId: user.uid,
               userEmail: user.email,
               createdAt: serverTimestamp()
@@ -188,6 +206,7 @@
             alert("Thanks for checking in! Mood saved: " + mood);
           } catch (err) {
             console.error("Error saving mood:", err);
+            alert("Couldn’t save mood. Please try again.");
           }
         } else {
           alert("You must be logged in to save mood.");
@@ -198,9 +217,10 @@
     });
   });
 
-  function closeMoodModal() {
-    document.getElementById("moodModal").style.display = "none";
-  }
+  // Wait for auth to be ready, then decide whether to show the modal
+  onAuthStateChanged(auth2, (user) => {
+    showMoodModalIfNeeded(user);
+  });
 </script>
 </body>
 </html>

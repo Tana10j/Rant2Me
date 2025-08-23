@@ -1,78 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
-    <meta charset="UTF-8">
-    <title>Rant2Me - About Us</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Rant2Me - About Us</title>
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- put this CSS AFTER the <link rel="stylesheet" href="style.css"> line -->
+<style>
+/* ==== Slideshow fix: anchor slides and use class-based fade ==== */
+.slideshow {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+  height: clamp(240px, 40vh, 380px); /* responsive height */
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+/* Anchor each image to all four edges of the container */
+.slideshow img {
+  position: absolute;
+  inset: 0;            /* top:0; right:0; bottom:0; left:0; */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity .8s ease;
+  left: 0;
+  top: 0;
+  animation: none !important; /* disable earlier keyframe animation to avoid conflicts */
+  transform: translateZ(0);    /* help rendering stability */
+}
+
+/* The visible slide */
+.slideshow img.active {
+  opacity: 1;
+  z-index: 2;
+}
+</style>
+
+  <style>
+    /* --- About Page Overrides --- */
+
+    .team {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 50px 20px;
+    }
+
+    .team div {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--line);
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .team div:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .team img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      border: 3px solid var(--aqua);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .team h2 {
+      font-size: 1.25rem;
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+
+    .team p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    /* Gallery section */
+    .gallery {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--cloud);
+    }
+
+    .gallery h2 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      color: var(--blue);
+    }
+
+    .gallery p {
+      color: var(--muted);
+      margin-bottom: 25px;
+    }
+
+    .slideshow {
+      position: relative;
+      max-width: 960px;
+      margin: 0 auto;
+      height: 380px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .slideshow img {
+      border-radius: 0;
+    }
+
+    /* Footer override */
+    footer {
+      text-align:center;
+      padding:18px;
+      font-size:14px;
+      background: var(--blue);
+      color:#fff;
+    }
+
+    footer a {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Extra mobile polish */
+    @media (max-width: 640px) {
+      .team {
+        padding: 32px 16px;
+      }
+      .team p {
+        text-align: center;
+      }
+      .slideshow {
+        height: 240px;
+      }
+    }
+  </style>
 </head>
 <body class="about">
-    <header>
-        <h1 class="brand-title">Meet The Team</h1>
-        <nav>
-            <a href="home.html">Home</a>
-            <a href="chat.html">Chat</a>
-            <a href="help.html">Help Centre</a>
-            <a href="faq.html">FAQ</a>
-            <a href="pay.html">Plans</a>
-            <a href="about.html">About Us</a>
-            <a href="services.html">Services</a>
-        </nav>
-    </header>
+  <header>
+    <h1 class="brand-title">Meet The Team</h1>
+    <nav>
+      <a href="home.html">Home</a>
+      <a href="chat.html">Chat</a>
+      <a href="help.html">Help Centre</a>
+      <a href="faq.html">FAQ</a>
+      <a href="pay.html">Plans</a>
+      <a href="about.html">About Us</a>
+      <a href="services.html">Services</a>
+    </nav>
+  </header>
 
-    <section class="team">
-        <div>
-            <img src="images/Dorc.jpeg" alt="Dorcas Edima Eduk">
-            <h2>CEO: Dorcas Eduk</h2>
-            <p>Dorcas Eduk is a passionate woman on a mission to bridge wellness, technology, and human connection.
+  <section class="team">
+    <div>
+      <img src="images/Dorc.jpeg" alt="Dorcas Edima Eduk">
+      <h2>CEO: Dorcas Eduk</h2>
+      <p>Dorcas Eduk is a passionate woman on a mission to bridge wellness, technology, and human connection. She holds a Bachelor’s degree in Human Nutrition and Dietetics from Ambrose Alli University, where she developed a strong understanding of how food, science, and lifestyle influence wellbeing. She founded Rant2Me to offer a safe, anonymous space for people to express themselves without judgment.</p>
+    </div>
 
-                She holds a Bachelor’s degree in Human Nutrition and Dietetics from Ambrose Alli University, where she developed a strong understanding of how food, science, and lifestyle influence both physical and emotional wellbeing.
-                
-                As a wellness advocate, Dorcas has worked with clients across a wide range of needs, from managing diet-related health conditions to making sense of data for smarter, more human-centered decisions. Her approach is grounded in empathy, and genuine respect for individual experience.
-                
-                She founded RANT2ME to offer a soft, anonymous space for people who simply need to let it all out without pressure, judgment, or unwanted advice.Dorcas is there to listen.
-                
-                When she’s not holding space for others, she’s often buried in a book, chasing something new to learn, or dreaming up her next hair goal.</p>
-        </div>
+    <div>
+      <img src="images/TJ.jpg" alt="Tana Joshua Ayo-Ogbor">
+      <h2>CTO: Tana Ayo-Ogbor</h2>
+      <p>Tana is passionate about technology for mental health support. He ensures that Rant2Me is powered by innovative, reliable, and user-friendly technology to create meaningful digital experiences.</p>
+    </div>
 
-        <div>
-            <img src="images/TJ.jpg" alt="Tana Joshua Ayo-Ogbor">
-            <h2>CTO: Tana Ayo-Ogbor</h2>
-            <p>Tana is passionate about technology for mental health support.</p>
-        </div>
+    <div>
+      <img src="images/Annonymous.jpg" alt="Chi">
+      <h2>COO: Chidera Umezurike</h2>
+      <p>Chidera oversees daily operations, making sure Rant2Me runs smoothly for everyone. She is dedicated to wellness, mental health, and building empathetic spaces. Outside of work, she enjoys cooking, novels, and exploring ideas on YouTube.</p>
+    </div>
+  </section>
 
-        <div>
-            <img src="images/Annonymous.jpg" alt="Chi">
-            <h2>COO: Chidera Umezurike</h2>
-            <p>Chi handles operations, making sure Rant2Me runs smoothly for everyone. Chidera Umezurike is a dedicated and passionate public health student with a strong interest in healthcare, wellness and mental health
+  <section class="gallery">
+    <h2>Find Peace In Life</h2>
+    <p>More pictures coming soon!</p>
+    <div class="slideshow">
+      <img src="images/moving-forward-4777506_1920.jpg" class="slide" />
+      <img src="images/business-3208596_1920.jpg" class="slide" />
+      <img src="images/landscape-3703479_1920.jpg" class="slide" />
+    </div>
+  </section>
 
-                As a people's person, Chidera thrives in an environment where she can engage with others in meaningful conversations, build relationships and make a positive impact.
-                
-                My goal as a mental health therapist is to provide empathetic and non judgemental support, empowering clients and building a therapeutic relationship
-                
-                Chidera spends most of her time cooking, reading novels and watching YouTube videos.
-                </p>
-        </div>
-    </section>
-    <script src="script.js"></script>
-    <footer style="text-align:center; padding:15px; font-size:14px; background:#f5f5f5;">
-  &copy; 2025 Rant2Me | <a href="#" onclick="showDisclaimer()" style="color:#007BFF; text-decoration:none;">Disclaimer & Terms</a>
-</footer>
+  <footer>
+    &copy; 2025 Rant2Me | <a href="#" onclick="showDisclaimer()">Disclaimer & Terms</a>
+  </footer>
 
+  <script>
+    function showDisclaimer() {
+      alert("Disclaimer & Terms: Content provided on Rant2Me is for emotional support and listening purposes only, not professional medical advice.");
+    }
+  </script>
+  <!-- Put this just before the closing </body> -->
 <script>
-  function showDisclaimer() {
-    document.getElementById("disclaimerModal").style.display = "flex";
-  }
+document.addEventListener('DOMContentLoaded', () => {
+  const slides = Array.from(document.querySelectorAll('.slideshow img'));
+  if (!slides.length) return;
+
+  // initialize
+  let idx = 0;
+  slides.forEach((s, i) => s.classList.toggle('active', i === 0));
+
+  // cycle every 4s (adjust as you like)
+  const INTERVAL_MS = 4000;
+  setInterval(() => {
+    slides[idx].classList.remove('active');
+    idx = (idx + 1) % slides.length;
+    slides[idx].classList.add('active');
+  }, INTERVAL_MS);
+});
 </script>
 </body>
 </html>
-
-<section class="gallery">
-    <h2>Our Moments</h2>
-    <p>More pictures and stories coming soon!</p>
-    <div class="image-grid">
-        <img src="images/ronnie-overgoor-EdKCckXXRCI-unsplash.jpg" alt="Coming soon image">
-        <img src="images/andrea-de-santis-YElG04lSJcM-unsplash.jpg" alt="Coming soon image">
-    </div>
-</section>

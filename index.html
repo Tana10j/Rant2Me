@@ -21,11 +21,13 @@
 
     <!-- Login Form -->
     <div id="loginForm" class="form active-form">
-      <input type="email" id="loginEmail" placeholder="Email" required />
-      <input type="password" id="loginPassword" placeholder="Password" required />
-      <button onclick="login()">Login</button>
-      <p id="login-error-msg"></p>
-    </div>
+  <input type="email" id="loginEmail" placeholder="Email" required />
+  <input type="password" id="loginPassword" placeholder="Password" required />
+  <button onclick="login()">Login</button>
+  <p><a href="#" onclick="resetPassword()">Forgot Password?</a></p>
+  <p id="login-error-msg"></p>
+  <p id="reset-msg"></p>
+</div>
 
     <!-- Signup Form -->
     <div id="signupForm" class="form">
@@ -116,6 +118,30 @@
       signupForm.classList.add("active-form");
       loginForm.classList.remove("active-form");
     });
+
+    import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+// Forgot Password
+window.resetPassword = () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const resetMsg = document.getElementById("reset-msg");
+
+  if (!email) {
+    resetMsg.textContent = "Please enter your email to reset password.";
+    resetMsg.style.color = "var(--danger-color)";
+    return;
+  }
+
+  sendPasswordResetEmail(auth, email)
+    .then(() => {
+      resetMsg.textContent = "Password reset link sent! Check your email.";
+      resetMsg.style.color = "lightgreen";
+    })
+    .catch((error) => {
+      resetMsg.textContent = error.message;
+      resetMsg.style.color = "var(--danger-color)";
+    });
+};
   </script>
 </body>
 </html>

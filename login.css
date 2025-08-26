@@ -4,7 +4,7 @@
   --dark-color: #0a192f; /* Deep Navy */
   --light-color: #e6f1ff;
   --danger-color: #e74c3c;
-  --glass-bg: rgba(17, 34, 64, 0.85);
+  --glass-bg: rgba(17, 34, 64, 0.6);
   --border-glow: rgba(100, 255, 218, 0.6);
 }
 
@@ -38,7 +38,7 @@ body {
   width: 100%;
   max-width: 420px;
   text-align: center;
-  border: 1px solid rgba(100, 255, 218, 0.2);
+  border: 1px solid rgba(100, 255, 218, 0.3);
   animation: floatUp 1.5s ease forwards;
 }
 
@@ -175,4 +175,9 @@ body {
   background: url('images/2151073985.jpg') no-repeat center center fixed;
   background-size: cover;
   font-family: Arial, sans-serif;
+}
+#reset-msg {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: var(--primary-color);
 }

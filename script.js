@@ -59,7 +59,7 @@ if (currentPage === "chat.html") {
             } else if (lowerMsg.includes("sad") || lowerMsg.includes("depressed") || lowerMsg.includes("lonely") || lowerMsg.includes("unhappy") || lowerMsg.includes("down") || lowerMsg.includes("miserable") || lowerMsg.includes("cry") || lowerMsg.includes("tear")) {
                 reply = "I’m sorry you’re feeling this way. You’re not alone, and it’s okay to express it here. Your rant will auto-delete in 5 minutes, but you can choose a support section if you’d like to continue.";
             } else if (lowerMsg.includes("angry") || lowerMsg.includes("frustrated") || lowerMsg.includes("mad") || lowerMsg.includes("upset") || lowerMsg.includes("Vex") || lowerMsg.includes("irritated") || lowerMsg.includes("annoyed") || lowerMsg.includes("rage")) {
-                reply = "It’s completely valid to feel angry sometimes. This space is judgment-free — let it out. In 5 minutes, this chat will be wiped for your privacy.";
+                reply = "It’s completely valid to feel angry sometimes. This space is judgment-free, let it out. In 5 minutes, this chat will be wiped for your privacy.";
             } else if (lowerMsg.includes("thanks") || lowerMsg.includes("thank you") || lowerMsg.includes("appreciate") || lowerMsg.includes("grateful") || lowerMsg.includes("cheers") || lowerMsg.includes("bless") || lowerMsg.includes("gratitude")) {
                 reply = "You’re welcome. I’m glad this space could be here for you.";
                 } else if (lowerMsg.includes("Happy") || lowerMsg.includes (" joyful") || lowerMsg.includes("excited") || lowerMsg.includes("content") || lowerMsg.includes("pleased") || lowerMsg.includes("delighted") || lowerMsg.includes("cheerful") || lowerMsg.includes("elated")) {

@@ -14,7 +14,6 @@
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Tailwind theme tweak -->
   <script>
     tailwind.config = {
       theme: {
@@ -40,25 +39,46 @@
   <style>
     body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
     h1.brand { font-family: "Cinzel Decorative", serif; }
+
+    /* Chat bubble animations */
+    .bubble {
+      transition: all 0.2s ease-in-out;
+    }
+    .bubble.new-message {
+      transform: translateY(10px);
+      opacity: 0;
+      animation: bubbleIn 0.3s forwards;
+    }
+    @keyframes bubbleIn {
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Scrollbar */
+    #messages::-webkit-scrollbar { width: 6px; }
+    #messages::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius:3px; }
   </style>
 </head>
 <body class="bg-gradient-to-b from-white to-slate-50 text-slate-800 min-h-screen flex flex-col">
 
   <!-- HEADER -->
   <header class="sticky top-0 z-40 bg-gradient-to-b from-r2m-blue to-r2m-blue-600 text-white shadow">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0">
       <a href="home.html" class="flex items-center gap-3">
         <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
         <div>
-          <h1 class="brand text-2xl leading-tight">Rant<span class="text-r2m-aqua">2</span>Me Admin</h1>
-          <div class="text-xs opacity-80 -mt-1">Chidera's Dashboard</div>
+          <h1 class="brand text-xl md:text-2xl leading-tight">Rant<span class="text-r2m-aqua">2</span>Me Admin</h1>
+          <div class="text-xs opacity-80 -mt-1">Admin Dashboard</div>
         </div>
       </a>
 
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap gap-2 md:gap-3">
         <button onclick="window.location.href='log.html'" 
           class="px-4 py-2 bg-r2m-sky text-white rounded-md font-semibold shadow hover:scale-[1.02] transition">
           Mood Logs
+        </button>
+        <button onclick="window.location.href='admin-resources.html'" 
+          class="px-4 py-2 bg-r2m-sky text-white rounded-md font-semibold shadow hover:scale-[1.02] transition">
+          Manage Resources
         </button>
         <button id="signOutBtn" 
           class="px-4 py-2 bg-white/90 text-r2m-blue rounded-md font-semibold shadow hover:bg-slate-100 transition">
@@ -68,48 +88,40 @@
     </div>
   </header>
 
+  <!-- MOBILE SIDEBAR OVERLAY -->
+  <div id="sidebarOverlay" class="fixed inset-0 bg-black/40 z-40 hidden md:hidden"></div>
+
   <!-- MAIN -->
-  <main class="flex-1 max-w-7xl mx-auto w-full flex flex-col md:flex-row h-[calc(100vh-80px)]">
-    
+  <main class="flex-1 max-w-7xl mx-auto w-full flex flex-col md:flex-row h-[calc(100vh-80px)] relative">
+
     <!-- SIDEBAR THREADS -->
-     <aside id="sidebar" 
-  class="w-full md:w-80 bg-white shadow-r-md border-r border-slate-200 flex flex-col 
-         max-h-60 md:max-h-none md:h-auto overflow-y-auto 
-         transform md:transform-none -translate-x-full md:translate-x-0 
-         fixed md:static top-20 left-0 z-50 transition-transform duration-300 ease-in-out">
-      <div class="p-4 border-b border-slate-200">
+    <aside id="sidebar" 
+      class="w-72 bg-white shadow-r-md border-r border-slate-200 flex flex-col
+             max-h-full overflow-y-auto
+             transform -translate-x-full md:translate-x-0 md:static
+             fixed top-0 left-0 z-50 transition-transform duration-300 ease-in-out">
+      <div class="p-4 border-b border-slate-200 sticky top-0 bg-white z-10">
         <h2 class="text-lg font-bold text-r2m-blue">Chidera's Chats</h2>
       </div>
       <div id="threadsList" class="flex-1 overflow-y-auto p-3 space-y-2">
         <div class="text-slate-500 italic">Loading chats…</div>
-        <!-- Example chat thread card -->
-        <!--
-        <div class="p-3 bg-slate-50 rounded shadow-sm cursor-pointer hover:bg-slate-100 flex justify-between items-center">
-          <div>
-            <p class="font-semibold text-slate-800">John Doe</p>
-            <p class="text-sm text-slate-500 truncate">Last message preview…</p>
-          </div>
-          <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">3</span>
-        </div>
-        -->
       </div>
     </aside>
 
     <!-- CHAT AREA -->
     <section class="flex-1 flex flex-col bg-slate-50">
       <!-- CHAT HEADER -->
-         <button id="toggleSidebar" class="md:hidden px-3 py-2 text-slate-600">
-  <!-- Hamburger icon -->
-  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-  </svg>
-</button>
-      <div class="flex items-center justify-between bg-white shadow px-6 py-3 border-b border-slate-200">
-        <div class="flex items-center gap-2">
+      <div class="flex items-center justify-between bg-white shadow px-4 py-3 border-b border-slate-200 sticky top-0 z-20">
+        <button id="toggleSidebar" class="md:hidden px-3 py-2 text-slate-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div class="flex items-center gap-2 flex-1">
           <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9" />
           </svg>
-          <h3 id="chatHeaderTitle" class="text-lg font-semibold text-slate-800">No chat selected</h3>
+          <h3 id="chatHeaderTitle" class="text-lg font-semibold text-slate-800 truncate">No chat selected</h3>
         </div>
         <div class="relative">
           <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -120,16 +132,16 @@
       </div>
 
       <!-- MESSAGES -->
-      <div id="messages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+      <div id="messages" class="flex-1 overflow-y-auto p-4 space-y-4">
         <div class="text-slate-400 italic">Select a chat to view messages</div>
       </div>
 
       <!-- INPUT -->
-      <div class="bg-white border-t border-slate-200 p-4 flex items-center gap-3">
+      <div class="bg-white border-t border-slate-200 p-3 flex items-center gap-2 sticky bottom-0 z-10">
         <input id="replyInput" placeholder="Type your reply..." 
           class="flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-r2m-sky" />
         <button id="sendReplyBtn" 
-          class="bg-r2m-sky hover:bg-r2m-aqua text-white px-5 py-2 rounded-lg font-semibold shadow-md transition">
+          class="bg-r2m-sky hover:bg-r2m-aqua text-white px-4 py-2 rounded-lg font-semibold shadow-md transition">
           Send
         </button>
       </div>
@@ -137,26 +149,39 @@
   </main>
 
   <script type="module" src="./admin-student.js"></script>
- <script>
-  const sidebar = document.getElementById('sidebar');
-  const toggleBtn = document.getElementById('toggleSidebar');
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const toggleBtn = document.getElementById('toggleSidebar');
 
-  if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
       sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
     });
-  }
 
-  // Auto-close sidebar when clicking a thread (on mobile only)
-  const threadsList = document.getElementById('threadsList');
-  threadsList.addEventListener('click', (e) => {
-    // only auto-close if the clicked element is a thread card
-    if (e.target.closest('.thread-card')) {
-      if (window.innerWidth < 768) { // md breakpoint
-        sidebar.classList.add('-translate-x-full');
+    overlay.addEventListener('click', () => {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    });
+
+    const threadsList = document.getElementById('threadsList');
+    threadsList.addEventListener('click', (e) => {
+      if (e.target.closest('.thread-item')) {
+        if (window.innerWidth < 768) {
+          sidebar.classList.add('-translate-x-full');
+          overlay.classList.add('hidden');
+        }
       }
-    }
-  });
-</script>
+    });
+
+    // Scroll to bottom on new message
+    const messagesEl = document.getElementById('messages');
+    const observer = new MutationObserver(() => {
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      const lastBubble = messagesEl.lastElementChild?.querySelector('.bubble');
+      if (lastBubble) lastBubble.classList.add('new-message');
+    });
+    observer.observe(messagesEl, { childList: true });
+  </script>
 </body>
 </html>

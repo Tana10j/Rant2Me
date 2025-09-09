@@ -61,9 +61,10 @@ function attachServiceClicks() {
         location.href = "chat.html#anon";
         return;
       }
-      else if (service === 'Resources') {
-      window.location.href = 'resource.html';
-      }
+      else if (service === 'resources') {
+  location.href = 'resource.html';
+  return;
+}
       // Admin shortcuts (always allowed for admins)
       if (service === 'counselling' && (userRole === "counselling" || userEmail === "tana10j@gmail.com")) {
         location.href = "admin-counselling.html";

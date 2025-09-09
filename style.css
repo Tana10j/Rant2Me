@@ -372,3 +372,74 @@ header h1 {
   40%  { opacity: 0; }
   100% { opacity: 0; }
 }
+/* ========= Responsive Nav (Hamburger + Drawer) ========= */
+.hamburger {
+  display: none;
+  font-size: 26px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 260px;
+  height: 100%;
+  background: var(--blue-600);
+  color: white;
+  padding: 20px;
+  transition: left 0.3s ease;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.drawer.open {
+  left: 0;
+}
+
+.drawer nav a,
+.drawer nav button {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 12px 0;
+  font-weight: 600;
+  border: none;
+  background: none;
+  text-align: left;
+}
+
+.drawer nav a:hover {
+  color: var(--aqua);
+}
+
+.drawer-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 1000;
+}
+
+.drawer-overlay.show {
+  display: block;
+}
+
+/* Hide desktop nav on mobile */
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none;
+  }
+  .hamburger {
+    display: block;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+  }
+}

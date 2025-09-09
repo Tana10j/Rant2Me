@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Contact Us — Rant2Me</title>
+
+  <!-- favicon -->
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+    .brand { font-family: "Cinzel Decorative", serif; }
+  </style>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function(){ 
+      try { emailjs.init("jqARK9d1VArhRM_lp"); } 
+      catch(e){ console.warn('EmailJS init failed', e); } 
+    })();
+  </script>
+</head>
+<body class="bg-gradient-to-b from-white to-slate-50 min-h-screen text-slate-800 flex flex-col">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white border-b shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <!-- Brand -->
+      <a href="home.html" class="flex items-center gap-3">
+        <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
+        <div>
+          <h1 class="brand text-2xl leading-tight text-r2m-blue">Rant<span class="text-r2m-aqua">2</span>Me</h1>
+          <p class="text-xs opacity-70 -mt-1">Contact & Support</p>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
+        <a href="home.html" class="hover:text-r2m-aqua">Home</a>
+        <a href="chat.html" class="hover:text-r2m-aqua">Chat</a>
+        <a href="help.html" class="hover:text-r2m-aqua">Help</a>
+        <a href="faq.html" class="hover:text-r2m-aqua">FAQ</a>
+        <a href="pay.html" class="hover:text-r2m-aqua">Plans</a>
+        <a href="about.html" class="hover:text-r2m-aqua">About</a>
+      </nav>
+
+      <!-- Mobile Nav -->
+      <div class="md:hidden">
+        <select onchange="if(this.value) location=this.value;" class="border rounded px-2 py-1 text-sm">
+          <option value="">Menu</option>
+          <option value="home.html">Home</option>
+          <option value="chat.html">Chat</option>
+          <option value="help.html">Help</option>
+          <option value="faq.html">FAQ</option>
+          <option value="pay.html">Plans</option>
+          <option value="about.html">About</option>
+          <option value="contactus.html" selected>Contact</option>
+        </select>
+      </div>
+
+      <!-- Login -->
+      <div class="hidden md:flex items-center gap-3">
+        <a href="index.html" class="px-4 py-2 bg-r2m-aqua text-white rounded-md font-semibold shadow-sm">Login</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="bg-gradient-to-r from-r2m-blue to-r2m-blue-600 text-white text-center py-12">
+    <h2 class="text-3xl md:text-4xl font-bold">We’re here to help</h2>
+    <p class="mt-2 text-lg opacity-90">Whether you’re facing a payment issue, need support, or want to share feedback — reach out to us below.</p>
+  </section>
+
+  <!-- Main Content -->
+  <main class="flex-grow max-w-6xl mx-auto px-4 py-10 space-y-10">
+
+    <!-- Contact Form Section -->
+    <section class="bg-white p-8 rounded-lg shadow-md">
+      <h3 class="text-2xl font-bold text-r2m-blue">Contact us</h3>
+      <p class="text-slate-600 mt-2">Fill the form below or reach us directly via WhatsApp. We aim to reply within 24 hours.</p>
+
+      <div class="mt-8 grid gap-10 lg:grid-cols-2">
+        
+        <!-- Left: Contact Form -->
+        <div>
+          <form id="contact-form" class="space-y-5">
+            <div>
+              <label class="text-sm font-medium">Name</label>
+              <input type="text" id="name" placeholder="Your name" class="mt-1 block w-full border rounded-lg px-3 py-2 focus:ring focus:ring-r2m-aqua" required />
+            </div>
+            <div>
+              <label class="text-sm font-medium">Email</label>
+              <input type="email" id="email" placeholder="you@example.com" class="mt-1 block w-full border rounded-lg px-3 py-2 focus:ring focus:ring-r2m-aqua" required />
+            </div>
+            <div>
+              <label class="text-sm font-medium">Subject</label>
+              <input type="text" id="subject" placeholder="Short summary" class="mt-1 block w-full border rounded-lg px-3 py-2 focus:ring focus:ring-r2m-aqua" required />
+            </div>
+            <div>
+              <label class="text-sm font-medium">Message</label>
+              <textarea id="message" rows="6" placeholder="Describe your issue or feedback..." class="mt-1 block w-full border rounded-lg px-3 py-2 focus:ring focus:ring-r2m-aqua" required></textarea>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <button id="send-form" type="submit" class="px-5 py-2 bg-r2m-aqua text-white rounded-lg font-semibold shadow hover:bg-r2m-blue">Send message</button>
+              <div id="form-status" class="text-sm text-slate-600"></div>
+            </div>
+          </form>
+          <p class="mt-4 text-xs text-slate-500"><strong>Note:</strong> For payment issues, include your <strong>tx_ref</strong> and a screenshot if possible.</p>
+        </div>
+
+        <!-- Right: Contact Details -->
+        <aside class="space-y-6">
+          <div class="bg-slate-50 p-5 rounded-lg border shadow-sm">
+            <h4 class="font-semibold text-lg">Direct Support</h4>
+            <p class="text-sm text-slate-600 mt-2">Prefer chat? Contact us on WhatsApp:</p>
+            <a href="https://wa.me/2348161127500?text=Hi,+I+need+help+with..." 
+               class="mt-4 inline-flex items-center gap-3 px-4 py-2 bg-green-500 text-white rounded-lg font-medium">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/></svg>
+              Chat on WhatsApp
+            </a>
+            <div class="mt-4 text-sm text-slate-700">
+              <div><strong>Email:</strong> <a href="mailto:edukdorcas@gmail.com" class="hover:underline">edukdorcas@gmail.com</a></div>
+              <div><strong>Phone:</strong> +234-8161127500</div>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-5 rounded-lg border shadow-sm">
+            <h4 class="font-semibold text-lg">Office Hours</h4>
+            <p class="text-sm text-slate-600 mt-2">Mon–Fri, 09:00–17:00 (WAT). Fastest replies are via WhatsApp.</p>
+          </div>
+
+          <div class="bg-slate-50 p-5 rounded-lg border shadow-sm">
+            <h4 class="font-semibold text-lg">Privacy</h4>
+            <p class="text-sm text-slate-600 mt-2">We only use submitted information to handle your request. For details, check our <a href="about.html" class="text-r2m-aqua hover:underline">About</a> and <a href="help.html" class="text-r2m-aqua hover:underline">Help</a> pages.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Other Help Options -->
+    <section class="bg-white p-8 rounded-lg shadow-md">
+      <h3 class="text-xl font-bold text-r2m-blue">Other ways to get help</h3>
+      <p class="text-slate-600 mt-2">You can also use our chat service for anonymous venting or purchase a plan to access specialists.</p>
+      <div class="mt-6 flex gap-4 flex-wrap">
+        <a href="chat.html" class="px-4 py-2 border rounded-lg hover:bg-slate-100">Anonymous chat</a>
+        <a href="pay.html" class="px-4 py-2 bg-r2m-aqua text-white rounded-lg shadow hover:bg-r2m-blue">Buy a plan</a>
+        <a href="faq.html" class="px-4 py-2 border rounded-lg hover:bg-slate-100">FAQ</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-100 text-center py-6 text-sm text-slate-600 mt-10">
+    &copy; 2025 Rant2Me • 
+    <a href="about.html" class="text-r2m-aqua hover:underline">About</a> • 
+    <a href="help.html" class="text-r2m-aqua hover:underline">Help</a>
+    <div class="mt-2 text-xs">
+      <!-- Admin link (hidden from public unless manually accessed) -->
+      <a href="admin.html" class="text-slate-400 hover:underline">Admin Access</a>
+    </div>
+  </footer>
+
+  <!-- Script: EmailJS + Firestore backup -->
+  <script type="module">
+    const EMAILJS_SERVICE = 'service_cg2vvr2';
+    const EMAILJS_TEMPLATE = 'template_68qimta';
+
+    let db;
+    try {
+      const mod = await import('./firebase.js');
+      db = mod.db;
+    } catch (e) {
+      console.warn('Could not import firebase db (fallback only):', e);
+      db = null;
+    }
+
+    let addDoc, collection, serverTimestamp;
+    if (db) {
+      try {
+        const firestore = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+        addDoc = firestore.addDoc;
+        collection = firestore.collection;
+        serverTimestamp = firestore.serverTimestamp;
+      } catch (e) {
+        console.warn('Firestore import failed:', e);
+      }
+    }
+
+    const form = document.getElementById('contact-form');
+    const statusEl = document.getElementById('form-status');
+    const sendBtn = document.getElementById('send-form');
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      statusEl.textContent = '';
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Sending...';
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const subject = document.getElementById('subject').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (!name || !email || !message) {
+        statusEl.textContent = 'Please fill all required fields.';
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Send message';
+        return;
+      }
+
+      let emailResult = null;
+      try {
+        emailResult = await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+          from_name: name,
+          from_email: email,
+          subject,
+          message
+        });
+        statusEl.textContent = 'Message sent! We’ll reply soon.';
+      } catch (e) {
+        console.warn('EmailJS failed:', e);
+        statusEl.textContent = 'Email failed. Saving backup...';
+      }
+
+      if (db && addDoc) {
+        try {
+          await addDoc(collection(db, 'shares'), {
+            name, email, subject, message,
+            createdAt: serverTimestamp ? serverTimestamp() : Date.now()
+          });
+          if (!emailResult) statusEl.textContent = 'Message saved. Support will follow up.';
+        } catch (e) {
+          console.warn('Firestore backup failed:', e);
+          if (!emailResult) {
+            statusEl.innerHTML = 'Could not send your message. Please contact us on <a href="https://wa.me/2348161127500?text=I+need+help" class="text-r2m-aqua underline">WhatsApp</a>.';
+          }
+        }
+      }
+
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Send message';
+      form.reset();
+    });
+  </script>
+</body>
+</html>

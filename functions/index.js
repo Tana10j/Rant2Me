@@ -22,7 +22,7 @@ const cors = corsLib({ origin: true });
 // ── PLANS (server-side source of truth) ───────────────────────────────────────
 const PLANS = {
   // TEST plan (delete later)
-  test10:      { minutes: 10,    amount: 100,   currency: 'NGN' },
+ // test10:      { minutes: 10, amount: 100, currency: 'NGN' }, // DELETE THIS
 
   basic20:     { minutes: 20,    amount: 1000,  currency: 'NGN' },
   pro60:       { minutes: 60,    amount: 2500,  currency: 'NGN' },
@@ -297,5 +297,83 @@ exports.flwWebhook = functions.region(REGION).https.onRequest((req, res) => {
       if (e && e.code === 'functions/permission-denied') return res.status(401).send('bad-signature');
       return res.status(200).send('error-logged');
     }
+    // Create a hosted checkout session and return the link
+exports.createPayment = functions.region(REGION).https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      if (req.method === 'OPTIONS') return res.status(204).send('');
+      if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+      const authHeader = req.get('Authorization') || '';
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      if (!token) return res.status(401).json({ error: 'Missing Authorization' });
+
+      const decoded = await admin.auth().verifyIdToken(token).catch(() => null);
+      if (!decoded || !decoded.uid) return res.status(401).json({ error: 'Invalid Auth token' });
+
+      if (!FLW_SECRET) return res.status(412).json({ error: 'Flutterwave secret not configured' });
+
+      const { tx_ref, amount, currency = 'NGN', section, minutes, planId, redirect_url } = req.body || {};
+      if (!tx_ref || !amount || !section || !minutes || !planId) {
+        return res.status(400).json({ error: 'Missing fields' });
+      }
+
+      const plan = PLANS[planId];
+      if (!plan) return res.status(400).json({ error: 'Unknown planId' });
+
+      if (Number(amount) !== Number(plan.amount) ||
+          String(currency).toUpperCase() !== plan.currency) {
+        return res.status(400).json({ error: 'Amount/currency mismatch' });
+      }
+
+      const payload = {
+        tx_ref,
+        amount: Number(amount),
+        currency: String(currency).toUpperCase(),
+        payment_options: 'card,banktransfer,ussd', // keeps transfer working
+        redirect_url: redirect_url || 'https://YOUR_DOMAIN/payment-done.html',
+        customer: {
+          email: decoded.email || `${decoded.uid}@user.rant2me`,
+          name: decoded.name || 'Rant2Me User'
+        },
+        customizations: {
+          title: 'Rant2Me',
+          description: `Access to ${section} chat`,
+          logo: ''
+        },
+        meta: {
+          userId: decoded.uid,
+          section,
+          minutes,
+          planId
+        }
+      };
+
+      const resp = await fetch('https://api.flutterwave.com/v3/payments', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${FLW_SECRET}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const text = await resp.text();
+      let data; try { data = JSON.parse(text); } catch { data = null; }
+
+      if (!resp.ok) {
+        return res.status(resp.status).json({ error: data?.message || text || 'Flutterwave error' });
+      }
+
+      const link = data?.data?.link;
+      if (!link) return res.status(500).json({ error: 'No payment link from Flutterwave' });
+
+      return res.status(200).json({ link });
+    } catch (e) {
+      console.error('createPayment error:', e);
+      return res.status(500).json({ error: e.message || 'Server error' });
+    }
+  });
+});
   });
 });

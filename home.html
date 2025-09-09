@@ -1,127 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rant2Me — Home</title>
+
   <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
-    <meta charset="UTF-8">
-    <title>Rant2Me - Home</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="home">
-  <div class="banner">
-  <span>✨ Statement of the Week Coming Soon✨</span>
-</div>
-    <header>
-       <h1 class="brand-title">Welcome to Rant2Me</h1>
-       <!-- Daily Mood Modal -->
-<div id="moodModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-  background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:#fff; padding:20px; max-width:400px; width:90%; border-radius:8px; text-align:center;">
-    <h2>Daily Mood Check-In</h2>
-    <p>How are you feeling today?</p>
-    <div style="margin:15px 0;">
-      <button class="moodBtn" data-mood="😊">😊 Good</button>
-      <button class="moodBtn" data-mood="😐">😐 Okay</button>
-      <button class="moodBtn" data-mood="😔">😔 Bad</button>
-    </div>
-    <button onclick="closeMoodModal()" style="padding:8px 16px; background:#007BFF; color:#fff; border:none; border-radius:4px;">Skip</button>
-  </div>
-</div>
-        <nav>
-            <a href="home.html">Home</a>
-            <a href="chat.html">Chat</a>
-            <a href="help.html">Help Centre</a>
-            <a href="faq.html">FAQ</a>
-            <a href="pay.html">Plans</a>
-            <a href="about.html">About Us</a>
-            <a href="services.html">Services</a>
-            <button id="logoutBtn" style="margin-left: 10px;">Logout</button>
-        </nav>
-    </header>
 
-    <section class="welcome">
-        <img src="images/counselling_black_people.jpg" alt="Counselling Session">
-        <h2 id="typing-text"></h2>
-    </section>    
-
-    <p class="quote">"Sometimes all we need is for someone to listen."</p>
-
-    <section class="gallery">
-        <h2>Find Peace In Nature</h2>
-        <p>More pictures coming soon!</p>
-        <div class="slideshow">
-  <img src="images/forest-3804001_1920.jpg" class="slide" />
-  <img src="images/horse-7993644_1920.jpg" class="slide" />
-  <img src="images/landscape-9556563_1920.jpg" class="slide" />
-  <img src="images/milky-way-8149815_1920.jpg" class="slide" />
-  <img src="images/mountains-5112952_1920.jpg" class="slide" />
-  <img src="images/landscape-7373484_1920.jpg" class="slide" />
-  <img src="images/rice-field-3490060_1920.jpg" class="slide" />
-  <img src="images/autumn-7541345_1920.jpg" class="slide" />
-</div>
-    </section>
-
-    <section class="newsletter">
-        <h2>📩 Subscribe to Our Weekly Newsletter</h2>
-        <p>Get infonomics insights, lifestyle hacks, and wellness tips from Rant2Me.</p>
-        <div class="newsletter-embed">
-            <iframe src="https://rant2me.substack.com/embed" 
-                    width="480" height="320" 
-                    style="border:1px solid #EEE; background:white;" 
-                    frameborder="0" scrolling="no"></iframe>
-        </div>
-    </section>
-    <!-- ✅ End Newsletter -->
-
-    <script src="script.js"></script>
-
-    <!-- ✅ Combined Firebase Auth logic in one script -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
-            authDomain: "rant2me-ab36b.firebaseapp.com",
-            projectId: "rant2me-ab36b",
-            storageBucket: "rant2me-ab36b.appspot.com",
-            messagingSenderId: "245661393279",
-            appId: "1:245661393279:web:b31483f57a40cf2c807a4a",
-            measurementId: "G-KPCSJTSMT9"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-
-        // ✅ Restrict access if not logged in
-       onAuthStateChanged(auth, (user) => {
-    if (user) {
-        // User is logged in, do nothing
-        console.log("User is authenticated:", user.email);
-    } else {
-        // Wait a bit before redirecting to be sure Firebase finished initializing
-        setTimeout(() => {
-            window.location.href = "index.html";
-        }, 100); // short delay to avoid false redirect
-            }
-        });
-
-        // ✅ Logout functionality
-        const logoutBtn = document.getElementById("logoutBtn");
-        if (logoutBtn) {
-            logoutBtn.addEventListener("click", () => {
-                signOut(auth)
-                    .then(() => {
-                        window.location.href = "index.html"; // redirect after logout
-                    })
-                    .catch((error) => {
-                        alert("Error signing out: " + error.message);
-                    });
-            });
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'r2m-blue': '#0d1b2a',
+            'r2m-blue-600': '#1b263b',
+            'r2m-aqua': '#00b4d8',
+            'r2m-sky': '#0077b6',
+            'r2m-gold': '#F5C542'
+          },
+          borderRadius: { 'r-lg': '14px' },
+          boxShadow: {
+            'r-lg': '0 18px 40px rgba(0,43,85,.18)',
+            'r-md': '0 10px 24px rgba(0,43,85,.14)',
+            'r-sm': '0 6px 14px rgba(0,43,85,.10)'
+          }
         }
-    </script>
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+    h1.brand { font-family: "Cinzel Decorative", serif; }
+    .fade-in { animation: fadeIn .9s ease both; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none } }
+    .slide { display:none; border-radius:14px; }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-white to-slate-50 text-slate-800 min-h-screen">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-40 bg-gradient-to-b from-r2m-blue to-r2m-blue-600 text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="home.html" class="flex items-center gap-3">
+        <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
+        <div>
+          <h1 class="brand text-2xl leading-tight">Rant<span class="text-r2m-aqua">2</span>Me</h1>
+          <div class="text-xs opacity-80 -mt-1">Speak freely. Be heard.</div>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
+        <a href="home.html" class="hover:text-r2m-aqua underline">Home</a>
+        <a href="chat.html" class="hover:text-r2m-aqua">Chat</a>
+        <a href="help.html" class="hover:text-r2m-aqua">Help Centre</a>
+        <a href="faq.html" class="hover:text-r2m-aqua">FAQ</a>
+        <a href="pay.html" class="hover:text-r2m-aqua">Plans</a>
+        <a href="about.html" class="hover:text-r2m-aqua">About</a>
+        <a href="services.html" class="hover:text-r2m-aqua">Services</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="hidden md:inline-block px-4 py-2 bg-white text-r2m-blue rounded-md font-semibold shadow-sm">Login</a>
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Open menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE DRAWER -->
+  <div id="mobileDrawer" class="fixed inset-0 z-50 hidden">
+    <div id="drawerOverlay" class="absolute inset-0 bg-black/50"></div>
+    <aside class="absolute right-0 top-0 h-full w-72 bg-white shadow-lg p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Menu</h2>
+          <div class="text-sm text-slate-500">Navigate Rant2Me</div>
+        </div>
+        <button id="drawerClose" class="p-2 rounded hover:bg-slate-100" aria-label="Close">✕</button>
+      </div>
+      <nav class="flex flex-col gap-3 text-base">
+        <a href="home.html" class="px-3 py-2 rounded hover:bg-slate-50">Home</a>
+        <a href="chat.html" class="px-3 py-2 rounded hover:bg-slate-50">Chat</a>
+        <a href="help.html" class="px-3 py-2 rounded hover:bg-slate-50">Help Centre</a>
+        <a href="faq.html" class="px-3 py-2 rounded hover:bg-slate-50">FAQ</a>
+        <a href="pay.html" class="px-3 py-2 rounded hover:bg-slate-50">Plans</a>
+        <a href="about.html" class="px-3 py-2 rounded hover:bg-slate-50">About</a>
+        <a href="services.html" class="px-3 py-2 rounded hover:bg-slate-50">Services</a>
+        <a href="index.html" class="mt-4 inline-block px-4 py-2 bg-r2m-aqua text-white rounded-md text-center">Login / Sign up</a>
+      </nav>
+    </aside>
+  </div>
+
+  <main class="max-w-6xl mx-auto px-4 py-10 space-y-16">
+
+    <!-- HERO / SLIDESHOW -->
+    <section class="fade-in">
+      <div class="relative w-full overflow-hidden rounded-r-lg shadow-r-lg">
+        <img class="slide w-full object-cover h-96" src="images/forest-3804001_1920.jpg" />
+        <img class="slide w-full object-cover h-96" src="images/horse-7993644_1920.jpg" />
+        <img class="slide w-full object-cover h-96" src="images/milky-way-8149815_1920.jpg" />
+        <img class="slide w-full object-cover h-96" src="images/mountains-5112952_1920.jpg" />
+      </div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white">
+        <h2 class="text-4xl md:text-5xl font-extrabold drop-shadow-lg">Welcome to Rant2Me</h2>
+        <p class="mt-3 text-lg drop-shadow-md">Express yourself freely and find supportive listeners</p>
+        <a href="chat.html" class="mt-5 inline-block px-6 py-3 bg-r2m-aqua text-white rounded-md shadow hover:scale-[1.02]">Start Chatting</a>
+      </div>
+    </section>
+
+    <!-- LATEST POSTS / TESTIMONIALS CAROUSEL -->
+<section class="fade-in">
+  <h2 class="text-2xl font-bold text-center mb-6">What Our Users Say</h2>
+  <div class="relative max-w-6xl mx-auto">
+    <div class="overflow-hidden relative">
+      <div id="carouselTrack" class="flex transition-transform duration-500 gap-6">
+        <!-- Testimonial 1 -->
+        <div class="flex-none w-80 bg-white rounded-r-lg shadow-r-md p-6">
+          <p class="text-slate-600 mb-4">"Rant2Me helped me share thoughts I never could with anyone else. Truly life-changing."</p>
+          <div class="font-semibold text-r2m-blue">– Ada</div>
+          <div class="text-xs text-slate-400">Nigeria</div>
+        </div>
+        <!-- Testimonial 2 -->
+        <div class="flex-none w-80 bg-white rounded-r-lg shadow-r-md p-6">
+          <p class="text-slate-600 mb-4">"The listeners are amazing! Always ready to hear me out without judgment."</p>
+          <div class="font-semibold text-r2m-blue">– Annonymous</div>
+          <div class="text-xs text-slate-400">USA</div>
+        </div>
+        <!-- Testimonial 3 -->
+        <div class="flex-none w-80 bg-white rounded-r-lg shadow-r-md p-6">
+          <p class="text-slate-600 mb-4">"I feel heard and supported every single time I use Rant2Me."</p>
+          <div class="font-semibold text-r2m-blue">– Annonymous</div>
+          <div class="text-xs text-slate-400">UK</div>
+        </div>
+        <!-- Testimonial 4 -->
+        <div class="flex-none w-80 bg-white rounded-r-lg shadow-r-md p-6">
+          <p class="text-slate-600 mb-4">"A safe space for venting. I love the anonymity and care."</p>
+          <div class="font-semibold text-r2m-blue">– Annonymous</div>
+          <div class="text-xs text-slate-400">Canada</div>
+        </div>
+      </div>
+    </div>
+    <!-- Carousel Arrows -->
+    <button id="prevBtn" class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white/90 hover:bg-white px-2 py-1 rounded shadow">◀</button>
+    <button id="nextBtn" class="absolute top-1/2 right-0 transform -translate-y-1/2 bg-white/90 hover:bg-white px-2 py-1 rounded shadow">▶</button>
+  </div>
+</section>
+
+<script>
+  // Carousel functionality
+  const track = document.getElementById('carouselTrack');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentIndex = 0;
+  const totalItems = track.children.length;
+  const cardWidth = track.children[0].offsetWidth + 24; // card width + gap
+
+  nextBtn.addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % totalItems;
+    track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+  });
+
+  prevBtn.addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + totalItems) % totalItems;
+    track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+  });
+
+  // Auto-slide every 5s
+  setInterval(() => {
+    currentIndex = (currentIndex + 1) % totalItems;
+    track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+  }, 5000);
+</script>
+
+    <!-- FEATURE CARDS -->
+    <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 fade-in">
+      <div class="bg-white rounded-r-lg shadow-r-md p-6 text-center">
+        <h3 class="font-semibold text-lg text-r2m-blue">Confidential Support</h3>
+        <p class="mt-2 text-sm text-slate-600">Speak to listeners one-on-one with guaranteed privacy and care.</p>
+      </div>
+      <div class="bg-white rounded-r-lg shadow-r-md p-6 text-center">
+        <h3 class="font-semibold text-lg text-r2m-blue">Wellness Resources</h3>
+        <p class="mt-2 text-sm text-slate-600">Access tips, lifestyle hacks, and guides to improve your mental health and daily life.</p>
+      </div>
+      <div class="bg-white rounded-r-lg shadow-r-md p-6 text-center">
+        <h3 class="font-semibold text-lg text-r2m-blue">Global Reach</h3>
+        <p class="mt-2 text-sm text-slate-600">Our listeners and resources are available internationally, anytime you need support.</p>
+      </div>
+    </section>
+
+    <!-- COUNTERS -->
+    <section class="grid grid-cols-3 gap-4 text-center fade-in">
+      <div class="bg-white p-6 rounded-r-lg shadow-r-sm">
+        <div class="text-2xl font-bold text-r2m-sky" data-target="100">0</div>
+        <div class="text-xs text-slate-500 mt-1">Sessions this month</div>
+      </div>
+      <div class="bg-white p-6 rounded-r-lg shadow-r-sm">
+        <div class="text-2xl font-bold text-r2m-sky" data-target="4">0</div>
+        <div class="text-xs text-slate-500 mt-1">Active listeners</div>
+      </div>
+      <div class="bg-white p-6 rounded-r-lg shadow-r-sm">
+        <div class="text-2xl font-bold text-r2m-sky" data-target="6">0</div>
+        <div class="text-xs text-slate-500 mt-1">Countries served</div>
+      </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section class="fade-in text-center bg-r2m-blue-600 text-white p-10 rounded-r-lg shadow-r-md">
+      <h2 class="text-3xl font-bold">Ready to share your story?</h2>
+      <p class="mt-3 max-w-lg mx-auto">Join Rant2Me today and start connecting with professional listeners and supportive peers.</p>
+      <a href="pay.html" class="mt-5 inline-block px-6 py-3 bg-r2m-aqua text-white rounded-md shadow hover:scale-[1.02]">Get Started</a>
+    </section>
+
+    <!-- NEWSLETTER -->
+    <section class="fade-in text-center">
+      <h2 class="text-2xl font-bold">📩 Subscribe to Our Newsletter</h2>
+      <p class="mt-2 text-slate-600 max-w-lg mx-auto">Get infonomics insights, lifestyle hacks, and wellness tips from Rant2Me.</p>
+      <div class="mt-4 flex justify-center">
+        <iframe src="https://rant2me.substack.com/embed" width="480" height="320" style="border:1px solid #EEE; background:white;" frameborder="0" scrolling="no"></iframe>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="text-center py-6 text-sm text-slate-500 bg-slate-50">
+    &copy; 2025 Rant2Me • <a href="about.html" class="text-r2m-aqua">About</a> • <a href="help.html" class="text-r2m-aqua">Support</a> • <a href="services.html" class="text-r2m-aqua">Services</a> • <a href="faq.html" class="text-r2m-aqua">FAQ</a> • <a href="contactus.html" class="text-r2m-aqua">Contact Us</a>
+  </footer>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Counter animation
+    document.querySelectorAll('[data-target]').forEach(el => {
+      const target = Number(el.getAttribute('data-target') || 0);
+      let cur = 0;
+      const step = Math.max(1, Math.floor(target / 60));
+      const iv = setInterval(() => {
+        cur += step;
+        if (cur >= target) { el.textContent = target; clearInterval(iv); }
+        else el.textContent = cur;
+      }, 20);
+    });
+
+    // Mobile drawer
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const drawerClose = document.getElementById('drawerClose');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    mobileMenuBtn?.addEventListener('click', () => mobileDrawer.classList.remove('hidden'));
+    drawerClose?.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+    drawerOverlay?.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+
+    // Slideshow
+    let slideIndex = 0;
+    function showSlides() {
+      const slides = document.querySelectorAll('.slide');
+      slides.forEach(s => s.style.display = 'none');
+      slideIndex++;
+      if (slideIndex > slides.length) slideIndex = 1;
+      slides[slideIndex-1].style.display = 'block';
+      setTimeout(showSlides, 4000);
+    }
+    showSlides();
+  </script>
+
+</body>
+</html>
     <!-- Disclaimer Modal -->
 <div id="disclaimerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
   <div style="background:#fff; padding:20px; max-width:500px; width:90%; border-radius:8px; text-align:center;">
@@ -160,67 +310,98 @@
     document.getElementById("disclaimerModal").style.display = "flex";
   }
 </script>
+<!-- Mood Modal -->
+<div id="moodModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:20px; max-width:400px; width:90%; border-radius:8px; text-align:center;">
+    <h2>How are you feeling today?</h2>
+    <p>Select your mood:</p>
+    <div style="margin-top:15px; display:flex; justify-content:space-around;">
+      <button class="moodBtn" data-mood="😊" style="font-size:2rem;">😊</button>
+      <button class="moodBtn" data-mood="😐" style="font-size:2rem;">😐</button>
+      <button class="moodBtn" data-mood="😔" style="font-size:2rem;">😔</button>
+    </div>
+    <button onclick="closeMoodModal()" style="margin-top:15px; padding:8px 16px; border-radius:6px; background:#ccc;">Skip</button>
+  </div>
+</div>
+
 <script type="module">
-  import { getFirestore, collection, addDoc, serverTimestamp }
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged }
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-  // Reuse the default app initialized in the earlier module
-  const db = getFirestore();     // uses the default app
-  const auth2 = getAuth();        // uses the default app
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
+  authDomain: "rant2me-ab36b.firebaseapp.com",
+  projectId: "rant2me-ab36b",
+  storageBucket: "rant2me-ab36b.appspot.com",
+  messagingSenderId: "245661393279",
+  appId: "1:245661393279:web:b31483f57a40cf2c807a4a"
+};
 
-  function showMoodModalIfNeeded(user) {
-    const today = new Date().toISOString().split('T')[0];
-    const alreadyChecked = localStorage.getItem("moodCheckDate") === today;
-    if (user && !alreadyChecked) {
-      document.getElementById("moodModal").style.display = "flex";
-    }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+function showMoodModalIfNeeded(user) {
+  const today = new Date().toISOString().split('T')[0];
+  const alreadyChecked = localStorage.getItem("moodCheckDate") === today;
+  if (user && !alreadyChecked) {
+    document.getElementById("moodModal").style.display = "flex";
   }
+}
 
-  function closeMoodModal() {
-    document.getElementById("moodModal").style.display = "none";
-  }
-  // Make it callable from the inline onclick on the Skip button
-  window.closeMoodModal = closeMoodModal;
+function closeMoodModal() {
+  document.getElementById("moodModal").style.display = "none";
+  localStorage.setItem("moodCheckDate", new Date().toISOString().split('T')[0]);
+}
+window.closeMoodModal = closeMoodModal;
 
-  // Wire up buttons once the DOM is ready
-  document.addEventListener("DOMContentLoaded", () => {
-    const today = new Date().toISOString().split('T')[0];
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".moodBtn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const mood = btn.dataset.mood;
+      const user = auth.currentUser;
+      if (!user) {
+        alert("You must be logged in to save your mood.");
+        return;
+      }
 
-    document.querySelectorAll(".moodBtn").forEach(btn => {
-      btn.addEventListener("click", async function () {
-        const mood = this.dataset.mood;
-        localStorage.setItem("moodCheckDate", today);
+      try {
+        await addDoc(collection(db, "moods"), {
+          mood,
+          userId: user.uid,
+          userEmail: user.email,
+          createdAt: serverTimestamp()
+        });
         localStorage.setItem("mood", mood);
+      } catch (err) {
+        console.error("Error saving mood:", err);
+      }
 
-        const user = auth2.currentUser;
-        if (user) {
-          try {
-            await addDoc(collection(db, "moods"), {
-              mood,
-              userId: user.uid,
-              userEmail: user.email,
-              createdAt: serverTimestamp()
-            });
-            alert("Thanks for checking in! Mood saved: " + mood);
-          } catch (err) {
-            console.error("Error saving mood:", err);
-            alert("Couldn’t save mood. Please try again.");
-          }
-        } else {
-          alert("You must be logged in to save mood.");
-        }
-
-        closeMoodModal();
-      });
+      closeMoodModal();
     });
   });
+});
 
-  // Wait for auth to be ready, then decide whether to show the modal
-  onAuthStateChanged(auth2, (user) => {
-    showMoodModalIfNeeded(user);
-  });
+// Show modal after auth state is ready
+onAuthStateChanged(auth, user => {
+  showMoodModalIfNeeded(user);
+});
+ // Drawer toggle logic
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const drawer = document.getElementById("drawer");
+    const overlay = document.getElementById("drawerOverlay");
+
+    hamburgerBtn.addEventListener("click", () => {
+      drawer.classList.toggle("open");
+      overlay.classList.toggle("show");
+    });
+
+    overlay.addEventListener("click", () => {
+      drawer.classList.remove("open");
+      overlay.classList.remove("show");
+    });
 </script>
 </body>
 </html>

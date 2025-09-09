@@ -1,147 +1,444 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
   <meta charset="utf-8" />
-  <title>Rant2Me - Chat</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rant2Me — Connect & Chat</title>
+
+  <!-- favicon -->
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+
+  <!-- Google font (match home) -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script>
+    tailwind = window.tailwind ||= {};
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tailwind theme overrides to match your color palette -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'r2m-blue': '#0d1b2a',
+            'r2m-blue-600': '#1b263b',
+            'r2m-aqua': '#00b4d8',
+            'r2m-sky': '#0077b6',
+            'r2m-gold': '#F5C542'
+          },
+          borderRadius: {
+            'r-lg': '14px'
+          },
+          boxShadow: {
+            'r-lg': '0 18px 40px rgba(0,43,85,.18)',
+            'r-md': '0 10px 24px rgba(0,43,85,.14)',
+            'r-sm': '0 6px 14px rgba(0,43,85,.10)'
+          }
+        }
+      }
+    }
+  </script>
 
   <style>
-  /* Slideshow container */
-  .slideshow-container {
-    max-width: 80%; /* smaller width than full screen */
-    max-height: 250px; /* control the slideshow height */
-    position: relative;
-    margin: 20px auto;
-    overflow: hidden;
-    border-radius: 12px;
-    background: #000; /* fills background if images don't cover */
-  }
-
-  .mySlides {
-    display: none;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-  }
-
-  .mySlides img {
-    max-width: 100%;
-    max-height: 250px;
-    object-fit: contain; /* show full image */
-    display: block;
-    margin: 0 auto;
-  }
-
-  /* Fading animation */
-  .fade {
-    animation-name: fade;
-    animation-duration: 1.5s;
-  }
-
-  @keyframes fade {
-    from {opacity: .4}
-    to {opacity: 1}
-  }
-</style>
-
+    /* small global tweaks */
+    :root { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    h1.brand { font-family: "Cinzel Decorative", serif; }
+    /* subtle fade-in for hero image layers */
+    .layer-fade { animation: fadeLayer 10s ease-in-out infinite; }
+    @keyframes fadeLayer {
+      0%{opacity:.92; transform: scale(1);}
+      50%{opacity:.98; transform: scale(1.02);}
+      100%{opacity:.92; transform: scale(1);}
+    }
+    /* small accessibility focus outline */
+    :focus{outline: 3px solid rgba(0,180,216,.18); outline-offset: 2px;}
+  </style>
 </head>
-<body>
-  <header>
-    <h1>Anonymous Chat</h1>
-    <nav>
-      <a href="home.html">Home</a>
-      <a href="chat.html">Chat</a>
-      <a href="help.html">Help Centre</a>
-      <a href="faq.html">FAQ</a>
-      <a href="pay.html">Plans</a>
-      <a href="about.html">About Us</a>
-      <a href="services.html">Services</a>
-    </nav>
+<body class="antialiased bg-gradient-to-b from-white to-slate-50 text-slate-800">
+
+  <!-- HEADER -->
+  <header class="w-full sticky top-0 z-40 bg-gradient-to-b from-r2m-blue to-r2m-blue-600 text-white shadow-r-sm">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+      <a href="home.html" class="flex items-center gap-3">
+        <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
+        <div>
+          <h1 class="brand text-2xl leading-tight">Rant<span class="text-r2m-aqua">2</span>Me</h1>
+          <div class="text-xs opacity-80 -mt-1">Speak freely. Be heard.</div>
+        </div>
+      </a>
+
+      <!-- desktop nav -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
+        <a href="home.html" class="hover:text-r2m-aqua">Home</a>
+        <a href="chat.html" class="underline text-white">Chat</a>
+        <a href="help.html" class="hover:text-r2m-aqua">Help Centre</a>
+        <a href="faq.html" class="hover:text-r2m-aqua">FAQ</a>
+        <a href="pay.html" class="hover:text-r2m-aqua">Plans</a>
+        <a href="about.html" class="hover:text-r2m-aqua">About</a>
+        <a href="services.html" class="hover:text-r2m-aqua">Services</a>
+      </nav>
+
+      <!-- mobile menu / login -->
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="hidden md:inline-block px-4 py-2 bg-white text-r2m-blue rounded-md font-semibold shadow-sm">Login</a>
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Open menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
   </header>
 
-  <section class="chat-box">
-    <div class="bot-message" id="intro-message">👋 Hello and Welcome to Rant2Me, your safe place to be heard. How can we support you today?</div>
+  <!-- MOBILE DRAWER -->
+  <div id="mobileDrawer" class="fixed inset-0 z-50 hidden">
+    <div id="drawerOverlay" class="absolute inset-0 bg-black/50"></div>
+    <aside class="absolute right-0 top-0 h-full w-72 bg-white shadow-r-lg p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Menu</h2>
+          <div class="text-sm text-slate-500">Navigate Rant2Me</div>
+        </div>
+        <button id="drawerClose" class="p-2 rounded hover:bg-slate-100" aria-label="Close">✕</button>
+      </div>
+      <nav class="flex flex-col gap-3 text-base">
+        <a href="home.html" class="px-3 py-2 rounded hover:bg-slate-50">Home</a>
+        <a href="chat.html" class="px-3 py-2 rounded bg-slate-50">Chat</a>
+        <a href="help.html" class="px-3 py-2 rounded hover:bg-slate-50">Help Centre</a>
+        <a href="faq.html" class="px-3 py-2 rounded hover:bg-slate-50">FAQ</a>
+        <a href="pay.html" class="px-3 py-2 rounded hover:bg-slate-50">Plans</a>
+        <a href="about.html" class="px-3 py-2 rounded hover:bg-slate-50">About</a>
+        <a href="services.html" class="px-3 py-2 rounded hover:bg-slate-50">Services</a>
+        <a href="index.html" class="mt-4 inline-block px-4 py-2 bg-r2m-aqua text-white rounded-md text-center">Login / Sign up</a>
+      </nav>
+    </aside>
+  </div>
 
-    <div id="chat-output"></div>
-    <textarea placeholder="Type your message here..."></textarea>
-    <button id="sendBtn">Send</button>
-    <p class="disclaimer">Your privacy is our priority. Nothing you say here will be saved.</p>
-  </section>
+  <!-- MAIN -->
+  <main class="max-w-6xl mx-auto px-4 py-8">
 
-  <button onclick="shareOnWhatsApp('This rant hit me today...')">Share on WhatsApp</button>
+    <!-- HERO -->
+    <section class="relative overflow-hidden rounded-r-lg mb-8">
+      <div class="absolute inset-0 -z-10">
+        <!-- layered background images (use your images) -->
+        <div class="absolute inset-0 bg-[url('images/counselling_black_people.jpg')] bg-cover bg-center opacity-80 layer-fade"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,27,42,0.65),rgba(27,38,59,0.65))]"></div>
+      </div>
 
-<script>
-function shareOnWhatsApp(snippet) {
-  const siteLink = "https://tana10j.github.io/Rant2Me/"; // replace with your site
-  const text = encodeURIComponent(`${snippet}\n\nShared from Rant2Me 👉 ${siteLink}?utm_source=whatsapp`);
-  const url = `https://wa.me/?text=${text}`;
-  window.open(url, '_blank');
-}
-</script>
+      <div class="relative z-10 grid gap-6 md:grid-cols-2 items-center py-14 px-6">
+        <div>
+          <h2 class="text-white text-4xl md:text-5xl font-extrabold leading-tight brand">Chat: Get listened to, privately</h2>
+          <p class="mt-4 text-slate-100 max-w-xl">Rant2Me offers anonymous & specialist-guided chat. Start with the anonymous bot, or choose a specialist for deeper support. Your privacy is our priority.</p>
 
-  <!-- Slideshow Section -->
-  <section class="slideshow-container">
-    <div class="mySlides fade">
-      <img src="images/ChatGPT Image Aug 23, 2025, 07_41_59 PM.png" alt="Slide 1">
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a href="services.html" class="inline-flex items-center px-5 py-3 bg-r2m-aqua text-white rounded-md shadow hover:scale-[1.02]">Choose a service</a>
+            <a href="pay.html" class="inline-flex items-center px-5 py-3 border border-white/20 text-white rounded-md hover:bg-white/5">View plans</a>
+          </div>
+
+          <!-- trust badges -->
+          <div class="mt-6 flex gap-3 items-center">
+            <div class="inline-flex items-center gap-2 bg-white/5 px-3 py-2 rounded-full">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 1.657-1.343 3-3 3S6 12.657 6 11s1.343-3 3-3 3 1.343 3 3zM19 11c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z"/></svg>
+              <span class="text-sm text-slate-100">Anonymous by default</span>
+            </div>
+            <div class="inline-flex items-center gap-2 bg-white/5 px-3 py-2 rounded-full">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11v2m0 4h.01M20.49 12.45A8 8 0 1112 4v1.5"/></svg>
+              <span class="text-sm text-slate-100">Encrypted & private</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- quick anonymous rant box -->
+        <div class="bg-white rounded-r-lg shadow-r-md p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-bold">Anonymous Quick Rant</h3>
+              <p class="text-sm text-slate-500">No sign-in required. Your rant auto-deletes in 5 minutes.</p>
+            </div>
+            <span class="text-xs px-2 py-1 bg-slate-100 rounded">Private</span>
+          </div>
+
+          <textarea id="anonRant" rows="7" class="w-full mt-4 p-3 border rounded-md resize-none focus:ring r2m-aqua" placeholder="Write anything that’s on your mind..."></textarea>
+
+          <div class="flex items-center justify-between mt-3">
+            <div class="text-sm text-slate-500">Auto-delete: 5 min</div>
+            <div class="flex gap-2">
+              <button id="rantClear" class="px-4 py-2 rounded-md border">Clear</button>
+              <button id="rantSend" class="px-4 py-2 rounded-md bg-r2m-sky text-white">Rant</button>
+            </div>
+          </div>
+
+          <div id="anonRantOutput" class="mt-4 text-sm text-slate-700"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES GRID -->
+    <section id="services" class="mb-12">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold">Choose a support service</h2>
+        <p class="text-sm text-slate-500">Select a listener or try the anonymous option</p>
+      </div>
+
+      <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- counselling -->
+        <article class="service-card bg-white rounded-r-lg p-6 shadow-r-sm hover:shadow-r-md transition transform hover:-translate-y-1" data-service="counselling" role="button" tabindex="0">
+          <div class="flex items-start gap-4">
+            <img src="images/TJ.jpg" alt="Tana" class="w-16 h-16 rounded-full object-cover border-2 border-r2m-aqua" />
+            <div>
+              <h3 class="text-lg font-semibold">Tana</h3>
+              <p class="text-sm text-slate-500 mt-1">Deep listening & emotional support. Book a focused session.</p>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <div class="text-sm text-slate-600">Avg. response time: <strong>mins</strong></div>
+            <div>
+              <button class="px-3 py-1 rounded bg-r2m-aqua text-white text-sm">Select</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- nutrition -->
+        <article class="service-card bg-white rounded-r-lg p-6 shadow-r-sm hover:shadow-r-md transition transform hover:-translate-y-1" data-service="nutrition" role="button" tabindex="0">
+          <div class="flex items-start gap-4">
+            <img src="images/Dorc.jpeg" alt="Dorcas" class="w-16 h-16 rounded-full object-cover border-2 border-r2m-aqua" />
+            <div>
+              <h3 class="text-lg font-semibold">Dorcas</h3>
+              <p class="text-sm text-slate-500 mt-1">Talk nutrition & wellbeing in a safe, non-judgmental space.</p>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <div class="text-sm text-slate-600">Avg. response time: <strong>mins</strong></div>
+            <div>
+              <button class="px-3 py-1 rounded bg-r2m-aqua text-white text-sm">Select</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- student -->
+        <article class="service-card bg-white rounded-r-lg p-6 shadow-r-sm hover:shadow-r-md transition transform hover:-translate-y-1" data-service="student" role="button" tabindex="0">
+          <div class="flex items-start gap-4">
+            <img src="images/Annonymous.jpg" alt="Chidera" class="w-16 h-16 rounded-full object-cover border-2 border-r2m-aqua" />
+            <div>
+              <h3 class="text-lg font-semibold">Chidera</h3>
+              <p class="text-sm text-slate-500 mt-1">Practical tips, life guidance & friendly check-ins.</p>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <div class="text-sm text-slate-600">Avg. response time: <strong>mins</strong></div>
+            <div>
+              <button class="px-3 py-1 rounded bg-r2m-aqua text-white text-sm">Select</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- anonymous -->
+        <article class="service-card bg-white rounded-r-lg p-6 shadow-r-sm hover:shadow-r-md transition transform hover:-translate-y-1 col-span-full sm:col-span-2 lg:col-span-1" data-service="anonymous" role="button" tabindex="0">
+          <div class="flex items-start gap-4">
+            <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-2xl text-slate-600">🤖</div>
+            <div>
+              <h3 class="text-lg font-semibold">Anonymous Bot Rant</h3>
+              <p class="text-sm text-slate-500 mt-1">Instant anonymity, write, release & leave. No account required.</p>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <div class="text-sm text-slate-600">Free</div>
+            <div>
+              <button class="px-3 py-1 rounded border border-slate-200 text-sm">Open</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- extras: group therapy / resources -->
+        <article class="service-card bg-white rounded-r-lg p-6 shadow-r-sm hover:shadow-r-md transition transform hover:-translate-y-1" data-service="resources" role="button" tabindex="0">
+          <div class="flex items-start gap-4">
+            <img src="images/book-99132_640.png" alt="Resources" class="w-16 h-16 rounded-full object-cover" />
+            <div>
+              <h3 class="text-lg font-semibold">Self-help Resources</h3>
+              <p class="text-sm text-slate-500 mt-1">Articles, breathing exercises, and practical tools to feel better today.</p>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <div class="text-sm text-slate-600">On demand</div>
+            <div>
+              <button 
+  class="px-3 py-1 rounded bg-r2m-gold text-black text-sm"
+  onclick="window.location.href='resource.html'">
+  Open
+</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="mb-14">
+      <h3 class="text-xl font-bold mb-4">How it works</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-6 bg-white rounded-r-lg shadow-r-sm">
+          <div class="text-3xl">1</div>
+          <h4 class="font-semibold mt-2">Choose a service</h4>
+          <p class="text-sm text-slate-500 mt-2">Select anonymous bot or a specialist depending on your needs.</p>
+        </div>
+        <div class="p-6 bg-white rounded-r-lg shadow-r-sm">
+          <div class="text-3xl">2</div>
+          <h4 class="font-semibold mt-2">Connect & chat</h4>
+          <p class="text-sm text-slate-500 mt-2">Start private, real-time chats. Specialist chats require plans.</p>
+        </div>
+        <div class="p-6 bg-white rounded-r-lg shadow-r-sm">
+          <div class="text-3xl">3</div>
+          <h4 class="font-semibold mt-2">Feel lighter</h4>
+          <p class="text-sm text-slate-500 mt-2">Conversations are secure and private — your wellbeing matters.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- STICKY FOOTER / NAV (like BetterHelp quick actions) -->
+  <nav class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-white rounded-full shadow-r-md px-4 py-2 flex gap-4 items-center">
+    <a href="home.html" class="flex flex-col items-center text-sm text-slate-700">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M13 5v6"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="chat.html" class="flex flex-col items-center text-sm text-slate-700">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h6M7 16h6"/></svg>
+      <span>Chat</span>
+    </a>
+    <a href="pay.html" class="flex flex-col items-center text-sm text-slate-700">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8M8 12h8"/></svg>
+      <span>Plans</span>
+    </a>
+    <a href="about.html" class="flex flex-col items-center text-sm text-slate-700">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12v.01M12 6v.01M12 18v.01"/></svg>
+      <span>About</span>
+    </a>
+  </nav>
+
+  <!-- DISCLAIMER MODAL (small) -->
+  <div id="disclaimerModal" class="fixed inset-0 z-60 hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60"></div>
+    <div class="relative z-10 w-full max-w-lg bg-white rounded-r-lg p-6 shadow-r-lg">
+      <h4 class="font-bold text-lg">Disclaimer & Terms</h4>
+      <div class="text-sm text-slate-600 mt-3 max-h-56 overflow-auto">
+        <p>By using Rant2Me you agree to our terms. Rant2Me is a listening platform and not a substitute for medical or emergency services.</p>
+      </div>
+      <div class="mt-4 flex justify-end gap-3">
+        <button id="discClose" class="px-4 py-2 rounded border">Close</button>
+      </div>
     </div>
-    <div class="mySlides fade">
-      <img src="images/ChatGPT Image Aug 23, 2025, 07_43_51 PM.png" alt="Slide 2">
-    </div>
-    <div class="mySlides fade">
-      <img src="images/27dcfdb8-00b3-49f5-9ab8-2da7e443e60c.jpeg" alt="Slide 3">
-  </section>
+  </div>
 
-  <section class="dropdown-services">
-    <h2>Choose A Support Service</h2>
-    <div class="service-list">
-      <div class="service-card" data-service="counselling">
-        <h3>Listener 1</h3>
-        <p>Talk to Tana – Your friendly guide</p>
-      </div>
-      <div class="service-card" data-service="nutrition">
-        <h3>Listener 2</h3>
-        <p>Talk to Dorcas – The Listener who makes you feel safe</p>
-      </div>
-      <div class="service-card" data-service="student">
-        <h3>Listener 3</h3>
-        <p>Talk to Chidera – The Straight talker and chat buddy who keeps it real</p>
-      </div>
-      <div class="service-card" data-service="anonymous">
-        <h3>Anonymous Bot Rant</h3>
-        <p>No names. No records. Just honesty with our listening Bot.</p>
-      </div>
-    </div>
-  </section>
+  <footer class="mt-12 pb-8 text-center text-sm text-slate-500">
+    &copy; 2025 Rant2Me • <a href="#" class="text-r2m-aqua" id="showDisclaimer">Disclaimer & Terms</a>
+  </footer>
 
-  <!-- load external module script (no inline script!) -->
-  <script type="module" src="./chat-page.js"></script>
-  <script src="script.js"></script> <!-- your UI helpers (non-module) -->
-  <footer style="text-align:center; padding:15px; font-size:14px; background:#f5f5f5;">
-  &copy; 2025 Rant2Me | <a href="#" onclick="showDisclaimer()" style="color:#007BFF; text-decoration:none;">Disclaimer & Terms</a>
-</footer>
+  <!-- SCRIPTS -->
+  <!-- 1) Slide logic (simple, non-invasive) -->
+  <script>
+    (function () {
+      const slides = Array.from(document.querySelectorAll('#slideshow img'));
+      if (!slides.length) return;
+      let i = 0;
+      setInterval(() => {
+        slides.forEach((s, idx) => s.style.opacity = idx === i ? '1' : '0');
+        i = (i + 1) % slides.length;
+      }, 4500);
+    })();
+  </script>
 
-<script>
-  function showDisclaimer() {
-    document.getElementById("disclaimerModal").style.display = "flex";
-  }
+  <!-- 2) Mobile drawer behavior -->
+  <script>
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const drawerClose = document.getElementById('drawerClose');
+    const drawerOverlay = document.getElementById('drawerOverlay');
 
-  // Slideshow script
-  let slideIndex = 0;
-  showSlides();
+    mobileMenuBtn?.addEventListener('click', () => {
+      mobileDrawer.classList.remove('hidden');
+    });
+    drawerClose?.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+    drawerOverlay?.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+  </script>
 
-  function showSlides() {
-    let i;
-    let slides = document.getElementsByClassName("mySlides");
-    for (i = 0; i < slides.length; i++) {
-      slides[i].style.display = "none";  
+  <!-- 3) Anonymous rant quick actions (keeps everything client-only; does not touch firestore/payment) -->
+  <script>
+    const rantSend = document.getElementById('rantSend');
+    const rantClear = document.getElementById('rantClear');
+    const anonRant = document.getElementById('anonRant');
+    const anonOutput = document.getElementById('anonRantOutput');
+    let anonTimeout = null;
+
+    rantClear?.addEventListener('click', () => {
+      anonRant.value = '';
+      anonOutput.textContent = '';
+      if (anonTimeout) { clearTimeout(anonTimeout); anonTimeout = null; }
+    });
+
+    rantSend?.addEventListener('click', () => {
+      const txt = anonRant.value.trim();
+      if (!txt) {
+        anonOutput.textContent = 'Write something first…';
+        return;
+      }
+      // display locally
+      anonOutput.innerHTML = `<div class="p-3 rounded bg-slate-50 border text-slate-800">${escapeHtml(txt)}</div><div class="text-xs text-slate-500 mt-2">This rant will be cleared in 5 minutes.</div>`;
+       // bot response from script.js
+    const botReply = getBotResponse(txt);
+    setTimeout(() => {
+      anonOutput.innerHTML += `
+        <div class="p-3 mt-2 rounded bg-r2m-aqua/10 border text-r2m-blue">${botReply}</div>
+      `;
+    }, 800);
+      // clear input
+      anonRant.value = '';
+      // auto-delete after 5 minutes
+      if (anonTimeout) clearTimeout(anonTimeout);
+      anonTimeout = setTimeout(() => {
+        anonOutput.textContent = '';
+        anonTimeout = null;
+      }, 5 * 60 * 1000);
+    });
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
     }
-    slideIndex++;
-    if (slideIndex > slides.length) {slideIndex = 1}    
-    slides[slideIndex-1].style.display = "block";  
-    setTimeout(showSlides, 4000); // Change image every 4 seconds
-  }
-</script>
+  </script>
+
+  <!-- 4) Wire service card clicks to your existing app logic (chat-page.js will attach handlers too) -->
+  <script>
+    // keep a small UI-friendly binding so keyboard users can "Activate" card
+    document.querySelectorAll('.service-card, .service-card[role="button"], article[role="button"]').forEach(el => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          el.click();
+        }
+      });
+    });
+
+    // ensure service-card clicks bubble: existing chat-page.js expects .service-card elements
+    // (it attaches its own click handlers). No extra routing here to avoid conflicting logic.
+  </script>
+
+  <!-- 5) Disclaimer modal toggle -->
+  <script>
+    document.getElementById('showDisclaimer').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('disclaimerModal').classList.remove('hidden');
+    });
+    document.getElementById('discClose').addEventListener('click', () => {
+      document.getElementById('disclaimerModal').classList.add('hidden');
+    });
+  </script>
+
+  <!-- 6) Load your firebase / app logic AFTER UI so your scripts can attach to the DOM.
+         IMPORTANT: don't change your firebase.js or chat-page.js — they still run as before.
+         chat-page.js expects elements with class "service-card" and data-service attributes. -->
+  <script type="module" src="./firebase.js"></script>
+  <script type="module" src="./chat-page.js"></script>
+<script src="script.js"></script>
 </body>
 </html>

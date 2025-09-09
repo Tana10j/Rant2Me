@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rant2Me — Admin Dashboard</title>
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js for analytics placeholders -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* small custom tweaks */
+    .badge-source-chat { background: rgba(59,130,246,0.12); color: #2563EB; }
+    .badge-source-contact { background: rgba(16,185,129,0.12); color: #059669; }
+    .card-resolved { opacity: .6; }
+    /* scrollbar for feed */
+    .feed-scroll { max-height: calc(100vh - 180px); overflow: auto; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+  <!-- Topbar -->
+  <header class="bg-white shadow sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="images/Rant2Me Favicon.png" class="w-10 h-10 rounded" alt="logo">
+        <div>
+          <h1 class="text-xl font-bold text-sky-700">Rant<span class="text-teal-500">2</span>Me</h1>
+          <div class="text-xs text-slate-500">Admin Dashboard</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div id="adminEmailBadge" class="hidden px-3 py-1 text-sm rounded bg-slate-100 text-slate-700"></div>
+        <button id="goToSiteBtn" class="px-3 py-2 rounded border text-sm hover:bg-slate-100">Open site</button>
+        <button id="logoutBtnTop" class="px-3 py-2 bg-rose-500 text-white rounded hover:bg-rose-600">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 grid md:grid-cols-12 gap-6">
+    <!-- SIDEBAR -->
+    <aside class="md:col-span-3 bg-white rounded-lg shadow p-4 sticky top-20 h-fit">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-sky-700">Admin Tools</h2>
+        <span class="text-xs text-slate-400">v1.0</span>
+      </div>
+
+      <nav class="space-y-2">
+        <button class="w-full text-left px-3 py-2 rounded hover:bg-slate-50 flex items-center gap-2 active-nav" data-tab="messages">
+          <svg class="w-5 h-5 text-sky-500" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Messages
+        </button>
+
+        <button class="w-full text-left px-3 py-2 rounded hover:bg-slate-50 flex items-center gap-2" data-tab="analytics">
+          <svg class="w-5 h-5 text-amber-500" viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 17V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 17V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 17v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Analytics
+        </button>
+
+        <button class="w-full text-left px-3 py-2 rounded hover:bg-slate-50 flex items-center gap-2" data-tab="settings">
+          <svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5 3.5 3.5 0 0 0 12 15.5z" stroke="currentColor" stroke-width="1.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82L4.3 3.7A2 2 0 0 1 7.12.88l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V1a2 2 0 0 1 4 0v.09c.04.57.4 1.07 1 1.51h.06a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.5.16.96.5 1.31 1z" stroke="currentColor" stroke-width="1"/></svg>
+          Settings
+        </button>
+
+        <a href="help.html" class="block mt-4 px-3 py-2 rounded hover:bg-slate-50 text-sm text-slate-600">Open Help Centre</a>
+      </nav>
+
+      <div class="mt-6">
+        <h3 class="text-sm font-semibold text-slate-600">Quick actions</h3>
+        <div class="mt-2 flex flex-col gap-2">
+          <button id="bulkResolveBtn" class="w-full px-3 py-2 bg-emerald-500 text-white rounded">Mark selected resolved</button>
+          <button id="bulkDeleteBtn" class="w-full px-3 py-2 bg-rose-500 text-white rounded">Delete selected</button>
+          <button id="exportCsvBtn" class="w-full px-3 py-2 border rounded">Export CSV</button>
+        </div>
+      </div>
+
+      <div class="mt-6 text-xs text-slate-500">
+        <div><strong>Only</strong> allowed: tana10j@gmail.com, edukdorcas@gmail.com</div>
+        <div class="mt-2">Data from <code>supportMessages</code> & <code>shares</code> merged here.</div>
+      </div>
+    </aside>
+
+    <!-- MAIN PANEL -->
+    <section class="md:col-span-9 space-y-6">
+
+      <!-- Controls -->
+      <div class="bg-white rounded-lg shadow p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
+          <input id="searchInput" type="search" placeholder="Search name, email, text..." class="px-3 py-2 border rounded w-full md:w-96" />
+          <select id="sourceFilter" class="px-3 py-2 border rounded">
+            <option value="all">All sources</option>
+            <option value="supportMessages">Chatbot (supportMessages)</option>
+            <option value="shares">Contact (shares)</option>
+          </select>
+          <select id="statusFilter" class="px-3 py-2 border rounded">
+            <option value="all">All statuses</option>
+            <option value="unread">Unread</option>
+            <option value="resolved">Resolved</option>
+          </select>
+
+          <label class="flex items-center gap-2 ml-2">
+            <input id="onlyWithEmail" type="checkbox" />
+            <span class="text-sm text-slate-600">Only with email</span>
+          </label>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="refreshBtn" class="px-3 py-2 border rounded">Refresh</button>
+          <div class="text-sm text-slate-500" id="feedStatus">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Feed + detail column (stacked on mobile) -->
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Feed column (cards) -->
+        <div class="md:col-span-2 bg-white rounded-lg shadow p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold">Unified Messages Feed</h3>
+            <div class="text-sm text-slate-500" id="totalCount">0 items</div>
+          </div>
+
+          <!-- feed list -->
+          <div id="feed" class="space-y-4 feed-scroll">
+            <!-- Cards injected here -->
+            <div id="emptyHint" class="text-center text-slate-400 py-8">
+              Loading messages...
+            </div>
+          </div>
+
+          <!-- pager -->
+          <div class="mt-4 flex items-center justify-between">
+            <div class="text-sm text-slate-500" id="pagerInfo"></div>
+            <div class="flex items-center gap-2">
+              <button id="prevPageBtn" class="px-3 py-1 border rounded">Prev</button>
+              <button id="nextPageBtn" class="px-3 py-1 border rounded">Next</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column: detail / analytics snapshot -->
+        <aside class="bg-white rounded-lg shadow p-4 space-y-4">
+          <div>
+            <h4 class="font-semibold">Selected message</h4>
+            <div id="selectedCardPlaceholder" class="mt-2 text-sm text-slate-500">Select a message to view details</div>
+          </div>
+
+          <div>
+            <h4 class="font-semibold">Quick analytics</h4>
+            <canvas id="sourceChart" width="400" height="200"></canvas>
+            <div class="mt-2 text-xs text-slate-500">Realtime counts — Chatbot vs Contact form.</div>
+          </div>
+
+          <div>
+            <h4 class="font-semibold">Recent activity</h4>
+            <ul id="recentList" class="mt-2 text-sm text-slate-600 space-y-2"></ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <!-- Message Detail Modal -->
+  <div id="detailModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50">
+    <div class="bg-white rounded-lg w-full max-w-3xl p-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h3 id="detailTitle" class="text-lg font-bold">Message detail</h3>
+          <div id="detailMeta" class="text-xs text-slate-500 mt-1"></div>
+        </div>
+        <div class="flex gap-2">
+          <button id="markResolvedBtn" class="px-3 py-2 bg-emerald-500 text-white rounded">Mark resolved</button>
+          <button id="deleteBtn" class="px-3 py-2 bg-rose-500 text-white rounded">Delete</button>
+          <button id="closeModalBtn" class="px-3 py-2 border rounded">Close</button>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <h4 class="text-sm font-semibold">Message</h4>
+        <div id="detailMessage" class="mt-2 text-slate-700 whitespace-pre-wrap"></div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h4 class="text-sm font-semibold">Bot Reply</h4>
+          <div id="detailBotReply" class="mt-2 text-slate-600"></div>
+        </div>
+        <div>
+          <h4 class="text-sm font-semibold">Raw IDs</h4>
+          <div id="detailRaw" class="mt-2 text-xs text-slate-500"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tiny toast -->
+  <div id="toast" class="fixed right-4 bottom-4 hidden bg-slate-900 text-white px-4 py-2 rounded"></div>
+
+  <!-- Script: Firestore + UI logic -->
+  <script type="module">
+    // Allowed admins
+    const ALLOWED_ADMINS = ["tana10j@gmail.com", "edukdorcas@gmail.com"];
+
+    // Imports (expects your ./firebase.js to export `auth` and `db`)
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
+    import {
+      collection, query, orderBy, onSnapshot, getDocs,
+      doc, deleteDoc, updateDoc, where, limit
+    } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
+
+    // DOM
+    const adminEmailBadge = document.getElementById('adminEmailBadge');
+    const logoutBtnTop = document.getElementById('logoutBtnTop');
+    const goToSiteBtn = document.getElementById('goToSiteBtn');
+    const feed = document.getElementById('feed');
+    const feedStatus = document.getElementById('feedStatus');
+    const totalCount = document.getElementById('totalCount');
+    const searchInput = document.getElementById('searchInput');
+    const sourceFilter = document.getElementById('sourceFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const onlyWithEmail = document.getElementById('onlyWithEmail');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const emptyHint = document.getElementById('emptyHint');
+    const detailModal = document.getElementById('detailModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const markResolvedBtn = document.getElementById('markResolvedBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const selectedCardPlaceholder = document.getElementById('selectedCardPlaceholder');
+    const recentList = document.getElementById('recentList');
+    const exportCsvBtn = document.getElementById('exportCsvBtn');
+    const bulkResolveBtn = document.getElementById('bulkResolveBtn');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    const prevPageBtn = document.getElementById('prevPageBtn');
+    const nextPageBtn = document.getElementById('nextPageBtn');
+    const pagerInfo = document.getElementById('pagerInfo');
+
+    // Chart
+    const ctx = document.getElementById('sourceChart').getContext('2d');
+    const sourceChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Chatbot', 'Contact'],
+        datasets: [{
+          data: [0,0],
+          backgroundColor: ['#60A5FA','#34D399']
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // state
+    let currentUser = null;
+    let allMessages = []; // merged array
+    let selectedMessage = null;
+    let subscriptions = []; // for snapshot unsubscribe if needed
+    let pageSize = 25;
+    let currentPage = 0;
+    let filteredMessages = [];
+
+    // helper: toast
+    function showToast(txt, timeout=2500) {
+      const t = document.getElementById('toast');
+      t.textContent = txt;
+      t.classList.remove('hidden');
+      setTimeout(()=> t.classList.add('hidden'), timeout);
+    }
+
+    // Auth guard
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        // Not signed in: redirect to login page or show quick login form
+        // We will show a minimal login prompt using browser prompt (quick convenience).
+        // IMPORTANT: For better security, use a proper admin-only login flow in production.
+        const email = prompt('Admin email:');
+        const pass = prompt('Password: (input will be visible)');
+        if (!email || !pass) {
+          alert('Admin access required.');
+          return;
+        }
+        try {
+          await signInWithEmailAndPassword(auth, email, pass);
+          return; // onAuthStateChanged will re-run
+        } catch (err) {
+          console.error('Sign-in failed', err);
+          alert('Sign-in failed: ' + err.message);
+          return;
+        }
+      }
+
+      // Signed in: check allowed list
+      if (!ALLOWED_ADMINS.includes((user.email || '').toLowerCase())) {
+        // not allowed -> sign out and show message
+        alert('This account is not authorized to access admin. Signing out.');
+        await signOut(auth);
+        return;
+      }
+
+      currentUser = user;
+      adminEmailBadge.textContent = user.email;
+      adminEmailBadge.classList.remove('hidden');
+      feedStatus.textContent = 'Listening for messages...';
+
+      // Start listening
+      startRealtimeFeed();
+    });
+
+    // Logout
+    logoutBtnTop.addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = 'index.html';
+    });
+
+    goToSiteBtn.addEventListener('click', () => {
+      window.open('home.html', '_blank');
+    });
+
+    // Real-time feed: merge supportMessages and shares
+    function startRealtimeFeed() {
+      // unsubscribe old snapshots (if any)
+      subscriptions.forEach(unsub => { try{ unsub(); }catch(_){} });
+      subscriptions = [];
+
+      // We'll use simple onSnapshot on two collections and merge updates locally
+      const q1 = query(collection(db, 'supportMessages'), orderBy('createdAt', 'desc'));
+      const unsub1 = onSnapshot(q1, snap => {
+        // reconstruct local entries from supportMessages
+        const arr = [];
+        snap.forEach(d => {
+          const data = d.data();
+          arr.push({
+            _id: d.id,
+            source: 'supportMessages',
+            from_name: data.from_name || data.user || data.userName || null,
+            from_email: data.from_email || data.email || null,
+            userMessage: data.userMessage || data.message || null,
+            botReply: data.botReply || data.reply || null,
+            createdAt: data.createdAt ? data.createdAt.toMillis ? data.createdAt.toMillis() : (typeof data.createdAt === 'number' ? data.createdAt : Date.parse(data.createdAt)) : Date.now(),
+            status: data.status || (data.seen ? 'resolved' : 'unread'),
+            raw: data
+          });
+        });
+        // merge into master
+        mergeAndRender(arr, 'supportMessages');
+      }, err => {
+        console.error('supportMessages snapshot error', err);
+        feedStatus.textContent = 'Error listening to supportMessages';
+      });
+
+      const q2 = query(collection(db, 'shares'), orderBy('createdAt', 'desc'));
+      const unsub2 = onSnapshot(q2, snap => {
+        const arr = [];
+        snap.forEach(d => {
+          const data = d.data();
+          arr.push({
+            _id: d.id,
+            source: 'shares',
+            from_name: data.name || data.from_name || null,
+            from_email: data.email || data.from_email || null,
+            userMessage: data.message || data.userMessage || null,
+            botReply: data.botReply || null,
+            createdAt: data.createdAt ? data.createdAt.toMillis ? data.createdAt.toMillis() : (typeof data.createdAt === 'number' ? data.createdAt : Date.parse(data.createdAt)) : Date.now(),
+            status: data.status || 'unread',
+            raw: data
+          });
+        });
+        mergeAndRender(arr, 'shares');
+      }, err => {
+        console.error('shares snapshot error', err);
+        feedStatus.textContent = 'Error listening to shares';
+      });
+
+      subscriptions.push(unsub1, unsub2);
+    }
+
+    // Local store for each collection; we will keep them merged
+    const store = {
+      supportMessages: [],
+      shares: []
+    };
+
+    function mergeAndRender(arr, key) {
+      store[key] = arr;
+      // Merge both stores, sort by createdAt desc
+      allMessages = [...store.supportMessages, ...store.shares]
+        .sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+      // Apply filters & render
+      applyFiltersAndRender();
+      // update analytics & recent
+      updateAnalytics();
+      updateRecentActivity();
+    }
+
+    function applyFiltersAndRender() {
+      const q = (searchInput.value || '').toLowerCase().trim();
+      const src = sourceFilter.value;
+      const st = statusFilter.value;
+      const onlyEmail = onlyWithEmail.checked;
+
+      filteredMessages = allMessages.filter(m => {
+        if (src !== 'all' && m.source !== src) return false;
+        if (st === 'unread' && m.status === 'resolved') return false;
+        if (st === 'resolved' && m.status !== 'resolved') return false;
+        if (onlyEmail && (!m.from_email || m.from_email.trim() === '')) return false;
+        if (!q) return true;
+        // search across multiple fields
+        const hay = ((m.from_name||'') + ' ' + (m.from_email||'') + ' ' + (m.userMessage||'') + ' ' + (m.botReply||'')).toLowerCase();
+        return hay.includes(q);
+      });
+
+      totalCount.textContent = `${filteredMessages.length} items`;
+      // paging
+      currentPage = 0; // reset page on filter
+      renderPage();
+    }
+
+    function renderPage() {
+      const start = currentPage * pageSize;
+      const pageItems = filteredMessages.slice(start, start + pageSize);
+      pagerInfo.textContent = `Showing ${start+1} – ${Math.min(start+pageSize, filteredMessages.length)} of ${filteredMessages.length}`;
+      prevPageBtn.disabled = currentPage === 0;
+      nextPageBtn.disabled = (start + pageSize) >= filteredMessages.length;
+      renderFeed(pageItems);
+    }
+
+    prevPageBtn.addEventListener('click', () => {
+      if (currentPage > 0) { currentPage--; renderPage(); }
+    });
+    nextPageBtn.addEventListener('click', () => {
+      if ((currentPage+1) * pageSize < filteredMessages.length) { currentPage++; renderPage(); }
+    });
+
+    // render feed cards
+    function renderFeed(items) {
+      feed.innerHTML = '';
+      if (!items || items.length === 0) {
+        emptyHint.textContent = filteredMessages.length === 0 ? 'No messages found.' : 'No items on this page.';
+        feed.appendChild(emptyHint);
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = `p-4 bg-white rounded-lg shadow flex gap-3 items-start ${item.status === 'resolved' ? 'card-resolved' : ''}`;
+        card.dataset.id = item._id;
+        card.dataset.source = item.source;
+
+        // checkbox for bulk
+        const chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.className = 'mt-1';
+        chk.dataset.id = item._id;
+        chk.dataset.source = item.source;
+
+        // left marker column
+        const left = document.createElement('div');
+        left.className = 'flex-shrink-0';
+        left.appendChild(chk);
+
+        // body
+        const body = document.createElement('div');
+        body.className = 'flex-1';
+
+        // header row
+        const h = document.createElement('div');
+        h.className = 'flex items-center justify-between gap-2';
+
+        const title = document.createElement('div');
+        title.innerHTML = `<div class="font-semibold">${escapeHtml(item.from_name || (item.from_email || 'Anonymous'))}</div>
+                           <div class="text-xs text-slate-400">${new Date(item.createdAt).toLocaleString()}</div>`;
+        h.appendChild(title);
+
+        const meta = document.createElement('div');
+        meta.className = 'flex items-center gap-2';
+
+        const badge = document.createElement('span');
+        badge.className = `text-xs px-2 py-1 rounded-full ${item.source === 'supportMessages' ? 'badge-source-chat' : 'badge-source-contact'}`;
+        badge.textContent = item.source === 'supportMessages' ? 'Chatbot' : 'Contact';
+        meta.appendChild(badge);
+
+        const statusP = document.createElement('span');
+        statusP.className = 'text-xs text-slate-500';
+        statusP.textContent = item.status === 'resolved' ? 'Resolved' : 'Unread';
+        meta.appendChild(statusP);
+
+        h.appendChild(meta);
+        body.appendChild(h);
+
+        // message preview
+        const preview = document.createElement('div');
+        preview.className = 'mt-3 text-sm text-slate-700';
+        preview.textContent = (item.userMessage || '').slice(0, 220) + (item.userMessage && item.userMessage.length > 220 ? '…' : '');
+        body.appendChild(preview);
+
+        // footer actions
+        const footer = document.createElement('div');
+        footer.className = 'mt-3 flex items-center gap-3 justify-between';
+
+        const leftActions = document.createElement('div');
+        leftActions.className = 'flex items-center gap-2';
+
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'px-2 py-1 text-sm border rounded';
+        viewBtn.textContent = 'View';
+        viewBtn.addEventListener('click', () => openDetail(item));
+
+        const markBtn = document.createElement('button');
+        markBtn.className = 'px-2 py-1 text-sm border rounded';
+        markBtn.textContent = item.status === 'resolved' ? 'Mark unread' : 'Mark resolved';
+        markBtn.addEventListener('click', () => toggleResolved(item));
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'px-2 py-1 text-sm border rounded text-rose-600';
+        delBtn.textContent = 'Delete';
+        delBtn.addEventListener('click', () => deleteMessage(item));
+
+        leftActions.appendChild(viewBtn);
+        leftActions.appendChild(markBtn);
+        leftActions.appendChild(delBtn);
+
+        footer.appendChild(leftActions);
+
+        // right actions: email / open in new tab
+        const rightActions = document.createElement('div');
+        rightActions.className = 'text-sm text-slate-500';
+
+        if (item.from_email) {
+          const mail = document.createElement('a');
+          mail.href = `mailto:${item.from_email}`;
+          mail.className = 'px-2 py-1 border rounded';
+          mail.textContent = 'Email';
+          rightActions.appendChild(mail);
+        }
+
+        footer.appendChild(rightActions);
+
+        body.appendChild(footer);
+
+        card.appendChild(left);
+        card.appendChild(body);
+        feed.appendChild(card);
+      });
+    }
+
+    // escape helper
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    }
+
+    // open detail modal
+    function openDetail(item) {
+      selectedMessage = item;
+      document.getElementById('detailTitle').textContent = item.from_name || item.from_email || 'Anonymous';
+      document.getElementById('detailMeta').textContent = `${item.source} • ${new Date(item.createdAt).toLocaleString()} • ${item._id}`;
+      document.getElementById('detailMessage').textContent = item.userMessage || '(no message)';
+      document.getElementById('detailBotReply').textContent = item.botReply || '(none)';
+      document.getElementById('detailRaw').textContent = JSON.stringify(item.raw || {}, null, 2);
+      detailModal.classList.remove('hidden');
+      detailModal.classList.add('flex');
+    }
+
+    closeModalBtn.addEventListener('click', () => {
+      detailModal.classList.add('hidden');
+      detailModal.classList.remove('flex');
+      selectedMessage = null;
+    });
+
+    // toggle resolved
+    async function toggleResolved(item) {
+      try {
+        // update on the correct collection
+        const col = item.source;
+        const docRef = doc(db, col, item._id);
+        const newStatus = item.status === 'resolved' ? 'unread' : 'resolved';
+        await updateDoc(docRef, { status: newStatus }).catch(async e => {
+          // fallback: perhaps field is 'seen' boolean in older messages
+          console.warn('updateDoc failed', e);
+          // try set seen true/false
+          if (newStatus === 'resolved') {
+            await updateDoc(docRef, { seen: true }).catch(()=>{});
+          } else {
+            await updateDoc(docRef, { seen: false }).catch(()=>{});
+          }
+        });
+
+        showToast('Status updated');
+      } catch (e) {
+        console.error('toggleResolved error', e);
+        showToast('Failed to update status');
+      }
+    }
+
+    // mark resolved button in modal
+    markResolvedBtn.addEventListener('click', async () => {
+      if (!selectedMessage) return;
+      await toggleResolved(selectedMessage);
+      closeModalBtn.click();
+    });
+
+    // delete message
+    async function deleteMessage(item) {
+      if (!confirm('Delete this message permanently?')) return;
+      try {
+        await deleteDoc(doc(db, item.source, item._id));
+        showToast('Deleted');
+      } catch (e) {
+        console.error('delete error', e);
+        showToast('Delete failed');
+      }
+    }
+
+    // delete from modal
+    deleteBtn.addEventListener('click', async () => {
+      if (!selectedMessage) return;
+      await deleteMessage(selectedMessage);
+      closeModalBtn.click();
+    });
+
+    // bulk actions
+    bulkResolveBtn.addEventListener('click', async () => {
+      const checked = Array.from(feed.querySelectorAll('input[type=checkbox]:checked'));
+      if (!checked.length) { showToast('No items selected'); return; }
+      if (!confirm(`Mark ${checked.length} messages as resolved?`)) return;
+      for (const c of checked) {
+        const id = c.dataset.id;
+        const src = c.dataset.source;
+        try {
+          await updateDoc(doc(db, src, id), { status: 'resolved' }).catch(()=>{});
+        } catch (e) { console.warn('bulk resolve error', e); }
+      }
+      showToast('Bulk resolve requested');
+    });
+
+    bulkDeleteBtn.addEventListener('click', async () => {
+      const checked = Array.from(feed.querySelectorAll('input[type=checkbox]:checked'));
+      if (!checked.length) { showToast('No items selected'); return; }
+      if (!confirm(`Delete ${checked.length} items permanently?`)) return;
+      for (const c of checked) {
+        const id = c.dataset.id;
+        const src = c.dataset.source;
+        try {
+          await deleteDoc(doc(db, src, id));
+        } catch (e) { console.warn('bulk delete error', e); }
+      }
+      showToast('Bulk delete requested');
+    });
+
+    // export CSV (from filteredMessages)
+    exportCsvBtn.addEventListener('click', () => {
+      const rows = filteredMessages.map(m => ({
+        id: m._id,
+        source: m.source,
+        name: m.from_name || '',
+        email: m.from_email || '',
+        message: (m.userMessage || '').replace(/\n/g, ' '),
+        botReply: (m.botReply || '').replace(/\n/g, ' '),
+        status: m.status || '',
+        createdAt: new Date(m.createdAt).toLocaleString()
+      }));
+      if (!rows.length) { showToast('No rows to export'); return; }
+      const csv = toCSV(rows);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `r2m_messages_export_${Date.now()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast('Export started');
+    });
+
+    function toCSV(objArray) {
+      const keys = Object.keys(objArray[0]);
+      const header = keys.join(',') + '\n';
+      const lines = objArray.map(r => keys.map(k => `"${String(r[k] || '').replace(/"/g,'""')}"`).join(','));
+      return header + lines.join('\n');
+    }
+
+    // search / filters
+    searchInput.addEventListener('input', debounce(() => {
+      applyFiltersAndRender();
+    }, 300));
+    sourceFilter.addEventListener('change', () => applyFiltersAndRender());
+    statusFilter.addEventListener('change', () => applyFiltersAndRender());
+    onlyWithEmail.addEventListener('change', () => applyFiltersAndRender());
+    refreshBtn.addEventListener('click', () => {
+      feedStatus.textContent = 'Refreshing...';
+      // re-run manual fetch of snapshots via startRealtimeFeed
+      startRealtimeFeed();
+      setTimeout(()=> feedStatus.textContent = 'Refreshed', 800);
+    });
+
+    // update analytics
+    function updateAnalytics() {
+      const chatbot = allMessages.filter(m => m.source === 'supportMessages').length;
+      const contact = allMessages.filter(m => m.source === 'shares').length;
+      sourceChart.data.datasets[0].data = [chatbot, contact];
+      sourceChart.update();
+    }
+
+    function updateRecentActivity() {
+      const recent = allMessages.slice(0, 6);
+      recentList.innerHTML = '';
+      recent.forEach(r => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center gap-2';
+        li.innerHTML = `<span class="text-xs text-slate-400">${new Date(r.createdAt).toLocaleTimeString()}</span>
+                        <span class="text-sm">${escapeHtml(r.from_name || r.from_email || 'Anonymous')}</span>
+                        <span class="text-xs ml-auto ${r.source==='supportMessages'?'text-sky-500':'text-emerald-500'}">${r.source==='supportMessages'?'Chatbot':'Contact'}</span>`;
+        recentList.appendChild(li);
+      });
+    }
+
+    // small debounce util
+    function debounce(fn, wait=200) {
+      let t;
+      return function(...a) {
+        clearTimeout(t);
+        t = setTimeout(()=> fn.apply(this, a), wait);
+      };
+    }
+
+    // initially load a small page of messages (in case snapshots are slow)
+    async function initialFetch() {
+      try {
+        // fetch last 100 from each collection
+        const smSnap = await getDocs(query(collection(db, 'supportMessages'), orderBy('createdAt','desc'), limit(100)));
+        const shSnap = await getDocs(query(collection(db, 'shares'), orderBy('createdAt','desc'), limit(100)));
+        const arr1 = []; smSnap.forEach(d => {
+          const data = d.data();
+          arr1.push({
+            _id: d.id,
+            source: 'supportMessages',
+            from_name: data.from_name || data.user || null,
+            from_email: data.from_email || data.email || null,
+            userMessage: data.userMessage || data.message || null,
+            botReply: data.botReply || data.reply || null,
+            createdAt: data.createdAt ? data.createdAt.toMillis ? data.createdAt.toMillis() : (typeof data.createdAt === 'number' ? data.createdAt : Date.parse(data.createdAt)) : Date.now(),
+            status: data.status || (data.seen ? 'resolved' : 'unread'),
+            raw: data
+          });
+        });
+        const arr2 = []; shSnap.forEach(d => {
+          const data = d.data();
+          arr2.push({
+            _id: d.id,
+            source: 'shares',
+            from_name: data.name || data.from_name || null,
+            from_email: data.email || data.from_email || null,
+            userMessage: data.message || data.userMessage || null,
+            botReply: data.botReply || null,
+            createdAt: data.createdAt ? data.createdAt.toMillis ? data.createdAt.toMillis() : (typeof data.createdAt === 'number' ? data.createdAt : Date.parse(data.createdAt)) : Date.now(),
+            status: data.status || 'unread',
+            raw: data
+          });
+        });
+
+        store.supportMessages = arr1;
+        store.shares = arr2;
+        allMessages = [...arr1, ...arr2].sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
+        applyFiltersAndRender();
+        updateAnalytics();
+        updateRecentActivity();
+        feedStatus.textContent = 'Initial fetch complete';
+      } catch (e) {
+        console.error('initialFetch failed', e);
+        feedStatus.textContent = 'Initial fetch failed';
+      }
+    }
+
+    // initial load (start snapshots and initial fetch)
+    initialFetch();
+
+    // simple keyboard shortcut: "r" refresh
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        refreshBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>

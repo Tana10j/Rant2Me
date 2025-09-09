@@ -1,53 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin — Nutrition (Dorcas)</title>
-  <link rel="stylesheet" href="admin-style.css" />
+  <title>Admin — Dorcas</title>
+
+  <!-- favicon -->
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tailwind theme tweak -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'r2m-blue': '#0d1b2a',
+            'r2m-blue-600': '#1b263b',
+            'r2m-aqua': '#00b4d8',
+            'r2m-sky': '#0077b6',
+            'r2m-gold': '#F5C542'
+          },
+          borderRadius: { 'r-lg': '14px' },
+          boxShadow: {
+            'r-lg': '0 18px 40px rgba(0,43,85,.18)',
+            'r-md': '0 10px 24px rgba(0,43,85,.14)',
+            'r-sm': '0 6px 14px rgba(0,43,85,.10)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+    h1.brand { font-family: "Cinzel Decorative", serif; }
+  </style>
 </head>
-<body>
-  <div class="admin-panel">
-    <div class="threads">
-      <h2>Nutrition Chat-list</h2>
-      <div id="threadsList">Loading chats…</div>
-    </div>
+<body class="bg-gradient-to-b from-white to-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <div class="chat-area">
-      <div class="chat-header">
-        <div class="title" id="chatHeaderTitle">Chat Section</div>
-
-        <!-- Notification icon + global badge -->
-        <div class="notif" aria-label="Unread messages">
-          <span class="icon-bell" aria-hidden="true"></span>
-          <span id="globalUnread" class="badge hidden">0</span>
+  <!-- HEADER -->
+  <header class="sticky top-0 z-40 bg-gradient-to-b from-r2m-blue to-r2m-blue-600 text-white shadow">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="home.html" class="flex items-center gap-3">
+        <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
+        <div>
+          <h1 class="brand text-2xl leading-tight">Rant<span class="text-r2m-aqua">2</span>Me Admin</h1>
+          <div class="text-xs opacity-80 -mt-1">Dorcas Dashboard</div>
         </div>
+      </a>
 
-<!-- ✅ Add Logs button here -->
-  <button onclick="window.location.href='log.html'" 
-          style="margin-left: 15px; background:#001eff; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">
-    Mood Logs
-  </button>
-
-        <div style="margin-left:auto">
-          <button id="signOutBtn" style="background:#eee;border:none;padding:8px 10px;border-radius:8px;cursor:pointer;">Sign out</button>
-        </div>
-      </div>
-
-      <!-- Messages load here (center column) -->
-      <div id="messages" class="messages">
-        <div style="color:#777">No chat selected</div>
-      </div>
-
-      <!-- Message input -->
-      <div class="input-area">
-        <input id="replyInput" placeholder="Type your reply..." />
-        <button id="sendReplyBtn">Send</button>
+      <div class="flex items-center gap-3">
+        <button onclick="window.location.href='log.html'" 
+          class="px-4 py-2 bg-r2m-sky text-white rounded-md font-semibold shadow hover:scale-[1.02] transition">
+          Mood Logs
+        </button>
+        <button onclick="window.location.href='admin-resources.html'" 
+          class="px-4 py-2 bg-r2m-sky text-white rounded-md font-semibold shadow hover:scale-[1.02] transition">
+          Manage Resources
+        </button>
+        <button id="signOutBtn" 
+          class="px-4 py-2 bg-white/90 text-r2m-blue rounded-md font-semibold shadow hover:bg-slate-100 transition">
+          Sign out
+        </button>
       </div>
     </div>
-  </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="flex-1 max-w-7xl mx-auto w-full flex h-[calc(100vh-80px)]">
+    
+    <!-- SIDEBAR THREADS -->
+    <aside class="w-80 bg-white shadow-r-md border-r border-slate-200 flex flex-col">
+      <div class="p-4 border-b border-slate-200">
+        <h2 class="text-lg font-bold text-r2m-blue">Dorcas Chats</h2>
+      </div>
+      <div id="threadsList" class="flex-1 overflow-y-auto p-3 space-y-2">
+        <div class="text-slate-500 italic">Loading chats…</div>
+        <!-- Example chat thread card -->
+        <!--
+        <div class="p-3 bg-slate-50 rounded shadow-sm cursor-pointer hover:bg-slate-100 flex justify-between items-center">
+          <div>
+            <p class="font-semibold text-slate-800">John Doe</p>
+            <p class="text-sm text-slate-500 truncate">Last message preview…</p>
+          </div>
+          <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">3</span>
+        </div>
+        -->
+      </div>
+    </aside>
+
+    <!-- CHAT AREA -->
+    <section class="flex-1 flex flex-col bg-slate-50">
+      <!-- CHAT HEADER -->
+      <div class="flex items-center justify-between bg-white shadow px-6 py-3 border-b border-slate-200">
+        <div class="flex items-center gap-2">
+          <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9" />
+          </svg>
+          <h3 id="chatHeaderTitle" class="text-lg font-semibold text-slate-800">No chat selected</h3>
+        </div>
+        <div class="relative">
+          <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14V9a6 6 0 10-12 0v5a2 2 0 01-.6 1.4L4 17h5m6 0v1a3 3 0 01-6 0v-1" />
+          </svg>
+          <span id="globalUnread" class="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full px-1 hidden">0</span>
+        </div>
+      </div>
+
+      <!-- MESSAGES -->
+      <div id="messages" class="flex-1 overflow-y-auto p-6 space-y-4">
+        <div class="text-slate-400 italic">Select a chat to view messages</div>
+      </div>
+
+      <!-- INPUT -->
+      <div class="bg-white border-t border-slate-200 p-4 flex items-center gap-3">
+        <input id="replyInput" placeholder="Type your reply..." 
+          class="flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-r2m-sky" />
+        <button id="sendReplyBtn" 
+          class="bg-r2m-sky hover:bg-r2m-aqua text-white px-5 py-2 rounded-lg font-semibold shadow-md transition">
+          Send
+        </button>
+      </div>
+    </section>
+  </main>
 
   <script type="module" src="./admin-nutrition.js"></script>
 </body>

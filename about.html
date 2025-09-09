@@ -1,232 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Rant2Me - About Us</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rant2Me — About Us</title>
+
+  <!-- favicon -->
   <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+
+  <!-- Google font -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <!-- put this CSS AFTER the <link rel="stylesheet" href="style.css"> line -->
-<style>
-/* ==== Slideshow fix: anchor slides and use class-based fade ==== */
-.slideshow {
-  position: relative;
-  max-width: 960px;
-  margin: 0 auto;
-  height: clamp(240px, 40vh, 380px); /* responsive height */
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-}
 
-/* Anchor each image to all four edges of the container */
-.slideshow img {
-  position: absolute;
-  inset: 0;            /* top:0; right:0; bottom:0; left:0; */
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  opacity: 0;
-  transition: opacity .8s ease;
-  left: 0;
-  top: 0;
-  animation: none !important; /* disable earlier keyframe animation to avoid conflicts */
-  transform: translateZ(0);    /* help rendering stability */
-}
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-/* The visible slide */
-.slideshow img.active {
-  opacity: 1;
-  z-index: 2;
-}
-</style>
-
-  <style>
-    /* --- About Page Overrides --- */
-
-    .team {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 28px;
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 50px 20px;
-    }
-
-    .team div {
-      background: #fff;
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid var(--line);
-      text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .team div:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .team img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 15px;
-      border: 3px solid var(--aqua);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .team h2 {
-      font-size: 1.25rem;
-      color: var(--blue);
-      margin-bottom: 12px;
-    }
-
-    .team p {
-      font-size: 0.95rem;
-      color: var(--muted);
-      line-height: 1.6;
-      text-align: left;
-    }
-
-    /* Gallery section */
-    .gallery {
-      text-align: center;
-      padding: 60px 20px;
-      background: var(--cloud);
-    }
-
-    .gallery h2 {
-      font-size: 1.8rem;
-      margin-bottom: 10px;
-      color: var(--blue);
-    }
-
-    .gallery p {
-      color: var(--muted);
-      margin-bottom: 25px;
-    }
-
-    .slideshow {
-      position: relative;
-      max-width: 960px;
-      margin: 0 auto;
-      height: 380px;
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow-md);
-    }
-
-    .slideshow img {
-      border-radius: 0;
-    }
-
-    /* Footer override */
-    footer {
-      text-align:center;
-      padding:18px;
-      font-size:14px;
-      background: var(--blue);
-      color:#fff;
-    }
-
-    footer a {
-      color: var(--gold);
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    /* Extra mobile polish */
-    @media (max-width: 640px) {
-      .team {
-        padding: 32px 16px;
-      }
-      .team p {
-        text-align: center;
-      }
-      .slideshow {
-        height: 240px;
-      }
-    }
-  </style>
-</head>
-<body class="about">
-  <header>
-    <h1 class="brand-title">Meet The Team</h1>
-    <nav>
-      <a href="home.html">Home</a>
-      <a href="chat.html">Chat</a>
-      <a href="help.html">Help Centre</a>
-      <a href="faq.html">FAQ</a>
-      <a href="pay.html">Plans</a>
-      <a href="about.html">About Us</a>
-      <a href="services.html">Services</a>
-    </nav>
-  </header>
-
-  <section class="team">
-    <div>
-      <img src="images/Dorc.jpeg" alt="Dorcas Edima Eduk">
-      <h2>CEO: Dorcas Eduk</h2>
-      <p>Dorcas Eduk is a passionate woman on a mission to bridge wellness, technology, and human connection. She holds a Bachelor’s degree in Human Nutrition and Dietetics from Ambrose Alli University, where she developed a strong understanding of how food, science, and lifestyle influence wellbeing. She founded Rant2Me to offer a safe, anonymous space for people to express themselves without judgment.</p>
-    </div>
-
-    <div>
-      <img src="images/TJ.jpg" alt="Tana Joshua Ayo-Ogbor">
-      <h2>CTO: Tana Ayo-Ogbor</h2>
-      <p>Tana is passionate about technology for mental health support. He ensures that Rant2Me is powered by innovative, reliable, and user-friendly technology to create meaningful digital experiences.</p>
-    </div>
-
-    <div>
-      <img src="images/Annonymous.jpg" alt="Chi">
-      <h2>COO: Chidera Umezurike</h2>
-      <p>Chidera oversees daily operations, making sure Rant2Me runs smoothly for everyone. She is dedicated to wellness, mental health, and building empathetic spaces. Outside of work, she enjoys cooking, novels, and exploring ideas on YouTube.</p>
-    </div>
-  </section>
-
-  <section class="gallery">
-    <h2>Find Peace In Life</h2>
-    <p>More pictures coming soon!</p>
-    <div class="slideshow">
-      <img src="images/moving-forward-4777506_1920.jpg" class="slide" />
-      <img src="images/business-3208596_1920.jpg" class="slide" />
-      <img src="images/landscape-3703479_1920.jpg" class="slide" />
-    </div>
-  </section>
-
-  <footer>
-    &copy; 2025 Rant2Me | <a href="#" onclick="showDisclaimer()">Disclaimer & Terms</a>
-  </footer>
-
+  <!-- Tailwind theme tweak -->
   <script>
-    function showDisclaimer() {
-      alert("Disclaimer & Terms: Content provided on Rant2Me is for emotional support and listening purposes only, not professional medical advice.");
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'r2m-blue': '#0d1b2a',
+            'r2m-blue-600': '#1b263b',
+            'r2m-aqua': '#00b4d8',
+            'r2m-sky': '#0077b6',
+            'r2m-gold': '#F5C542'
+          },
+          borderRadius: { 'r-lg': '14px' },
+          boxShadow: {
+            'r-lg': '0 18px 40px rgba(0,43,85,.18)',
+            'r-md': '0 10px 24px rgba(0,43,85,.14)',
+            'r-sm': '0 6px 14px rgba(0,43,85,.10)'
+          }
+        }
+      }
     }
   </script>
-  <!-- Put this just before the closing </body> -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const slides = Array.from(document.querySelectorAll('.slideshow img'));
-  if (!slides.length) return;
 
-  // initialize
-  let idx = 0;
-  slides.forEach((s, i) => s.classList.toggle('active', i === 0));
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+    h1.brand { font-family: "Cinzel Decorative", serif; }
+    .fade-in { animation: fadeIn .9s ease both; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none } }
 
-  // cycle every 4s (adjust as you like)
-  const INTERVAL_MS = 4000;
-  setInterval(() => {
-    slides[idx].classList.remove('active');
-    idx = (idx + 1) % slides.length;
-    slides[idx].classList.add('active');
-  }, INTERVAL_MS);
-});
-</script>
+    /* Background transitions */
+    .bg-section {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 1s ease;
+      background-size: cover;
+      background-position: center;
+    }
+    .bg-section.active { opacity: 1; }
+  </style>
+</head>
+<body class="text-slate-800 min-h-screen relative">
+
+  <!-- Background layers -->
+  <div id="bg-dorcas" class="bg-section" style="background-image:url('images/Dorc.jpeg')"></div>
+  <div id="bg-tana" class="bg-section" style="background-image:url('images/TJ.jpg')"></div>
+  <div id="bg-chidera" class="bg-section" style="background-image:url('images/Annonymous.jpg')"></div>
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-40 bg-gradient-to-b from-r2m-blue to-r2m-blue-600 text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="home.html" class="flex items-center gap-3">
+        <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
+        <div>
+          <h1 class="brand text-2xl leading-tight">Rant<span class="text-r2m-aqua">2</span>Me</h1>
+          <div class="text-xs opacity-80 -mt-1">Speak freely. Be heard.</div>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
+        <a href="home.html" class="hover:text-r2m-aqua">Home</a>
+        <a href="chat.html" class="hover:text-r2m-aqua">Chat</a>
+        <a href="help.html" class="hover:text-r2m-aqua">Help Centre</a>
+        <a href="faq.html" class="hover:text-r2m-aqua">FAQ</a>
+        <a href="pay.html" class="hover:text-r2m-aqua">Plans</a>
+        <a href="about.html" aria-current="page" class="underline">About</a>
+        <a href="services.html" class="hover:text-r2m-aqua">Services</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="hidden md:inline-block px-4 py-2 bg-white text-r2m-blue rounded-md font-semibold shadow-sm">Login</a>
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Open menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE DRAWER -->
+  <div id="mobileDrawer" class="fixed inset-0 z-50 hidden">
+    <div id="drawerOverlay" class="absolute inset-0 bg-black/50"></div>
+    <aside class="absolute right-0 top-0 h-full w-72 bg-white shadow-lg p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Menu</h2>
+          <div class="text-sm text-slate-500">Navigate Rant2Me</div>
+        </div>
+        <button id="drawerClose" class="p-2 rounded hover:bg-slate-100" aria-label="Close">✕</button>
+      </div>
+      <nav class="flex flex-col gap-3 text-base">
+        <a href="home.html" class="px-3 py-2 rounded hover:bg-slate-50">Home</a>
+        <a href="chat.html" class="px-3 py-2 rounded hover:bg-slate-50">Chat</a>
+        <a href="help.html" class="px-3 py-2 rounded hover:bg-slate-50">Help Centre</a>
+        <a href="faq.html" class="px-3 py-2 rounded hover:bg-slate-50">FAQ</a>
+        <a href="pay.html" class="px-3 py-2 rounded hover:bg-slate-50">Plans</a>
+        <a href="about.html" class="px-3 py-2 rounded bg-slate-50">About</a>
+        <a href="services.html" class="px-3 py-2 rounded hover:bg-slate-50">Services</a>
+        <a href="index.html" class="mt-4 inline-block px-4 py-2 bg-r2m-aqua text-white rounded-md text-center">Login / Sign up</a>
+      </nav>
+    </aside>
+  </div>
+
+  <!-- MAIN -->
+  <main class="relative z-10">
+
+    <!-- HERO -->
+    <section class="min-h-screen flex items-center justify-center text-center fade-in px-6">
+      <div class="bg-white/90 p-8 rounded-r-lg shadow-r-lg max-w-xl">
+        <h2 class="text-4xl md:text-5xl font-extrabold text-r2m-blue">About Rant2Me</h2>
+        <p class="mt-4 text-slate-600">A safe space to express, connect, and find relief. We blend technology with empathy to power anonymous listening across the world.</p>
+      </div>
+    </section>
+
+    <!-- TEAM SCROLL SECTIONS -->
+    <section id="dorcas" class="min-h-screen flex items-center justify-center">
+      <div class="bg-white/90 p-8 rounded-r-lg shadow-r-lg text-center max-w-lg fade-in">
+        <img src="images/Dorc.jpeg" alt="Dorcas" class="w-28 h-28 mx-auto rounded-full shadow-md" />
+        <h3 class="mt-4 text-2xl font-bold text-r2m-sky">Dorcas Eduk</h3>
+        <p class="text-sm text-slate-500">Founder & CEO</p>
+        <p class="mt-3 text-slate-600">Visionary founder who believes in the power of empathy and safe expression.</p>
+      </div>
+    </section>
+
+    <section id="tana" class="min-h-screen flex items-center justify-center">
+      <div class="bg-white/90 p-8 rounded-r-lg shadow-r-lg text-center max-w-lg fade-in">
+        <img src="images/TJ.jpg" alt="Tana" class="w-28 h-28 mx-auto rounded-full shadow-md" />
+        <h3 class="mt-4 text-2xl font-bold text-r2m-sky">Tana Ayo-Ogbor</h3>
+        <p class="text-sm text-slate-500">CTO</p>
+        <p class="mt-3 text-slate-600">Driving the technology behind Rant2Me, ensuring our platform is secure and innovative.</p>
+      </div>
+    </section>
+
+    <section id="chidera" class="min-h-screen flex items-center justify-center">
+      <div class="bg-white/90 p-8 rounded-r-lg shadow-r-lg text-center max-w-lg fade-in">
+        <img src="images/Annonymous.jpg" alt="Chidera" class="w-28 h-28 mx-auto rounded-full shadow-md" />
+        <h3 class="mt-4 text-2xl font-bold text-r2m-sky">Chidera Umezurike</h3>
+        <p class="text-sm text-slate-500">COO</p>
+        <p class="mt-3 text-slate-600">Oversees operations and ensures seamless experiences for our global users.</p>
+      </div>
+    </section>
+
+    <!-- JOURNEY -->
+    <section class="min-h-screen flex items-center justify-center text-center px-6">
+      <div class="bg-white/90 p-8 rounded-r-lg shadow-r-lg max-w-2xl fade-in">
+        <h3 class="text-2xl font-bold mb-4">Our Journey</h3>
+        <p class="text-slate-600 mb-6">From an idea to a movement, Rant2Me has grown to touch lives worldwide.</p>
+        <ul class="space-y-3 text-left text-slate-700">
+          <li><strong>2024:</strong> Idea conceived, the need for safe anonymous venting.</li>
+          <li><strong>2025:</strong> Beta launch, first 100 users join.</li>
+          <li><strong>2026:</strong> Scaling internationally with dedicated listeners.</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="text-center py-6 text-sm text-slate-500 relative z-10">
+    &copy; 2025 Rant2Me • <a href="help.html" class="text-r2m-aqua">Support</a> • <a href="services.html" class="text-r2m-aqua">Services</a>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // Mobile drawer
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const drawerClose = document.getElementById('drawerClose');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    mobileMenuBtn?.addEventListener('click', () => mobileDrawer.classList.remove('hidden'));
+    drawerClose?.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+    drawerOverlay?.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+
+    // Scroll-based background activation
+    const sections = [
+      { id: "dorcas", bg: "bg-dorcas" },
+      { id: "tana", bg: "bg-tana" },
+      { id: "chidera", bg: "bg-chidera" }
+    ];
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting) {
+          sections.forEach(s => document.getElementById(s.bg).classList.remove('active'));
+          const current = sections.find(s => s.id === entry.target.id);
+          if (current) document.getElementById(current.bg).classList.add('active');
+        }
+      });
+    }, { threshold: 0.6 });
+
+    sections.forEach(s => {
+      const el = document.getElementById(s.id);
+      if(el) observer.observe(el);
+    });
+  </script>
 </body>
 </html>

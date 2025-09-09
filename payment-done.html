@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Payment Verification</title>
+  <script type="module">
+    import { auth } from './firebase.js';
+
+    async function verify() {
+      const qs = new URLSearchParams(location.search);
+      const tx_ref = qs.get('tx_ref');
+      const section = qs.get('section') || 'counselling'; // or pass it in meta->redirect if you prefer
+      const transaction_id = qs.get('transaction_id');
+
+      const user = await new Promise(resolve =>
+        auth.onAuthStateChanged(u => resolve(u))
+      );
+      if (!user) {
+        alert('Please log in to complete verification.');
+        location.href = 'index.html';
+        return;
+      }
+
+      const idToken = await user.getIdToken();
+      const res = await fetch('https://us-central1-rant2me-ab36b.cloudfunctions.net/verifyPayment', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tx_ref, section, transaction_id })
+      }).catch(() => null);
+
+      let ok = false;
+      try {
+        const data = await res.json();
+        ok = res.status === 200 && data.status === 'ok';
+      } catch {}
+
+      if (ok) {
+        // same redirect logic as pay.js
+        const target =
+          section === 'counselling' ? 'chat-counselling.html' :
+          section === 'nutrition'   ? 'chat-nutrition.html' :
+                                      'chat-student.html';
+        location.replace(target);
+      } else {
+        // fall back to watching entitlement — or just send them to chats, your guard will handle access
+        location.replace('pay.html');
+      }
+    }
+    verify();
+  </script>
+</head>
+<body>
+  Verifying your payment, please wait…
+</body>
+</html>

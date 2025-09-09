@@ -1,86 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
-    <meta charset="UTF-8">
-    <title>Rant2Me - Services</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rant2Me — Services</title>
+
+  <!-- favicon -->
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tailwind custom theme -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'r2m-blue': '#0d1b2a',
+            'r2m-blue-600': '#1b263b',
+            'r2m-aqua': '#00b4d8',
+            'r2m-sky': '#0077b6',
+            'r2m-gold': '#F5C542'
+          },
+          borderRadius: { 'r-lg': '14px' },
+          boxShadow: {
+            'r-lg': '0 18px 40px rgba(0,43,85,.18)',
+            'r-md': '0 10px 24px rgba(0,43,85,.14)',
+            'r-sm': '0 6px 14px rgba(0,43,85,.10)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+    h1.brand { font-family: "Cinzel Decorative", serif; }
+    .fade-in { animation: fadeIn .9s ease both; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none } }
+  </style>
 </head>
-<body>
-    <header>
-        <h1>Our Services</h1>
-        <nav>
-            <a href="home.html">Home</a>
-            <a href="chat.html">Chat</a>
-            <a href="help.html">Help Centre</a>
-            <a href="faq.html">FAQ</a>
-            <a href="pay.html">Plans</a>
-            <a href="about.html">About Us</a>
-            <a href="services.html">Services</a>
-        </nav>
-    </header>
+<body class="bg-gradient-to-b from-white to-slate-50 text-slate-800 min-h-screen">
 
-    <section class="services">
-        <h2>Explore Our Services</h2>
-        <ul>
-            <li class="service-item">
-                <button>Counselling Sessions</button>
-                <div class="description">
-                    <p><strong>Talk to: Tana Ayo-Ogbor</strong></p>
-                    <p>Book a private one-on-one session with certified listener, Tana Ayo-Ogbor, to talk through whatever is weighing you down. Whether it's stress, trauma, heartbreak, or just the need to feel heard, these sessions are built to give you guidance, comfort, and clarity.</p>
-                    <img src="images/Listen.jpg" alt="Counselling" class="service-img">
-                </div>
-            </li>
-            <li class="service-item">
-                <button>Anonymous Ranting</button>
-                <div class="description">
-                    <p><strong>Fully Anonymous & Encrypted</strong></p>
-                    <p>Sometimes, you just need to scream into the void. This feature lets you rant anonymously to a trained listener. Both parties remain anonymous, the chat is fully encrypted, and all messages are deleted once the session ends. No saving. No tracking. Just a safe place to let it out.
-
-                    </p>
-                    <img src="images/Ann.jpg" alt="Anonymous Rant" class="service-img">
-                </div>
-            </li>
-            <li class="service-item">
-                <button>Nutrition & Mental Wellness</button>
-                <div class="description">
-                    <p><strong>Talk to: Eduk Dorcas</strong></p>
-                    <p>This session combines dietary advice with mental wellness check-ins. Led by Eduk Dorcas or Chidera, it’s perfect for anyone feeling off-balance, struggling with eating habits, or seeking a healthier lifestyle with less pressure. You’ll get gentle, evidence-backed support for both your plate and your peace of mind.</p>
-                    <img src="images/Diet.jpg" alt="Nutrition" class="service-img">
-                </div>
-            </li>
-            <li class="service-item">
-                <button>Student Emotional Support</button>
-                <div class="description">
-                    <p><strong>Talk to: Chidera Umezurike</strong></p>
-                    <p>Academics, pressure, loneliness, identity crises, students carry more than just books. This session is tailored for students navigating emotional overwhelm, burnout, and self-worth. Eduk Dorcas or Chidera are here to help you breathe, regroup, and feel a little less alone.</p>
-                    <img src="images/key-3087900_1920.jpg" alt="Student Support" class="service-img">
-                </div>
-            </li>
-        </ul>
-    </section>
-
-    <section class="gallery">
-        <h2>Our Moments</h2>
-        <p>More pictures and stories coming soon!</p>
-        <div class="image-grid">
-            <img src="images/Pic9.jpg" alt="Coming soon image">
-            <img src="images/Pic10.jpg" alt="Coming soon image">
+  <!-- HEADER -->
+  <header class="sticky top-0 z-40 bg-gradient-to-b from-r2m-blue to-r2m-blue-600 text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="home.html" class="flex items-center gap-3">
+        <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
+        <div>
+          <h1 class="brand text-2xl leading-tight">Rant<span class="text-r2m-aqua">2</span>Me</h1>
+          <div class="text-xs opacity-80 -mt-1">Speak freely. Be heard.</div>
         </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
+        <a href="home.html" class="hover:text-r2m-aqua">Home</a>
+        <a href="chat.html" class="hover:text-r2m-aqua">Chat</a>
+        <a href="help.html" class="hover:text-r2m-aqua">Help Centre</a>
+        <a href="faq.html" class="hover:text-r2m-aqua">FAQ</a>
+        <a href="pay.html" class="hover:text-r2m-aqua">Plans</a>
+        <a href="about.html" class="hover:text-r2m-aqua">About</a>
+        <a href="services.html" aria-current="page" class="underline">Services</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="hidden md:inline-block px-4 py-2 bg-white text-r2m-blue rounded-md font-semibold shadow-sm">Login</a>
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Open menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE DRAWER -->
+  <div id="mobileDrawer" class="fixed inset-0 z-50 hidden">
+    <div id="drawerOverlay" class="absolute inset-0 bg-black/50"></div>
+    <aside class="absolute right-0 top-0 h-full w-72 bg-white shadow-lg p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Menu</h2>
+          <div class="text-sm text-slate-500">Navigate Rant2Me</div>
+        </div>
+        <button id="drawerClose" class="p-2 rounded hover:bg-slate-100" aria-label="Close">✕</button>
+      </div>
+      <nav class="flex flex-col gap-3 text-base">
+        <a href="home.html" class="px-3 py-2 rounded hover:bg-slate-50">Home</a>
+        <a href="chat.html" class="px-3 py-2 rounded hover:bg-slate-50">Chat</a>
+        <a href="help.html" class="px-3 py-2 rounded hover:bg-slate-50">Help Centre</a>
+        <a href="faq.html" class="px-3 py-2 rounded hover:bg-slate-50">FAQ</a>
+        <a href="pay.html" class="px-3 py-2 rounded hover:bg-slate-50">Plans</a>
+        <a href="about.html" class="px-3 py-2 rounded hover:bg-slate-50">About</a>
+        <a href="services.html" class="px-3 py-2 rounded bg-slate-50">Services</a>
+        <a href="index.html" class="mt-4 inline-block px-4 py-2 bg-r2m-aqua text-white rounded-md text-center">Login / Sign up</a>
+      </nav>
+    </aside>
+  </div>
+
+  <!-- MAIN -->
+  <main class="max-w-6xl mx-auto px-4 py-10">
+
+    <!-- HERO -->
+    <section class="grid gap-6 md:grid-cols-2 items-center mb-10 fade-in">
+      <div>
+        <h2 class="text-4xl md:text-5xl font-extrabold text-r2m-blue">Our Services</h2>
+        <p class="mt-4 text-slate-600 max-w-lg">Different struggles call for different kinds of support. Whether it’s counselling, student emotional care, nutrition guidance, or anonymous ranting, Rant2Me provides a safe space where you can truly be heard.</p>
+
+        <div class="mt-6 flex gap-3 flex-wrap">
+          <a href="#services" class="inline-flex items-center px-5 py-3 bg-r2m-aqua text-white rounded-md shadow hover:scale-[1.02]">Explore services</a>
+          <a href="help.html" class="inline-flex items-center px-5 py-3 border border-slate-200 rounded-md text-slate-700">Help centre</a>
+        </div>
+      </div>
+
+      <!-- Visual/quote card -->
+      <aside class="bg-white p-6 rounded-r-lg shadow-r-md">
+        <h3 class="font-semibold text-lg">Why services matter</h3>
+        <p class="text-sm text-slate-600 mt-2">Every service is designed with empathy, confidentiality, and healing in mind. Select the area you need most today, and we’ll connect you with the right listener instantly.</p>
+        <blockquote class="mt-4 text-r2m-sky italic">“Different services for different struggles. We're always here.”</blockquote>
+      </aside>
     </section>
 
-    <p class="quote">"Different services for different struggles. We're always here."</p>
+    <!-- SERVICES GRID -->
+    <section id="services" class="fade-in">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold">Explore Our Services</h3>
+        <p class="text-sm text-slate-500">Choose a path that fits your needs best</p>
+      </div>
 
-    <script src="script.js"></script>
-    <footer style="text-align:center; padding:15px; font-size:14px; background:#f5f5f5;">
-  &copy; 2025 Rant2Me | <a href="#" onclick="showDisclaimer()" style="color:#007BFF; text-decoration:none;">Disclaimer & Terms</a>
-</footer>
+      <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Counselling -->
+        <div class="bg-white rounded-r-lg shadow-r-sm overflow-hidden flex flex-col">
+          <img src="images/Listen.jpg" alt="Counselling" class="h-40 w-full object-cover" />
+          <div class="p-6 flex-1 flex flex-col">
+            <h4 class="text-lg font-semibold text-r2m-blue">Counselling Sessions</h4>
+            <p class="text-sm text-slate-600 mt-2 flex-1">Private one-on-one sessions with <strong>Tana Ayo-Ogbor</strong>. Talk through stress, trauma, heartbreak, or anything weighing you down. Safe, confidential guidance and clarity.</p>
+            <a href="chat-counselling.html" class="mt-4 inline-block px-4 py-2 bg-r2m-sky text-white rounded-md text-sm text-center">Start now</a>
+          </div>
+        </div>
 
-<script>
-  function showDisclaimer() {
-    document.getElementById("disclaimerModal").style.display = "flex";
-  }
-</script>
+        <!-- Anonymous Ranting -->
+        <div class="bg-white rounded-r-lg shadow-r-sm overflow-hidden flex flex-col">
+          <img src="images/Ann.jpg" alt="Anonymous Rant" class="h-40 w-full object-cover" />
+          <div class="p-6 flex-1 flex flex-col">
+            <h4 class="text-lg font-semibold text-r2m-blue">Anonymous Ranting</h4>
+            <p class="text-sm text-slate-600 mt-2 flex-1">Fully anonymous & encrypted. Vent without judgement. Chats are deleted once the session ends, no saving, no tracking, just freedom to let it out.</p>
+            <a href="chat.html" class="mt-4 inline-block px-4 py-2 bg-r2m-sky text-white rounded-md text-sm text-center">Rant now</a>
+          </div>
+        </div>
+
+        <!-- Nutrition -->
+        <div class="bg-white rounded-r-lg shadow-r-sm overflow-hidden flex flex-col">
+          <img src="images/Diet.jpg" alt="Nutrition" class="h-40 w-full object-cover" />
+          <div class="p-6 flex-1 flex flex-col">
+            <h4 class="text-lg font-semibold text-r2m-blue">Nutrition & Mental Wellness</h4>
+            <p class="text-sm text-slate-600 mt-2 flex-1">Guidance from <strong>Eduk Dorcas</strong>. Sessions combine diet support with mental wellness check-ins, helping you feel balanced and healthier without pressure.</p>
+            <a href="chat-nutrition.html" class="mt-4 inline-block px-4 py-2 bg-r2m-sky text-white rounded-md text-sm text-center">Book session</a>
+          </div>
+        </div>
+
+        <!-- Student -->
+        <div class="bg-white rounded-r-lg shadow-r-sm overflow-hidden flex flex-col sm:col-span-2 lg:col-span-1">
+          <img src="images/key-3087900_1920.jpg" alt="Student Support" class="h-40 w-full object-cover" />
+          <div class="p-6 flex-1 flex flex-col">
+            <h4 class="text-lg font-semibold text-r2m-blue">Student Emotional Support</h4>
+            <p class="text-sm text-slate-600 mt-2 flex-1">Tailored for students navigating burnout, pressure, or loneliness. <strong>Chidera Umezurike</strong> and Dorcas offer a listening ear and gentle support.</p>
+            <a href="chat-student.html" class="mt-4 inline-block px-4 py-2 bg-r2m-sky text-white rounded-md text-sm text-center">Get support</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="mt-12 fade-in">
+      <h3 class="text-2xl font-bold mb-3">Our Moments</h3>
+      <p class="text-slate-600 mb-6">More pictures and stories coming soon.</p>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <img src="images/Pic9.jpg" alt="Coming soon" class="rounded shadow-sm object-cover h-40 w-full" />
+        <img src="images/Pic10.jpg" alt="Coming soon" class="rounded shadow-sm object-cover h-40 w-full" />
+      </div>
+    </section>
+
+    <!-- QUOTE -->
+    <section class="mt-12 text-center">
+      <blockquote class="text-xl italic text-r2m-blue font-semibold">"Different services for different struggles. We're always here."</blockquote>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="text-center py-6 text-sm text-slate-500">
+    &copy; 2025 Rant2Me • <a href="about.html" class="text-r2m-aqua">About</a> • <a href="help.html" class="text-r2m-aqua">Support</a>
+  </footer>
+
+  <!-- mobile drawer script -->
+  <script>
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const drawerClose = document.getElementById('drawerClose');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+
+    mobileMenuBtn?.addEventListener('click', () => mobileDrawer.classList.remove('hidden'));
+    drawerClose?.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+    drawerOverlay?.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+  </script>
 </body>
 </html>

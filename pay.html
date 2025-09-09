@@ -1,69 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rant2Me — Plans & Pricing</title>
+
+  <!-- favicon -->
   <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+
+  <!-- Google font (same aesthetic as your home) -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
-  <meta charset="UTF-8" />
-  <title>Rant2Me – Plans</title>
-  <link rel="stylesheet" href="style.css" />
-  <!-- Flutterwave Checkout (must load before pay.js) -->
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tailwind theme tweak -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'r2m-blue': '#0d1b2a',
+            'r2m-blue-600': '#1b263b',
+            'r2m-aqua': '#00b4d8',
+            'r2m-sky': '#0077b6',
+            'r2m-gold': '#F5C542'
+          },
+          borderRadius: { 'r-lg': '14px' },
+          boxShadow: {
+            'r-lg': '0 18px 40px rgba(0,43,85,.18)',
+            'r-md': '0 10px 24px rgba(0,43,85,.14)',
+            'r-sm': '0 6px 14px rgba(0,43,85,.10)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+    h1.brand { font-family: "Cinzel Decorative", serif; }
+    .fade-in { animation: fadeIn .9s ease both; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none } }
+  </style>
+
+  <!-- Flutterwave Checkout (must be loaded before your pay.js module which uses it) -->
   <script src="https://checkout.flutterwave.com/v3.js"></script>
 </head>
-<body>
-  <header>
-    <h1>Choose a Plan</h1>
-    <nav>
-      <a href="home.html">Home</a>
-      <a href="chat.html">Chat</a>
-      <a href="help.html">Help Centre</a>
-      <a href="faq.html">FAQ</a>
-      <a href="pay.html" aria-current="page">Plans</a>
-      <a href="about.html">About Us</a>
-      <a href="services.html">Services</a>
-    </nav>
+<body class="bg-gradient-to-b from-white to-slate-50 text-slate-800 min-h-screen">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-40 bg-gradient-to-b from-r2m-blue to-r2m-blue-600 text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="home.html" class="flex items-center gap-3">
+        <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
+        <div>
+          <h1 class="brand text-2xl leading-tight">Rant<span class="text-r2m-aqua">2</span>Me</h1>
+          <div class="text-xs opacity-80 -mt-1">Speak freely. Be heard.</div>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
+        <a href="home.html" class="hover:text-r2m-aqua">Home</a>
+        <a href="chat.html" class="hover:text-r2m-aqua">Chat</a>
+        <a href="help.html" class="hover:text-r2m-aqua">Help Centre</a>
+        <a href="faq.html" class="hover:text-r2m-aqua">FAQ</a>
+        <a href="pay.html" aria-current="page" class="underline">Plans</a>
+        <a href="about.html" class="hover:text-r2m-aqua">About</a>
+        <a href="services.html" class="hover:text-r2m-aqua">Services</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="hidden md:inline-block px-4 py-2 bg-white text-r2m-blue rounded-md font-semibold shadow-sm">Login</a>
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Open menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
   </header>
 
-  <section class="plans">
-    <h2>Access a Specialist</h2>
-    <p>Select a plan and the section you would like to be making use of. Access begins after successful payment. NOTE: For now please make use of the Bank Transfer Option ONLY in the Flutterwave Checkout Menu, we are currently working on other means of payment.</p>
-
-    <div class="plan-grid">
-     <!-- TEST PLAN (delete later) -->
-  <!-- <div class="plan-card" style="outline:1px dashed #ccc">
-    <h3>10 minutes (TEST)</h3>
-    <div class="price">₦100</div>
-    <button class="buy-btn" data-minutes="10" data-amount="100">Buy</button>
+  <!-- MOBILE DRAWER -->
+  <div id="mobileDrawer" class="fixed inset-0 z-50 hidden">
+    <div id="drawerOverlay" class="absolute inset-0 bg-black/50"></div>
+    <aside class="absolute right-0 top-0 h-full w-72 bg-white shadow-lg p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Menu</h2>
+          <div class="text-sm text-slate-500">Navigate Rant2Me</div>
+        </div>
+        <button id="drawerClose" class="p-2 rounded hover:bg-slate-100" aria-label="Close">✕</button>
+      </div>
+      <nav class="flex flex-col gap-3 text-base">
+        <a href="home.html" class="px-3 py-2 rounded hover:bg-slate-50">Home</a>
+        <a href="chat.html" class="px-3 py-2 rounded hover:bg-slate-50">Chat</a>
+        <a href="help.html" class="px-3 py-2 rounded hover:bg-slate-50">Help Centre</a>
+        <a href="faq.html" class="px-3 py-2 rounded hover:bg-slate-50">FAQ</a>
+        <a href="pay.html" class="px-3 py-2 rounded bg-slate-50">Plans</a>
+        <a href="about.html" class="px-3 py-2 rounded hover:bg-slate-50">About</a>
+        <a href="services.html" class="px-3 py-2 rounded hover:bg-slate-50">Services</a>
+        <a href="index.html" class="mt-4 inline-block px-4 py-2 bg-r2m-aqua text-white rounded-md text-center">Login / Sign up</a>
+      </nav>
+    </aside>
   </div>
--->
-      <div class="plan-card">
-        <h3>20 minutes</h3>
-        <div class="price">₦1,000</div>
-        <button class="buy-btn" data-minutes="20" data-amount="1000">Buy</button>
-      </div>
-      <div class="plan-card">
-        <h3>1 hour</h3>
-        <div class="price">₦2,500</div>
-        <button class="buy-btn" data-minutes="60" data-amount="2500">Buy</button>
-      </div>
-      <div class="plan-card">
-        <h3>1 week</h3>
-        <div class="price">₦10,000</div>
-        <button class="buy-btn" data-minutes="10080" data-amount="10000">Buy</button>
-        <!-- 1 week = 7 * 24 * 60 = 10080 minutes -->
-      </div>
-    </div>
 
-    <div class="section-picker">
-      <h4>Which section?</h4>
-      <label><input type="radio" name="section" value="counselling" checked> Tana</label>
-      <label><input type="radio" name="section" value="nutrition"> Dorcas</label>
-      <label><input type="radio" name="section" value="student"> Chidera</label>
-    </div>
+  <!-- MAIN -->
+  <main class="max-w-6xl mx-auto px-4 py-10">
 
-    <p id="pay-msg" style="margin-top:12px;color:#555;"></p>
-  </section>
+    <!-- HERO -->
+    <section class="grid gap-6 md:grid-cols-2 items-center mb-10 fade-in">
+      <div>
+        <h2 class="text-4xl md:text-5xl font-extrabold text-r2m-blue">Plans & Pricing</h2>
+        <p class="mt-4 text-slate-600 max-w-lg">Choose a plan to access specialist chats. Payments are processed via Flutterwave. If you encounter card issues, try bank transfer (recommended). We’ll activate access once payment is verified.</p>
+
+        <div class="mt-6 flex gap-3 flex-wrap">
+          <a href="#plans" class="inline-flex items-center px-5 py-3 bg-r2m-aqua text-white rounded-md shadow hover:scale-[1.02]">View plans</a>
+          <a href="help.html" class="inline-flex items-center px-5 py-3 border border-slate-200 rounded-md text-slate-700">Help centre</a>
+        </div>
+
+        <!-- small counters (animated) -->
+        <div class="mt-8 grid grid-cols-3 gap-4 max-w-sm">
+          <div class="bg-white p-4 rounded shadow-sm text-center">
+            <div class="text-2xl font-bold text-r2m-sky" data-target="100">0</div>
+            <div class="text-xs text-slate-500">Sessions this month</div>
+          </div>
+          <div class="bg-white p-4 rounded shadow-sm text-center">
+            <div class="text-2xl font-bold text-r2m-sky" data-target="4">0</div>
+            <div class="text-xs text-slate-500">Active listeners</div>
+          </div>
+          <div class="bg-white p-4 rounded shadow-sm text-center">
+            <div class="text-2xl font-bold text-r2m-sky" data-target="6">0</div>
+            <div class="text-xs text-slate-500">Countries served</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment guidance card -->
+      <aside class="bg-white p-6 rounded-r-lg shadow-r-md">
+        <h3 class="font-semibold text-lg">Payment guidance</h3>
+        <p class="text-sm text-slate-600 mt-2">We recommend bank transfer for local customers. Card payments are supported for international clients. If the checkout shows an error, please contact support with your <strong>tx_ref</strong>.</p>
+
+        <div class="mt-4">
+          <div class="text-xs text-slate-500">Note</div>
+          <ul class="mt-2 text-sm text-slate-700 list-disc pl-5">
+            <li>After successful payment we'll automatically grant access.</li>
+            <li>If verification is delayed, we watch for webhook updates and activate access.</li>
+            <li>Keep your receipt or reference code for support.</li>
+          </ul>
+        </div>
+      </aside>
+    </section>
+
+    <!-- PLANS -->
+    <section id="plans" class="fade-in">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold">Access a Specialist</h3>
+        <p class="text-sm text-slate-500">Select a plan and your preferred section below</p>
+      </div>
+
+      <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- 20 minutes -->
+        <div class="bg-white rounded-r-lg shadow-r-sm p-6 flex flex-col">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-lg font-semibold">20 minutes</h4>
+              <p class="text-sm text-slate-500 mt-1">Short focused session.</p>
+            </div>
+            <div class="text-2xl font-extrabold">₦1,000</div>
+          </div>
+          <ul class="mt-4 text-sm text-slate-600 space-y-2">
+            <li>Confidential 1:1 chat</li>
+            <li>Ideal for quick check-ins</li>
+            <li>Email receipt included</li>
+          </ul>
+          <div class="mt-6 flex items-center justify-between">
+            <div class="text-xs text-slate-500">Plan ID: basic20</div>
+            <button class="buy-btn px-4 py-2 rounded bg-r2m-sky text-white font-semibold" data-minutes="20" data-amount="1000">Buy ₦1,000</button>
+          </div>
+        </div>
+
+        <!-- 1 hour -->
+        <div class="bg-white rounded-r-lg shadow-r-sm p-6 flex flex-col">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-lg font-semibold">1 hour</h4>
+              <p class="text-sm text-slate-500 mt-1">In-depth support session.</p>
+            </div>
+            <div class="text-2xl font-extrabold">₦2,500</div>
+          </div>
+          <ul class="mt-4 text-sm text-slate-600 space-y-2">
+            <li>Deep listening & guidance</li>
+            <li>Best for meaningful conversations</li>
+            <li>Receive a receipt & confirmation</li>
+          </ul>
+          <div class="mt-6 flex items-center justify-between">
+            <div class="text-xs text-slate-500">Plan ID: pro60</div>
+            <button class="buy-btn px-4 py-2 rounded bg-r2m-sky text-white font-semibold" data-minutes="60" data-amount="2500">Buy ₦2,500</button>
+          </div>
+        </div>
+
+        <!-- 1 week -->
+        <div class="bg-white rounded-r-lg shadow-r-sm p-6 flex flex-col">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-lg font-semibold">1 week</h4>
+              <p class="text-sm text-slate-500 mt-1">Unlimited weekly access</p>
+            </div>
+            <div class="text-2xl font-extrabold">₦10,000</div>
+          </div>
+          <ul class="mt-4 text-sm text-slate-600 space-y-2">
+            <li>Access to chosen section for 7 days</li>
+            <li>Best value for regular needs</li>
+            <li>Priority support</li>
+          </ul>
+          <div class="mt-6 flex items-center justify-between">
+            <div class="text-xs text-slate-500">Plan ID: weekly10080</div>
+            <button class="buy-btn px-4 py-2 rounded bg-r2m-sky text-white font-semibold" data-minutes="10080" data-amount="10000">Buy ₦10,000</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- section picker -->
+      <div class="mt-8 bg-white p-4 rounded-r-lg shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div class="flex-1">
+          <h4 class="font-semibold">Which section?</h4>
+          <p class="text-sm text-slate-500">Choose the listener you want to grant access to (this determines which chat page you are granted access for).</p>
+        </div>
+
+        <div class="flex gap-4 items-center">
+          <label class="inline-flex items-center gap-2">
+            <input type="radio" name="section" value="counselling" checked class="h-4 w-4">
+            <span class="text-sm">Tana</span>
+          </label>
+          <label class="inline-flex items-center gap-2">
+            <input type="radio" name="section" value="nutrition" class="h-4 w-4">
+            <span class="text-sm">Dorcas</span>
+          </label>
+          <label class="inline-flex items-center gap-2">
+            <input type="radio" name="section" value="student" class="h-4 w-4">
+            <span class="text-sm">Chidera</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- message area -->
+      <div class="mt-6 text-center">
+        <p id="pay-msg" class="text-sm text-slate-600"></p>
+      </div>
+
+      <!-- extra: FAQ expansion -->
+      <div class="mt-8 grid gap-4">
+        <details class="bg-white p-4 rounded shadow-sm">
+          <summary class="font-semibold cursor-pointer">Why does verification sometimes say "pending"?</summary>
+          <p class="mt-2 text-sm text-slate-600">Some payment methods (bank transfer, USSD) are asynchronous. We will watch for the webhook and activate access automatically. If you paid with card and the server could not immediately verify, provide your tx_ref to support.</p>
+        </details>
+
+        <details class="bg-white p-4 rounded shadow-sm">
+          <summary class="font-semibold cursor-pointer">Card payments failing, what to do?</summary>
+          <p class="mt-2 text-sm text-slate-600">Check card 3D secure / verification with your bank. If the checkout shows "API key not found" or fingerprint errors, confirm your Flutterwave secret is configured on the server functions and the public key in the client is correct.</p>
+        </details>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="text-center py-6 text-sm text-slate-500">
+    &copy; 2025 Rant2Me • <a href="about.html" class="text-r2m-aqua">About</a> • <a href="help.html" class="text-r2m-aqua">Support</a>
+  </footer>
+
+  <!-- small scripts: counters, mobile drawer behavior -->
+  <script>
+    // simple counter animation
+    document.querySelectorAll('[data-target]').forEach(el => {
+      const target = Number(el.getAttribute('data-target') || 0);
+      let cur = 0;
+      const step = Math.max(1, Math.floor(target / 60));
+      const iv = setInterval(() => {
+        cur += step;
+        if (cur >= target) { el.textContent = target; clearInterval(iv); }
+        else el.textContent = cur;
+      }, 20);
+    });
+
+    // mobile drawer
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const drawerClose = document.getElementById('drawerClose');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+
+    mobileMenuBtn?.addEventListener('click', () => mobileDrawer.classList.remove('hidden'));
+    drawerClose?.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+    drawerOverlay?.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+  </script>
 
   <!-- Your Firebase bootstrapping must export `auth` and `db` from ./firebase.js -->
+  <!-- pay.js expects Flutterwave script to be present (we loaded it above) -->
   <script type="module" src="pay.js"></script>
 </body>
 </html>

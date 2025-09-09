@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rant2Me — Resources</title>
+
+  <!-- favicon -->
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tailwind theme tweak (matches pay.html) -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'r2m-blue': '#0d1b2a',
+            'r2m-blue-600': '#1b263b',
+            'r2m-aqua': '#00b4d8',
+            'r2m-sky': '#0077b6',
+            'r2m-gold': '#F5C542'
+          },
+          borderRadius: { 'r-lg': '14px' },
+          boxShadow: {
+            'r-lg': '0 18px 40px rgba(0,43,85,.18)',
+            'r-md': '0 10px 24px rgba(0,43,85,.14)',
+            'r-sm': '0 6px 14px rgba(0,43,85,.10)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+    h1.brand { font-family: "Cinzel Decorative", serif; }
+
+    /* book reader visuals */
+    .reader-page {
+      min-height: 60vh;
+      background: linear-gradient(180deg,#fff 0%, #fbfbfb 100%);
+      border-radius: 10px;
+      box-shadow: 0 8px 28px rgba(6,23,70,0.12);
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    /* simple page-turn animation */
+    .turn-in {
+      animation: turnIn .34s ease both;
+    }
+    .turn-out {
+      animation: turnOut .34s ease both;
+    }
+    @keyframes turnIn {
+      from { transform: translateX(20px) rotateY(-6deg); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+    @keyframes turnOut {
+      from { transform: none; opacity: 1; }
+      to   { transform: translateX(-20px) rotateY(6deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-white to-slate-50 text-slate-800 min-h-screen">
+
+  <!-- HEADER (same look as pay.html) -->
+  <header class="sticky top-0 z-40 bg-gradient-to-b from-r2m-blue to-r2m-blue-600 text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="home.html" class="flex items-center gap-3">
+        <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
+        <div>
+          <h1 class="brand text-2xl leading-tight">Rant<span class="text-r2m-aqua">2</span>Me</h1>
+          <div class="text-xs opacity-80 -mt-1">Speak freely. Be heard.</div>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
+        <a href="home.html" class="hover:text-r2m-aqua">Home</a>
+        <a href="chat.html" class="hover:text-r2m-aqua">Chat</a>
+        <a href="help.html" class="hover:text-r2m-aqua">Help Centre</a>
+        <a href="faq.html" class="hover:text-r2m-aqua">FAQ</a>
+        <a href="pay.html" class="hover:text-r2m-aqua">Plans</a>
+        <a href="about.html" class="hover:text-r2m-aqua">About</a>
+        <a href="services.html" class="hover:text-r2m-aqua">Services</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="hidden md:inline-block px-4 py-2 bg-white text-r2m-blue rounded-md font-semibold shadow-sm">Login</a>
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Open menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-6xl mx-auto px-4 py-10">
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+      <!-- Left: bookshelf / list -->
+      <aside class="md:col-span-1">
+        <div class="bg-white rounded-r-lg shadow-r-md p-5 sticky top-24">
+          <div class="flex items-center gap-3 mb-4">
+            <img src="images/bookcase-575963_1920.png" alt="Shelf" class="w-12 h-12 rounded" />
+            <div>
+              <h3 class="font-semibold text-lg text-r2m-blue">Resources</h3>
+              <div class="text-xs text-slate-500">Articles, exercises & tools</div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="block text-xs text-slate-500 mb-2">Search resources</label>
+            <input id="resourceSearch" type="search" placeholder="Search by title or tag"
+                   class="w-full rounded-md border px-3 py-2 text-sm focus:ring focus:ring-r2m-aqua/30" />
+          </div>
+
+          <hr class="my-4" />
+
+          <div class="space-y-3" id="tocList">
+            <!-- dynamically populated content list -->
+          </div>
+
+          <div class="mt-6 text-xs text-slate-500">
+            Tip: open an article and use ← / → to navigate pages. Press Esc to close reader.
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right: bookshelf grid -->
+      <section class="md:col-span-3 space-y-6">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- cards generated by JS, fallback in HTML for quick dev -->
+          <article class="service-card bg-white rounded-r-lg p-6 shadow-r-sm hover:shadow-r-md transition transform hover:-translate-y-1 cursor-pointer" data-slug="breathing" tabindex="0">
+            <div class="flex items-start gap-4">
+              <img src="images/ai-generated-9670723_1920.png" alt="Resources" class="w-16 h-16 rounded-full object-cover" />
+              <div>
+                <h3 class="text-lg font-semibold">Breathing Techniques</h3>
+                <p class="text-sm text-slate-500 mt-1">Practical exercises to calm your nervous system.</p>
+                <div class="text-xs text-slate-500 mt-2">5 pages • Beginner</div>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between">
+              <div class="text-sm text-slate-600">On demand</div>
+              <div>
+                <button class="open-btn px-3 py-1 rounded bg-r2m-gold text-black text-sm">Open</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="service-card bg-white rounded-r-lg p-6 shadow-r-sm hover:shadow-r-md transition transform hover:-translate-y-1 cursor-pointer" data-slug="stress" tabindex="0">
+            <div class="flex items-start gap-4">
+              <img src="images/deadline-8848711_1920.png" alt="Resources" class="w-16 h-16 rounded-full object-cover" />
+              <div>
+                <h3 class="text-lg font-semibold">Managing Stress</h3>
+                <p class="text-sm text-slate-500 mt-1">Short practices and thought tools to reduce overwhelm.</p>
+                <div class="text-xs text-slate-500 mt-2">4 pages • Practical</div>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between">
+              <div class="text-sm text-slate-600">On demand</div>
+              <div>
+                <button class="open-btn px-3 py-1 rounded bg-r2m-gold text-black text-sm">Open</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="service-card bg-white rounded-r-lg p-6 shadow-r-sm hover:shadow-r-md transition transform hover:-translate-y-1 cursor-pointer" data-slug="sleep" tabindex="0">
+            <div class="flex items-start gap-4">
+              <img src="images/cloud-3719093_1920.png" alt="Resources" class="w-16 h-16 rounded-full object-cover" />
+              <div>
+                <h3 class="text-lg font-semibold">Sleep & Recovery</h3>
+                <p class="text-sm text-slate-500 mt-1">Routines and practices to improve restorative sleep.</p>
+                <div class="text-xs text-slate-500 mt-2">6 pages • Routines</div>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between">
+              <div class="text-sm text-slate-600">On demand</div>
+              <div>
+                <button class="open-btn px-3 py-1 rounded bg-r2m-gold text-black text-sm">Open</button>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Spotlight / Featured -->
+        <div class="bg-white rounded-r-lg shadow-r-md p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-xl font-semibold text-r2m-blue">Featured guide - Quick calm</h3>
+              <p class="text-sm text-slate-600 mt-1">A quick 3-minute grounding you can do anywhere.</p>
+            </div>
+            <div>
+              <button data-slug="quick-calm" class="open-btn px-4 py-2 rounded bg-r2m-aqua text-white">Open Guide</button>
+            </div>
+          </div>
+        </div>
+
+         <!-- Shelf -->
+  <main class="p-6">
+    <h2 class="text-lg font-semibold mb-4">Articles & Exercises</h2>
+    <div id="resourceShelf" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+      <!-- Books from Firestore will be inserted here -->
+    </div>
+  </main>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Modal reader -->
+  <div id="readerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+    <div class="bg-white rounded-xl shadow-r-lg w-full max-w-5xl max-h-[90vh] overflow-hidden grid grid-cols-12">
+      <!-- Left column: TOC inside modal -->
+      <aside class="col-span-3 border-r p-4 bg-slate-50">
+        <div class="flex items-center gap-3 mb-4">
+          <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
+          <div>
+            <div id="modalTitle" class="text-lg font-semibold text-r2m-blue">Title</div>
+            <div id="modalMeta" class="text-xs text-slate-500">pages • category</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <button id="closeReader" class="px-3 py-2 rounded bg-slate-100 hover:bg-slate-200 text-sm">Close</button>
+        </div>
+
+        <div class="mt-4 text-xs font-semibold text-slate-600">Table of contents</div>
+        <nav id="modalToc" class="mt-2 space-y-2 text-sm text-slate-700 overflow-auto max-h-[60vh] pr-2"></nav>
+
+        <div class="mt-4 text-xs text-slate-500">
+          Tip: keyboard ← / → to turn pages, Esc to close.
+        </div>
+      </aside>
+
+      <!-- Reader pages -->
+      <div class="col-span-9 p-6 flex flex-col">
+        <!-- toolbar -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex gap-3 items-center">
+            <button id="prevBtn" class="px-3 py-2 bg-white border rounded hover:bg-slate-100">← Prev</button>
+            <button id="nextBtn" class="px-3 py-2 bg-r2m-aqua text-white rounded hover:opacity-95">Next →</button>
+            <div id="pageIndicator" class="text-sm text-slate-500 ml-4">Page 1 / 1</div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <label class="text-sm text-slate-500">Font</label>
+            <select id="fontSize" class="rounded border px-2 py-1 text-sm">
+              <option value="base">Normal</option>
+              <option value="lg">Large</option>
+              <option value="xl">XL</option>
+            </select>
+            <button id="readerPrint" class="px-3 py-2 bg-white border rounded hover:bg-slate-100 text-sm">Print</button>
+          </div>
+        </div>
+
+        <!-- two-column book view -->
+        <div class="flex-1 grid grid-cols-2 gap-6">
+          <div id="leftPage" class="reader-page"></div>
+          <div id="rightPage" class="reader-page"></div>
+        </div>
+
+        <!-- reader footer with share / bookmark -->
+        <div class="mt-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <button id="bookmarkBtn" class="px-3 py-2 bg-white border rounded text-sm">Bookmark</button>
+            <button id="shareBtn" class="px-3 py-2 bg-white border rounded text-sm">Share</button>
+          </div>
+          <div class="text-xs text-slate-500">Rant2Me resources - free to use</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- small footer -->
+  <footer class="text-center py-6 text-sm text-slate-500">
+    &copy; 2025 Rant2Me • <a href="about.html" class="text-r2m-aqua">About</a> • <a href="help.html" class="text-r2m-aqua">Support</a>
+  </footer>
+
+  <!-- SCRIPT: reader logic -->
+  <script>
+    // Sample resources data (replace with server data or fetch as needed)
+    const RESOURCES = {
+      "breathing": {
+        title: "Breathing Techniques",
+        meta: "Beginner • 5 pages",
+        pages: [
+          "<h2>Breathing Techniques - Intro</h2><p>Breathing supports the nervous system. Here are simple techniques to regain calm in minutes.</p>",
+          "<h3>Diaphragmatic Breathing</h3><p>Place one hand on your chest, one on your belly. Inhale for 4s through nose, feel belly push the hand out. Exhale 6s.</p>",
+          "<h3>Box Breathing</h3><p>Inhale 4s. Hold 4s. Exhale 4s. Hold 4s. Repeat 4x.</p>",
+          "<h3>4-4-6 Variant</h3><p>Inhale 4s; hold 4s; exhale 6s. Great before a presentation or stressful call.</p>",
+          "<h3>Practice & Reflection</h3><p>Try 3 minutes x 2 daily. Note how your body responds and increase duration slowly.</p>"
+        ],
+        tags: ["breath", "calm", "beginner"]
+      },
+
+      "stress": {
+        title: "Managing Stress",
+        meta: "Practical • 4 pages",
+        pages: [
+          "<h2>Managing Stress</h2><p>Stress is normal. The goal is to respond, not react. This guide gives small, practical tools.</p>",
+          "<h3>Micro-breaks</h3><p>Take 60 seconds every hour: stand, stretch, breathe. Reset attention and energy.</p>",
+          "<h3>Thought Records</h3><p>When stress spikes, capture the thought, evidence for/against, alternative perspective.</p>",
+          "<h3>Routine & Boundaries</h3><p>Limit notifications, schedule focused work blocks, and set 'stop' times in the evening.</p>"
+        ],
+        tags: ["stress", "routine", "work"]
+      },
+
+      "sleep": {
+        title: "Sleep & Recovery",
+        meta: "Routines • 6 pages",
+        pages: [
+          "<h2>Sleep & Recovery</h2><p>Sleep is the body's core restoration. This guide focuses on routines and small habits.</p>",
+          "<h3>Wind-down Routine</h3><p>90 minutes before bed: dim lights, avoid screens, read or journal for 10 minutes.</p>",
+          "<h3>Sleep Window</h3><p>Keep consistent bed/wake time. Small shifts (15 min) are easier than large changes.</p>",
+          "<h3>Environment</h3><p>Cool, dark, quiet. Remove bright electronics. Consider white noise if helpful.</p>",
+          "<h3>Pre-sleep Practices</h3><p>Light stretching, diaphragmatic breathing, and gratitude journaling help the transition.</p>",
+          "<h3>When to Seek Help</h3><p>If sleep problems persist for weeks and impact daytime functioning, consult a clinician.</p>"
+        ],
+        tags: ["sleep", "recovery", "habits"]
+      },
+
+      "quick-calm": {
+        title: "Quick Calm - 3 minute grounding",
+        meta: "Micro-practice • 1 page",
+        pages: [
+          "<h2>3-minute Grounding</h2><ol><li>Breathe in for 4s, out for 6s - 6 rounds.</li><li>Notice 5 things you see, 4 things you can touch, 3 things you hear.</li><li>Stretch shoulders and exhale - you're grounded.</li></ol>"
+        ],
+        tags: ["grounding", "micro-practice"]
+      }
+    };
+
+    // build TOC and attach open handlers
+    document.addEventListener('DOMContentLoaded', () => {
+      const toc = document.getElementById('tocList');
+      const cards = document.querySelectorAll('.service-card');
+
+      // populate left-side TOC (quick-access)
+      for (const key of Object.keys(RESOURCES)) {
+        const r = RESOURCES[key];
+        const entry = document.createElement('div');
+        entry.className = 'mb-2';
+        entry.innerHTML = `<button data-slug="${key}" class="w-full text-left px-3 py-2 rounded hover:bg-slate-50">${r.title} <div class="text-xs text-slate-400">${r.meta}</div></button>`;
+        entry.querySelector('button').addEventListener('click', () => openResource(key));
+        toc.appendChild(entry);
+      }
+
+      // attach open actions for cards (cards may duplicate resources)
+      document.querySelectorAll('.open-btn').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+          const card = ev.target.closest('.service-card');
+          const slug = card?.dataset?.slug;
+          if (slug) openResource(slug);
+        });
+      });
+
+      // allow clicking the whole card
+      document.querySelectorAll('.service-card').forEach(card => {
+        const slug = card.dataset.slug;
+        card?.addEventListener('click', (e) => {
+          // ignore clicks on buttons inside
+          if (e.target.closest('button')) return;
+          if (slug) openResource(slug);
+        });
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (slug) openResource(slug);
+          }
+        });
+      });
+
+      // search filter
+      document.getElementById('resourceSearch').addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        document.querySelectorAll('.service-card').forEach(card => {
+          const title = (card.querySelector('h3')?.textContent || '').toLowerCase();
+          const desc = (card.querySelector('p')?.textContent || '').toLowerCase();
+          const match = !q || title.includes(q) || desc.includes(q);
+          card.style.display = match ? '' : 'none';
+        });
+      });
+
+      // modal controls
+      document.getElementById('closeReader').addEventListener('click', closeReader);
+      document.getElementById('readerModal').addEventListener('click', (e) => {
+        if (e.target.id === 'readerModal') closeReader();
+      });
+
+      // next/prev buttons
+      document.getElementById('nextBtn').addEventListener('click', () => turnPage(1));
+      document.getElementById('prevBtn').addEventListener('click', () => turnPage(-1));
+
+      // print bookmark share
+      document.getElementById('readerPrint').addEventListener('click', () => window.print());
+      document.getElementById('bookmarkBtn').addEventListener('click', () => alert('Bookmarked (client-side).'));
+      document.getElementById('shareBtn').addEventListener('click', () => {
+        const title = document.getElementById('modalTitle').textContent;
+        const url = location.href.split('#')[0] + '#resource=' + encodeURIComponent(title);
+        navigator.clipboard?.writeText(url).then(() => alert('Link copied to clipboard.'));
+      });
+
+      // keyboard navigation
+      window.addEventListener('keydown', (ev) => {
+        const modalOpen = !document.getElementById('readerModal').classList.contains('hidden');
+        if (!modalOpen) return;
+        if (ev.key === 'ArrowRight') turnPage(1);
+        if (ev.key === 'ArrowLeft') turnPage(-1);
+        if (ev.key === 'Escape') closeReader();
+      });
+    });
+
+    // reader state
+    let currentResource = null;
+    let currentIndex = 0; // page index (0-based)
+
+    function openResource(slug) {
+      if (!RESOURCES[slug]) return alert('Resource not found');
+      currentResource = RESOURCES[slug];
+      currentIndex = 0;
+      document.getElementById('modalTitle').textContent = currentResource.title;
+      document.getElementById('modalMeta').textContent = currentResource.meta || '';
+      populateModalToc(currentResource);
+      renderPages();
+      document.getElementById('readerModal').classList.remove('hidden');
+      // focus to catch keyboard
+      setTimeout(() => document.getElementById('nextBtn').focus(), 200);
+    }
+
+    function populateModalToc(resource) {
+      const toc = document.getElementById('modalToc');
+      toc.innerHTML = '';
+      resource.pages.forEach((p, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left px-2 py-2 rounded hover:bg-white/60';
+        btn.innerHTML = `<div class="font-medium">Page ${i+1}</div><div class="text-xs text-slate-400">${(p.slice(0,80)).replace(/(<([^>]+)>)/gi, "")}...</div>`;
+        btn.addEventListener('click', () => {
+          jumpTo(i);
+        });
+        toc.appendChild(btn);
+      });
+    }
+
+    function renderPages() {
+      // two-column view: left = currentIndex, right = currentIndex+1
+      const left = document.getElementById('leftPage');
+      const right = document.getElementById('rightPage');
+      left.classList.remove('turn-in','turn-out');
+      right.classList.remove('turn-in','turn-out');
+
+      left.innerHTML = currentResource.pages[currentIndex] || '<p class="text-slate-500">—</p>';
+      right.innerHTML = currentResource.pages[currentIndex + 1] || '<p class="text-slate-500">—</p>';
+
+      // page indicator
+      const total = currentResource.pages.length;
+      const displayPage = currentIndex + 1;
+      document.getElementById('pageIndicator').textContent = `Page ${displayPage} / ${total}`;
+
+      // enable/disable buttons
+      document.getElementById('prevBtn').disabled = currentIndex <= 0;
+      document.getElementById('nextBtn').disabled = currentIndex >= total - 1;
+    }
+
+    function turnPage(dir) {
+      // dir = +1 (next) or -1 (prev)
+      if (!currentResource) return;
+      const total = currentResource.pages.length;
+      const newIndex = currentIndex + dir;
+      if (newIndex < 0 || newIndex > total - 1) return;
+
+      // animate out current pages, animate in new pages
+      const left = document.getElementById('leftPage');
+      const right = document.getElementById('rightPage');
+
+      // choose animation classes depending on direction
+      const outClass = dir > 0 ? 'turn-out' : 'turn-out';
+      const inClass = dir > 0 ? 'turn-in' : 'turn-in';
+
+      // animate container (both pages)
+      left.classList.add(outClass);
+      right.classList.add(outClass);
+
+      setTimeout(() => {
+        // update index
+        currentIndex = newIndex;
+        // render new content
+        left.innerHTML = currentResource.pages[currentIndex] || '<p class="text-slate-500">—</p>';
+        right.innerHTML = currentResource.pages[currentIndex + 1] || '<p class="text-slate-500">—</p>';
+
+        // swap animation classes to show "in"
+        left.classList.remove(outClass);
+        right.classList.remove(outClass);
+        left.classList.add(inClass);
+        right.classList.add(inClass);
+
+        // clean up classes after animation ends
+        setTimeout(() => {
+          left.classList.remove(inClass);
+          right.classList.remove(inClass);
+          renderPages(); // finalize state & buttons
+        }, 400);
+      }, 260);
+    }
+
+    function jumpTo(pageIndex) {
+      if (!currentResource) return;
+      if (pageIndex < 0 || pageIndex >= currentResource.pages.length) return;
+      // simple direct jump with small animation
+      const left = document.getElementById('leftPage');
+      left.classList.add('turn-out');
+      setTimeout(() => {
+        currentIndex = pageIndex;
+        renderPages();
+        left.classList.remove('turn-out');
+        left.classList.add('turn-in');
+        setTimeout(() => left.classList.remove('turn-in'), 350);
+      }, 220);
+    }
+
+    function closeReader() {
+      document.getElementById('readerModal').classList.add('hidden');
+      currentResource = null;
+      currentIndex = 0;
+    }
+
+    // optional: change font size
+    document.getElementById('fontSize')?.addEventListener('change', (e) => {
+      const val = e.target.value;
+      const left = document.getElementById('leftPage');
+      const right = document.getElementById('rightPage');
+      left.classList.remove('text-base','text-lg','text-xl');
+      right.classList.remove('text-base','text-lg','text-xl');
+      if (val === 'base') { left.classList.add('text-base'); right.classList.add('text-base'); }
+      if (val === 'lg') { left.classList.add('text-lg'); right.classList.add('text-lg'); }
+      if (val === 'xl') { left.classList.add('text-xl'); right.classList.add('text-xl'); }
+    });
+
+    // deep link support (optional)
+    (function applyDeepLink() {
+      const params = new URLSearchParams(location.hash.replace('#','?'));
+      const resource = params.get('resource');
+      if (resource) {
+        // try to find a matching slug by title
+        for (const slug in RESOURCES) {
+          if (RESOURCES[slug].title === resource) {
+            openResource(slug);
+            break;
+          }
+        }
+      }
+    })();
+
+  </script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ✅ Firebase config
+  const firebaseConfig = {
+  apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
+  authDomain: "rant2me-ab36b.firebaseapp.com",
+  projectId: "rant2me-ab36b",
+  storageBucket: "rant2me-ab36b.appspot.com",
+  messagingSenderId: "245661393279",
+  appId: "1:245661393279:web:b31483f57a40cf2c807a4a"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // ✅ Single global RESOURCES
+  window.RESOURCES = {};
+
+  // ✅ Load Firestore data
+  async function loadResources() {
+    const snapshot = await getDocs(collection(db, "resources"));
+    if (snapshot.empty) {
+      console.warn("⚠️ No resources found in Firestore, falling back to local.");
+      return;
+    }
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      RESOURCES[doc.id] = {
+        title: data.title,
+        meta: data.meta || "",
+        pages: data.pages || [],
+        tags: data.tags || []
+      };
+    });
+
+    renderResourceShelf();
+    renderTocList();
+  }
+
+  // ✅ Render bookshelf cards
+  function renderResourceShelf() {
+    const shelf = document.getElementById("resourceShelf");
+    shelf.innerHTML = "";
+    Object.entries(RESOURCES).forEach(([slug, res]) => {
+      const card = document.createElement("article");
+      card.className =
+        "service-card bg-white rounded-lg p-6 shadow hover:shadow-md transition cursor-pointer";
+      card.dataset.slug = slug;
+      card.innerHTML = `
+        <div class="flex items-start gap-4">
+          <img src="images/book-99132_640.png" class="w-16 h-16 rounded-full object-cover"/>
+          <div>
+            <h3 class="text-lg font-semibold">${res.title}</h3>
+            <p class="text-sm text-slate-500 mt-1">${res.meta}</p>
+          </div>
+        </div>
+        <div class="mt-3">
+          <button class="open-btn px-3 py-1 rounded bg-r2m-gold text-black text-sm">Open</button>
+        </div>
+      `;
+      card.querySelector(".open-btn").addEventListener("click", () => openResource(slug));
+      shelf.appendChild(card);
+    });
+  }
+
+  // ✅ Render TOC sidebar list
+  function renderTocList() {
+    const toc = document.getElementById("tocList");
+    toc.innerHTML = "";
+    Object.entries(RESOURCES).forEach(([slug, res]) => {
+      const btn = document.createElement("button");
+      btn.className = "w-full text-left px-3 py-2 rounded hover:bg-slate-50";
+      btn.innerHTML = `${res.title}<div class="text-xs text-slate-400">${res.meta}</div>`;
+      btn.addEventListener("click", () => openResource(slug));
+      toc.appendChild(btn);
+    });
+  }
+
+  // ✅ Init
+  loadResources();
+</script>
+
+</body>
+</html>

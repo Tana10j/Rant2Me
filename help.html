@@ -1,92 +1,669 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
-  <meta charset="UTF-8">
-  <title>Rant2Me - Help Centre</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rant2Me — Help Centre</title>
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
 
-  <!-- EmailJS SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-  <script>
-    (function(){
-      emailjs.init("jqARK9d1VArhRM_lp"); // Your EmailJS public key
-    })();
-  </script>
-</head>
-<body>
-  <header>
-    <h1>Help Centre</h1>
-    <nav>
-      <a href="home.html">Home</a>
-      <a href="chat.html">Chat</a>
-      <a href="help.html">Help Centre</a>
-      <a href="faq.html">FAQ</a>
-      <a href="pay.html">Plans</a>
-      <a href="about.html">About Us</a>
-      <a href="services.html">Services</a>
-    </nav>
-  </header>
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-  <section class="help">
-    <h2>Contact Support</h2>
-    <p>If you’re having payment or website issues, fill out the form below and our team will get back to you.</p>
-
-    <!-- Support Form -->
-    <!--<form id="support-form">
-      <input type="text" name="from_name" placeholder="Your Name" required><br>
-      <input type="email" name="from_email" placeholder="Your Email" required><br>
-      <textarea name="message" placeholder="Describe your issue..." rows="5" required></textarea><br>
-      <button type="submit">Send Report</button>
-    </form>
-    -->
-
-    <p style="margin-top:20px;">Or contact us directly:</p>
-    <!-- WhatsApp Button -->
-    <a href="https://wa.me/2348161127500?text=Hello,+I+have+an+issue+with+my+payment." target="_blank">
-      <button>Chat on WhatsApp</button>
-    </a>
-
-    <!-- Direct Info -->
-    <p style="margin-top:15px;">Email: edukdorcas@gmail.com</p>
-    <p>Phone: +234-8161127500</p>
-  </section>
-
-  <section class="gallery">
-    <h2>Our Moments</h2>
-    <p>Pictures and stories coming soon, for now, just be you.</p>
-    <div class="image-grid">
-      <img src="images/Pic5.jpeg" alt="Coming soon image">
-      <img src="images/Pic6.jpg" alt="Coming soon image">
-    </div>
-  </section>
-
-  <footer style="text-align:center; padding:15px; font-size:14px; background:#f5f5f5;">
-    &copy; 2025 Rant2Me | 
-    <a href="#" onclick="showDisclaimer()" style="color:#007BFF; text-decoration:none;">Disclaimer & Terms</a>
-  </footer>
-
-  <!-- Disclaimer Modal Logic -->
-  <script>
-    function showDisclaimer() {
-      document.getElementById("disclaimerModal").style.display = "flex";
+  <!-- Small custom utilities (keeps Tailwind primary but adds a couple animations) -->
+  <style>
+    /* subtle gradient hero background similar to BetterHelp vibe */
+    .hero-grad {
+      background: linear-gradient(135deg, rgba(9,30,70,0.92) 0%, rgba(8,52,97,0.94) 100%);
+      background-image: radial-gradient(circle at 10% 20%, rgba(0,180,216,0.06), transparent 10%),
+                        radial-gradient(circle at 90% 80%, rgba(85,31,210,0.04), transparent 12%),
+                        linear-gradient(135deg, rgba(9,30,70,0.92), rgba(8,52,97,0.94));
     }
 
-    // EmailJS Form Submission
-/*
-document.getElementById('support-form').addEventListener('submit', function(event) {
-  event.preventDefault();
-  
-  emailjs.sendForm('service_cg2vvr2', 'template_68qimta', this)
-    .then(function() {
-      alert('✅ Report sent successfully! We will reach out soon.');
-      document.getElementById('support-form').reset();
-    }, function(error) {
-      alert('❌ Failed to send report: ' + JSON.stringify(error));
+    .blob {
+      position: absolute;
+      filter: blur(48px);
+      opacity: .14;
+      transform: translateZ(0);
+      pointer-events: none;
+    }
+
+    /* chat bubbles */
+    .bubble { max-width: 84%; padding: .65rem .9rem; border-radius: 999px; box-shadow: 0 6px 18px rgba(2,6,23,.12); }
+    .bubble.bot { background: #eef8ff; color: #00304a; border-radius: 16px 16px 16px 4px; }
+    .bubble.user { background: #0b84ff; color: white; border-radius: 16px 16px 4px 16px; margin-left: auto; }
+
+    /* counter animation */
+    .counter { font-variant-numeric: tabular-nums; }
+    .fade-in { animation: fadeIn .6s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+  </style>
+</head>
+<body class="antialiased text-slate-800 bg-slate-50">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
+        <div>
+          <a href="home.html" class="text-xl font-extrabold text-sky-700">Rant<span class="text-sky-400">2</span>Me</a>
+          <div class="text-xs text-slate-500 leading-tight">Speak freely. Be heard.</div>
+        </div>
+      </div>
+
+      <!-- top nav / search / admin -->
+      <div class="flex items-center gap-3">
+        <nav class="hidden md:flex gap-4 items-center">
+          <a href="home.html" class="text-slate-700 hover:text-sky-600">Home</a>
+          <a href="chat.html" class="text-slate-700 hover:text-sky-600">Chat</a>
+          <a href="faq.html" class="text-slate-700 hover:text-sky-600">FAQ</a>
+          <a href="pay.html" class="text-slate-700 hover:text-sky-600">Plans</a>
+          <a href="about.html" class="text-slate-700 hover:text-sky-600">About</a>
+          <a href="contactus.html" class="text-slate-700 hover:text-sky-600">Contact</a>
+        </nav>
+
+        <div class="relative">
+          <input id="topSearch" type="search" placeholder="Search help..." 
+                 class="hidden md:block w-64 rounded-full border px-3 py-2 text-sm focus:ring focus:ring-sky-100" />
+        </div>
+
+        <!-- admin link shows only for admins (script toggles visibility) -->
+        <a id="adminLink" href="admin.html" class="hidden px-3 py-2 rounded-md text-sm bg-rose-600 text-white hover:opacity-95">Admin</a>
+
+        <!-- mobile: drawer toggle -->
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded bg-slate-100 hover:bg-slate-200">
+          <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="mobileDrawer" class="fixed inset-0 z-50 transform -translate-x-full transition-transform bg-white">
+    <div class="max-w-sm w-full h-full p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <img src="images/Rant2Me Favicon.png" class="w-10 h-10 rounded" alt="Rant2Me"/>
+          <div>
+            <div class="font-bold text-sky-700">Rant2Me</div>
+            <div class="text-xs text-slate-500">Help Centre</div>
+          </div>
+        </div>
+        <button id="drawerClose" class="p-2 rounded bg-slate-100 hover:bg-slate-200">✕</button>
+      </div>
+      <nav class="flex flex-col gap-3">
+        <a href="home.html" class="py-2 px-3 rounded hover:bg-slate-100">Home</a>
+        <a href="chat.html" class="py-2 px-3 rounded hover:bg-slate-100">Chat</a>
+        <a href="faq.html" class="py-2 px-3 rounded hover:bg-slate-100">FAQ</a>
+        <a href="pay.html" class="py-2 px-3 rounded hover:bg-slate-100">Plans</a>
+        <a href="about.html" class="py-2 px-3 rounded hover:bg-slate-100">About</a>
+        <a href="contactus.html" class="py-2 px-3 rounded hover:bg-slate-100">Contact</a>
+        <a id="adminLinkMobile" href="admin.html" class="py-2 px-3 rounded bg-rose-600 text-white hidden">Admin</a>
+      </nav>
+      <div class="mt-6 text-sm text-slate-500">
+        <p>Need urgent help? <a href="https://wa.me/2348161127500" class="text-sky-600">WhatsApp support</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO: large, animated counters, quick search and CTAs -->
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    <section class="relative hero-grad rounded-2xl overflow-hidden p-8 md:p-12 text-white mb-8">
+      <!-- decorative blobs -->
+      <div class="blob" style="right:-8%; top:-8%; width:360px; height:360px; background: radial-gradient(circle,#3dd5f1,#551fd2);"></div>
+      <div class="blob" style="left:-10%; bottom:-6%; width:420px; height:420px; background: radial-gradient(circle,#f5c542,#6be3d8); opacity:.08"></div>
+
+      <div class="relative z-10 grid md:grid-cols-2 gap-6 items-center">
+        <div>
+          <h1 class="text-3xl md:text-4xl font-extrabold leading-tight">How can we help you today?</h1>
+          <p class="mt-3 text-slate-100/90 max-w-xl">Ask our virtual assistant, browse helpful articles, check payment status, or contact our team.</p>
+
+          <!-- CTA -->
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a href="pay.html" class="inline-flex items-center gap-2 bg-white text-sky-700 px-4 py-2 rounded-full font-semibold shadow">Choose a Plan</a>
+            <a href="#helpbot" class="inline-flex items-center gap-2 border border-white/30 px-4 py-2 rounded-full text-white hover:bg-white/5">Ask the assistant</a>
+            <a href="contactus.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-500/30 text-white">Contact Support</a>
+          </div>
+
+          <!-- Counters -->
+          <div class="mt-8 grid grid-cols-3 gap-4">
+            <div class="bg-white/8 rounded-lg p-4 text-center">
+              <div class="text-xs uppercase text-white/80">Sessions</div>
+              <div class="text-2xl font-bold counter" data-target="253">0</div>
+              <div class="text-xs text-white/70 mt-1">Completed</div>
+            </div>
+            <div class="bg-white/8 rounded-lg p-4 text-center">
+              <div class="text-xs uppercase text-white/80">Listeners</div>
+              <div class="text-2xl font-bold counter" data-target="4">0</div>
+              <div class="text-xs text-white/70 mt-1">Active</div>
+            </div>
+            <div class="bg-white/8 rounded-lg p-4 text-center">
+              <div class="text-xs uppercase text-white/80">Users</div>
+              <div class="text-2xl font-bold counter" data-target="100">0</div>
+              <div class="text-xs text-white/70 mt-1">Trusted</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick resource cards -->
+        <div class="grid gap-4">
+          <div class="bg-white/6 backdrop-blur-sm rounded-xl p-4">
+            <div class="flex items-start gap-3">
+              <div class="p-3 bg-white/12 rounded-full">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M8 10h.01M12 10h.01M16 10h.01M9 16h6"/></svg>
+              </div>
+              <div>
+                <div class="text-sm font-semibold">Payment status</div>
+                <div class="text-xs mt-1">Trouble with a charge? Learn how to verify & refunds.</div>
+              </div>
+            </div>
+            <a href="pay.html" class="mt-3 inline-block text-xs text-sky-100 underline">View payment help →</a>
+          </div>
+
+          <div class="bg-white/6 backdrop-blur-sm rounded-xl p-4">
+            <div class="flex items-start gap-3">
+              <div class="p-3 bg-white/12 rounded-full">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M3 10h18M3 6h18M3 14h18M3 18h18"/></svg>
+              </div>
+              <div>
+                <div class="text-sm font-semibold">Account & Privacy</div>
+                <div class="text-xs mt-1">Need to reset password or remove your data? Start here.</div>
+              </div>
+            </div>
+            <a href="index.html" class="mt-3 inline-block text-xs text-sky-100 underline">Account settings →</a>
+          </div>
+
+          <div class="bg-white/6 backdrop-blur-sm rounded-xl p-4">
+            <div class="flex items-start gap-3">
+              <div class="p-3 bg-white/12 rounded-full">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 8v4l3 3"/></svg>
+              </div>
+              <div>
+                <div class="text-sm font-semibold">Community guidelines</div>
+                <div class="text-xs mt-1">Respectful use, no abuse. Read our terms for clarity.</div>
+              </div>
+            </div>
+            <a href="faq.html" class="mt-3 inline-block text-xs text-sky-100 underline">Community rules →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- hero bottom note -->
+      <div class="mt-7 text-sm text-white/85">If your issue involves payments, include your <strong>tx_ref</strong> when contacting support.</div>
+    </section>
+
+    <!-- Main grid: chatbot + resources + faq -->
+    <section class="grid lg:grid-cols-3 gap-6">
+      <!-- Chat panel (big) -->
+      <div id="helpbot" class="lg:col-span-2 bg-white rounded-2xl shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-xl font-semibold text-slate-800">Virtual Assistant</h3>
+            <p class="text-sm text-slate-500 mt-1">Ask a short question, the assistant recognizes keywords. If the assistant can't handle it, the message is sent to support and an agent will follow up.</p>
+          </div>
+          <div class="text-sm text-slate-500">
+            <button id="clearBtn" class="px-3 py-1 rounded bg-slate-100 hover:bg-slate-200">Clear</button>
+            <span class="ml-3 text-xs">Bot v1.0</span>
+          </div>
+        </div>
+
+        <!-- Chat window -->
+        <div id="chatWindow" class="mt-4 h-[460px] overflow-y-auto border rounded-xl p-4 bg-slate-50">
+          <!-- initial bot greeting -->
+          <div class="max-w-prose">
+            <div class="bubble bot inline-block fade-in">🤖 Hi, I'm the Rant2Me assistant. Try: <em>payment</em>, <em>plans</em>, <em>contact</em>, <em>refund</em>, <em>card</em>, <em>account</em></div>
+          </div>
+        </div>
+
+        <!-- quick suggestions -->
+        <div class="mt-4 flex flex-wrap gap-2">
+          <button class="suggest btn-sky px-3 py-1 rounded-full text-sm bg-sky-50 text-sky-700">plans</button>
+          <button class="suggest btn-sky px-3 py-1 rounded-full text-sm bg-sky-50 text-sky-700">payment</button>
+          <button class="suggest btn-sky px-3 py-1 rounded-full text-sm bg-sky-50 text-sky-700">refund</button>
+          <button class="suggest btn-sky px-3 py-1 rounded-full text-sm bg-sky-50 text-sky-700">card</button>
+          <button class="suggest btn-sky px-3 py-1 rounded-full text-sm bg-sky-50 text-sky-700">contact</button>
+          <button class="suggest btn-sky px-3 py-1 rounded-full text-sm bg-sky-50 text-sky-700">account</button>
+        </div>
+
+        <!-- input -->
+        <form id="chatForm" class="mt-4 flex gap-3">
+          <input id="chatInput" autocomplete="off" type="text" placeholder="Type a keyword or short question..."
+                 class="flex-1 rounded-xl border px-4 py-3 focus:ring focus:ring-sky-100" />
+          <button type="submit" class="rounded-xl bg-sky-600 text-white px-5 py-3 font-semibold">Send</button>
+        </form>
+
+        <p id="saveNote" class="mt-2 text-xs text-slate-500">Your message will be saved and a support agent may follow up via email/WhatsApp.</p>
+      </div>
+
+      <!-- Right column: support resources / contact form -->
+      <aside class="space-y-6">
+        <!-- Contact & urgent -->
+        <div class="bg-white rounded-2xl p-4 shadow">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-xs text-slate-500">Urgent help</div>
+              <div class="text-lg font-semibold text-slate-800">Contact Support</div>
+            </div>
+          </div>
+          <div class="mt-3 flex flex-col gap-2">
+            <a href="https://wa.me/2348161127500" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 text-green-700">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M21 15a4 4 0 0 1-4 4H7l-4 4V5a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
+              Chat via WhatsApp
+            </a>
+
+            <a href="mailto:edukdorcas@gmail.com" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 text-slate-700">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-9 6L3 7z"/></svg>
+              Email: edukdorcas@gmail.com
+            </a>
+
+            <a href="tel:+2348161127500" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 text-slate-700">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M3 5a2 2 0 0 1 2-2h3.6a1 1 0 0 1 .96.73l.8 3.2a1 1 0 0 1-.27.95L8.9 10.1a11.93 11.93 0 0 0 5 5l1.2-1.2a1 1 0 0 1 .95-.27l3.2.8a1 1 0 0 1 .73.96V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5z"/></svg>
+              Call: +234-8161127500
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick links -->
+        <div class="bg-white rounded-2xl p-4 shadow">
+          <div class="text-sm text-slate-500">Quick Links</div>
+          <ul class="mt-3 space-y-2">
+            <li><a href="pay.html" class="text-sky-600">Plans & Payments</a></li>
+            <li><a href="faq.html" class="text-sky-600">FAQ</a></li>
+            <li><a href="index.html" class="text-sky-600">Account</a></li>
+            <li><a href="admin.html" id="adminSidebarLink" class="text-rose-600 hidden">Admin Dashboard</a></li>
+          </ul>
+        </div>
+
+        <!-- Mini Support Form (saves to Firestore) -->
+        <div class="bg-white rounded-2xl p-4 shadow">
+          <div class="flex items-center justify-between">
+            <div class="text-sm font-semibold">Send a message</div>
+            <div class="text-xs text-slate-400">We respond within 24–48 hrs</div>
+          </div>
+          <form id="miniForm" class="mt-3 space-y-2">
+            <input id="miniName" type="text" placeholder="Your name (optional)" class="w-full rounded border px-3 py-2" />
+            <input id="miniEmail" type="email" placeholder="Your email" class="w-full rounded border px-3 py-2" required />
+            <textarea id="miniMessage" rows="3" placeholder="Describe your issue..." class="w-full rounded border px-3 py-2" required></textarea>
+            <div class="flex items-center gap-2">
+              <button type="submit" class="px-4 py-2 rounded bg-sky-600 text-white">Send</button>
+              <button type="button" id="miniClear" class="px-3 py-2 rounded bg-slate-100">Clear</button>
+            </div>
+            <p id="miniStatus" class="text-xs text-slate-500"></p>
+          </form>
+        </div>
+
+        <!-- FAQ teasers -->
+        <div class="bg-white rounded-2xl p-4 shadow">
+          <div class="text-sm font-semibold">Top FAQ</div>
+          <dl class="mt-3 space-y-3 text-sm text-slate-600">
+            <div>
+              <dt class="font-semibold">Card payment failed, what do I do?</dt>
+              <dd class="mt-1">Check tx_ref, try reloading or contact support with the error message.</dd>
+            </div>
+            <div>
+              <dt class="font-semibold">How do I cancel?</dt>
+              <dd class="mt-1">Open your account settings and follow cancellations. Contact support if stuck.</dd>
+            </div>
+            <div>
+              <dt class="font-semibold">Are my conversations private?</dt>
+              <dd class="mt-1">Anonymous rants are auto-deleted. Paid sessions create entitlements for access only.</dd>
+            </div>
+          </dl>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Full FAQ section (expandable) -->
+    <section class="mt-10 bg-white rounded-2xl p-6 shadow">
+      <h3 class="text-lg font-semibold">Frequently asked</h3>
+      <div class="mt-4 grid lg:grid-cols-2 gap-4">
+        <div>
+          <button class="faq-q w-full text-left p-4 rounded-lg border hover:shadow" data-id="q1">
+            What payment methods are supported?
+          </button>
+          <div id="q1" class="faq-a p-4 hidden border rounded-b-lg border-t-0">We support bank transfer, card, and USSD through Flutterwave. Card payments rely on 3DS and issuing bank approvals.</div>
+
+          <button class="faq-q w-full text-left p-4 rounded-lg border hover:shadow mt-3" data-id="q2">
+            My card was charged twice, how do I get a refund?
+          </button>
+          <div id="q2" class="faq-a p-4 hidden border rounded-b-lg border-t-0">Contact us with your tx_ref and we'll investigate. Refunds are processed per our payments provider policies.</div>
+        </div>
+
+        <div>
+          <button class="faq-q w-full text-left p-4 rounded-lg border hover:shadow" data-id="q3">
+            Can I get a transcript of my paid session?
+          </button>
+          <div id="q3" class="faq-a p-4 hidden border rounded-b-lg border-t-0">No, private transcripts are not stored. Paid entitlements only grant access to chats for the allowance period.</div>
+
+          <button class="faq-q w-full text-left p-4 rounded-lg border hover:shadow mt-3" data-id="q4">
+            How do I become a listener/admin?
+          </button>
+          <div id="q4" class="faq-a p-4 hidden border rounded-b-lg border-t-0">We recruit selectively. Contact us with your credentials and experience; admins are approved by the founding team.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- bottom resources -->
+    <section class="mt-8 grid md:grid-cols-3 gap-4">
+      <div class="bg-white rounded-2xl p-5 shadow">
+        <h4 class="font-bold text-slate-700">Guides</h4>
+        <p class="text-sm text-slate-500 mt-2">Quick how-tos: payments, accounts, and privacy.</p>
+        <ul class="mt-3 space-y-2 text-sky-600 text-sm">
+          <li><a href="pay.html">Payment troubleshooting</a></li>
+          <li><a href="faq.html">How entitlements work</a></li>
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 shadow">
+        <h4 class="font-bold text-slate-700">Security</h4>
+        <p class="text-sm text-slate-500 mt-2">How your data is protected and what we retain.</p>
+        <a href="#" class="text-sky-600 text-sm">Privacy policy</a>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 shadow">
+        <h4 class="font-bold text-slate-700">Contact</h4>
+        <p class="text-sm text-slate-500 mt-2">If all else fails, reach out and we'll assist.</p>
+        <a href="contactus.html" class="inline-block mt-3 px-4 py-2 rounded bg-sky-50 text-sky-700">Open contact form</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t bg-white mt-10">
+    <div class="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row justify-between gap-4 items-center">
+      <div class="text-sm text-slate-500">&copy; 2025 Rant2Me — Speak freely. Be heard.</div>
+      <div class="flex gap-4">
+        <a href="faq.html" class="text-sm text-sky-600">FAQ</a>
+        <a href="about.html" class="text-sm text-sky-600">About</a>
+        <a href="#" class="text-sm text-sky-600" onclick="showDisclaimer()">Disclaimer</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Disclaimer modal (simple) -->
+  <div id="disclaimerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50">
+    <div class="bg-white max-w-lg w-full p-6 rounded-xl">
+      <h4 class="text-lg font-semibold">Disclaimer & Terms</h4>
+      <div class="mt-3 text-sm text-slate-600" style="max-height:40vh; overflow:auto">
+        <p><strong>Use at your own risk.</strong> Rant2Me provides listening and emotional support but not professional medical or legal advice. Avoid sharing extremely sensitive information publicly.</p>
+        <p class="mt-2">We aim to keep communications private. Anonymous rants are auto-deleted. Paid sessions create entitlements that allow access for a fixed duration.</p>
+      </div>
+      <div class="mt-4 text-right">
+        <button onclick="closeDisclaimer()" class="px-4 py-2 rounded bg-sky-600 text-white">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase + Chatbot Script -->
+  <script type="module">
+    /**
+     * Requires your project to have firebase.js that exports:
+     *   export const auth = getAuth(app);
+     *   export const db = getFirestore(app);
+     *
+     * This script:
+     * - animates counters
+     * - handles mobile drawer
+     * - chatbot logic (keyword-based), saves messages to supportMessages
+     * - mini contact form writes to supportMessages
+     * - shows admin link if current user email is in allowedAdmins
+     */
+
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    // ----------------------
+    // UI references
+    // ----------------------
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const drawerClose = document.getElementById('drawerClose');
+    const adminLink = document.getElementById('adminLink');
+    const adminSidebarLink = document.getElementById('adminSidebarLink');
+    const adminLinkMobile = document.getElementById('adminLinkMobile');
+
+    const chatWindow = document.getElementById('chatWindow');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const clearBtn = document.getElementById('clearBtn');
+    const suggestBtns = document.querySelectorAll('.suggest');
+
+    const miniForm = document.getElementById('miniForm');
+    const miniStatus = document.getElementById('miniStatus');
+
+    const allowedAdmins = ["tana10j@gmail.com", "edukdorcas@gmail.com"];
+
+    // ----------------------
+    // Mobile drawer controls
+    // ----------------------
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileDrawer.style.transform = 'translateX(0)';
     });
-});
-*/
+    drawerClose.addEventListener('click', () => {
+      mobileDrawer.style.transform = 'translateX(-100%)';
+    });
+    // close drawer if clicked outside
+    document.addEventListener('click', (e) => {
+      if (!mobileDrawer.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+        mobileDrawer.style.transform = 'translateX(-100%)';
+      }
+    });
+
+    // ----------------------
+    // Counter animation (simple)
+    // ----------------------
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach(c => {
+      const target = +c.dataset.target || 0;
+      let cur = 0;
+      const step = Math.max(1, Math.floor(target / 150)); // animate ~150 frames
+      const id = setInterval(() => {
+        cur += step;
+        if (cur >= target) {
+          c.textContent = target.toLocaleString();
+          clearInterval(id);
+        } else {
+          c.textContent = cur.toLocaleString();
+        }
+      }, 12);
+    });
+
+    // ----------------------
+    // Auth: show admin link only for allowed emails
+    // ----------------------
+    onAuthStateChanged(auth, (user) => {
+      if (user && allowedAdmins.includes(user.email)) {
+        adminLink.classList.remove('hidden');
+        adminSidebarLink.classList.remove('hidden');
+        adminLinkMobile.classList.remove('hidden');
+      } else {
+        adminLink.classList.add('hidden');
+        adminSidebarLink.classList.add('hidden');
+        adminLinkMobile.classList.add('hidden');
+      }
+    });
+
+    // ----------------------
+    // Chatbot: responses map & logic
+    // ----------------------
+    // map keywords to replies (rich responses)
+    const RESPONSE_MAP = [
+      { keywords: ['plan', 'plans'], reply: 'You can choose a plan here: pay.html • 20min, 60min, 1 week.' },
+      { keywords: ['payment', 'paid', 'charge'], reply: 'For payments, check pay.html. If charged but not granted access, send your tx_ref and we will investigate.' },
+      { keywords: ['card', 'card failed', '3ds', 'authentication'], reply: 'Card errors often mean the card issuer blocked the 3DS authentication. Try using bank transfer or contact your bank. If you have an error code, share it here.' },
+      { keywords: ['refund', 'reversal', 'chargeback'], reply: 'Refunds are handled case-by-case. Share tx_ref with us and we will escalate. Processing can take a few business days.' },
+      { keywords: ['contact', 'support', 'whatsapp', 'phone'], reply: 'Contact us via WhatsApp: +2348161127500 or email: edukdorcas@gmail.com' },
+      { keywords: ['account', 'password', 'reset'], reply: 'To reset password, use the "Forgot Password?" link on the login page. If that fails, contact support with your email.' },
+      { keywords: ['nutrition', 'dorcas'], reply: 'Dorcas handles Nutrition support. To book time, choose the Nutrition service on the plans page.' },
+      { keywords: ['student', 'chidera'], reply: 'Chidera handles Student-life support. Choose Student section on Plans to connect.' },
+      { keywords: ['counsel', 'counselling', 'tana'], reply: 'Tana handles Counselling. Choose Counselling and complete payment to gain access.' },
+      { keywords: ['privacy', 'delete', 'remove'], reply: 'We keep anonymous rants for a short window only. To remove stored data, contact support with your user email.' }
+    ];
+
+    function findReply(message) {
+      const m = (message || '').toLowerCase();
+      for (const entry of RESPONSE_MAP) {
+        for (const k of entry.keywords) {
+          if (m.includes(k)) return entry.reply;
+        }
+      }
+      return null;
+    }
+
+    // Helper to append message into chat window
+    function appendMessage(sender, text) {
+      const wrap = document.createElement('div');
+      wrap.className = 'mt-3 w-full';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble ' + (sender === 'You' ? 'user' : 'bot');
+      bubble.innerHTML = `<strong class="text-sm">${sender}:</strong> <span class="block mt-1 text-sm">${escapeHtml(text)}</span>`;
+      wrap.appendChild(bubble);
+      chatWindow.appendChild(wrap);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // minimal sanitize
+    function escapeHtml(str = '') {
+      return ('' + str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;');
+    }
+
+    // send message handler
+    chatForm.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const text = (chatInput.value || '').trim();
+      if (!text) return;
+      appendMessage('You', text);
+      chatInput.value = '';
+
+      // find reply
+      const reply = findReply(text) || 'Invalid request. Try keywords like "plans", "payment", "contact", "refund".';
+      // show typing indicator
+      const typing = document.createElement('div');
+      typing.className = 'mt-3 w-full';
+      typing.innerHTML = `<div class="bubble bot">🤖 typing…</div>`;
+      chatWindow.appendChild(typing);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+
+      // simulate delay
+      setTimeout(async () => {
+        typing.remove();
+        appendMessage('🤖 Bot', reply);
+
+        // persist to Firestore supportMessages collection
+        try {
+          // include user email if available
+          const user = auth.currentUser;
+          const payload = {
+            userMessage: text,
+            botReply: reply,
+            createdAt: serverTimestamp(),
+            userEmail: user ? user.email : null,
+            resolved: false
+          };
+          await addDoc(collection(db, 'supportMessages'), payload);
+        } catch (e) {
+          console.error('Failed saving support message:', e);
+        }
+      }, 700 + Math.random() * 700);
+    });
+
+    // quick suggestions
+    suggestBtns.forEach(b => b.addEventListener('click', () => {
+      chatInput.value = b.textContent.trim();
+      chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }));
+
+    // clear chat window
+    clearBtn.addEventListener('click', () => {
+      chatWindow.innerHTML = '';
+      // reintroduce greeting
+      const greet = document.createElement('div');
+      greet.className = 'max-w-prose';
+      greet.innerHTML = `<div class="bubble bot inline-block fade-in">🤖 Hi, I'm the Rant2Me assistant. Try: <em>payment</em>, <em>plans</em>, <em>contact</em>, <em>refund</em>.</div>`;
+      chatWindow.appendChild(greet);
+    });
+
+    // ----------------------
+    // mini support form handling
+    // ----------------------
+    miniForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = (document.getElementById('miniName').value || '').trim();
+      const email = (document.getElementById('miniEmail').value || '').trim();
+      const message = (document.getElementById('miniMessage').value || '').trim();
+
+      if (!email || !message) {
+        miniStatus.textContent = 'Please provide email and a short message.';
+        miniStatus.className = 'text-xs text-rose-600';
+        return;
+      }
+
+      miniStatus.textContent = 'Sending...';
+      miniStatus.className = 'text-xs text-slate-500';
+
+      try {
+        await addDoc(collection(db, 'supportMessages'), {
+          from_name: name || null,
+          from_email: email,
+          userMessage: message,
+          botReply: 'Queued by mini form',
+          createdAt: serverTimestamp(),
+          resolved: false
+        });
+        miniStatus.textContent = 'Sent. We will reply via email or WhatsApp.';
+        miniStatus.className = 'text-xs text-green-600';
+        miniForm.reset();
+      } catch (err) {
+        console.error('mini form save failed', err);
+        miniStatus.textContent = 'Failed to send. Try again or WhatsApp us.';
+        miniStatus.className = 'text-xs text-rose-600';
+      }
+    });
+    document.getElementById('miniClear').addEventListener('click', () => {
+      miniForm.reset();
+      miniStatus.textContent = '';
+    });
+
+    // ----------------------
+    // FAQ expand/collapse
+    // ----------------------
+    document.querySelectorAll('.faq-q').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const a = document.getElementById(id);
+        a.classList.toggle('hidden');
+      });
+    });
+
+    // ----------------------
+    // Disclaimer modal
+    // ----------------------
+    window.showDisclaimer = () => {
+      document.getElementById('disclaimerModal').classList.remove('hidden');
+      document.getElementById('disclaimerModal').classList.add('flex');
+    };
+    window.closeDisclaimer = () => {
+      document.getElementById('disclaimerModal').classList.add('hidden');
+      document.getElementById('disclaimerModal').classList.remove('flex');
+    };
+
+    // ----------------------
+    // Accessibility: focus chat input on load
+    // ----------------------
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const el = document.getElementById('chatInput');
+        if (el) el.focus();
+      }, 400);
+    });
 
   </script>
 </body>

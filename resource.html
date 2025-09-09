@@ -50,32 +50,29 @@
       padding: 2rem;
       overflow-y: auto;
     }
-/* 📱 Mobile-friendly reader modal */
+/* Mobile-friendly modal reader: hide TOC and make pages full width */
 @media (max-width: 768px) {
-  #readerModal .grid {
-    grid-template-columns: 1fr !important; /* stack TOC + reader */
+  #readerModal aside {
+    display: none !important; /* remove table of contents */
+  }
+
+  #readerModal .col-span-9 {
+    grid-column: 1 / -1; /* make reader pages span full modal width */
     max-height: 95vh;
     overflow-y: auto;
   }
 
-  #readerModal aside {
-    border-right: none;
-    border-bottom: 1px solid #e5e7eb;
-    max-height: none;
-  }
-
-  #readerModal .flex-1.grid {
-    grid-template-columns: 1fr !important; /* single column */
-    gap: 1rem;
-  }
-
-  #readerModal .reader-page {
+  #singlePage {
     min-height: auto;
-    max-height: 60vh;
-    overflow-y: auto;
-    font-size: 1rem;       /* keep text comfortable */
-    line-height: 1.6;      /* improve readability */
-    word-wrap: break-word; /* prevent text from running off screen */
+    max-height: 80vh;
+    font-size: 1rem;
+    line-height: 1.6;
+    word-wrap: break-word;
+    padding: 1rem;
+  }
+
+  #tocToggle {
+    display: none; /* hide the mobile TOC toggle button */
   }
 }
 
@@ -103,6 +100,10 @@
     display: block;
     border-bottom: 1px solid #e5e7eb;
   }
+}
+#readerModal > div {
+  max-width: 100% !important;
+  height: 95vh !important;
 }
   </style>
 </head>

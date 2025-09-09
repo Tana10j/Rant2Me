@@ -303,11 +303,11 @@
           </div>
         </div>
 
-        <!-- two-column book view -->
-        <div class="flex-1 grid grid-cols-2 gap-6">
-          <div id="leftPage" class="reader-page"></div>
-          <div id="rightPage" class="reader-page"></div>
-        </div>
+       <!-- single-page reader -->
+<div class="flex-1">
+  <div id="singlePage" class="reader-page"></div>
+</div>
+
 
         <!-- reader footer with share / bookmark -->
         <div class="mt-4 flex items-center justify-between">
@@ -491,80 +491,57 @@
     }
 
     function renderPages() {
-      // two-column view: left = currentIndex, right = currentIndex+1
-      const left = document.getElementById('leftPage');
-      const right = document.getElementById('rightPage');
-      left.classList.remove('turn-in','turn-out');
-      right.classList.remove('turn-in','turn-out');
+  const page = document.getElementById('singlePage');
+  page.classList.remove('turn-in','turn-out');
 
-      left.innerHTML = currentResource.pages[currentIndex] || '<p class="text-slate-500">—</p>';
-      right.innerHTML = currentResource.pages[currentIndex + 1] || '<p class="text-slate-500">—</p>';
+  page.innerHTML = currentResource.pages[currentIndex] || '<p class="text-slate-500">—</p>';
 
-      // page indicator
-      const total = currentResource.pages.length;
-      const displayPage = currentIndex + 1;
-      document.getElementById('pageIndicator').textContent = `Page ${displayPage} / ${total}`;
+  const total = currentResource.pages.length;
+  const displayPage = currentIndex + 1;
+  document.getElementById('pageIndicator').textContent = `Page ${displayPage} / ${total}`;
 
-      // enable/disable buttons
-      document.getElementById('prevBtn').disabled = currentIndex <= 0;
-      document.getElementById('nextBtn').disabled = currentIndex >= total - 1;
-    }
+  document.getElementById('prevBtn').disabled = currentIndex <= 0;
+  document.getElementById('nextBtn').disabled = currentIndex >= total - 1;
+}
 
     function turnPage(dir) {
-      // dir = +1 (next) or -1 (prev)
-      if (!currentResource) return;
-      const total = currentResource.pages.length;
-      const newIndex = currentIndex + dir;
-      if (newIndex < 0 || newIndex > total - 1) return;
+  if (!currentResource) return;
+  const total = currentResource.pages.length;
+  const newIndex = currentIndex + dir;
+  if (newIndex < 0 || newIndex > total - 1) return;
 
-      // animate out current pages, animate in new pages
-      const left = document.getElementById('leftPage');
-      const right = document.getElementById('rightPage');
+  const page = document.getElementById('singlePage');
+  const outClass = 'turn-out';
+  const inClass = 'turn-in';
 
-      // choose animation classes depending on direction
-      const outClass = dir > 0 ? 'turn-out' : 'turn-out';
-      const inClass = dir > 0 ? 'turn-in' : 'turn-in';
+  page.classList.add(outClass);
 
-      // animate container (both pages)
-      left.classList.add(outClass);
-      right.classList.add(outClass);
+  setTimeout(() => {
+    currentIndex = newIndex;
+    renderPages();
+    page.classList.remove(outClass);
+    page.classList.add(inClass);
 
-      setTimeout(() => {
-        // update index
-        currentIndex = newIndex;
-        // render new content
-        left.innerHTML = currentResource.pages[currentIndex] || '<p class="text-slate-500">—</p>';
-        right.innerHTML = currentResource.pages[currentIndex + 1] || '<p class="text-slate-500">—</p>';
+    setTimeout(() => page.classList.remove(inClass), 350);
+  }, 220);
+}
 
-        // swap animation classes to show "in"
-        left.classList.remove(outClass);
-        right.classList.remove(outClass);
-        left.classList.add(inClass);
-        right.classList.add(inClass);
 
-        // clean up classes after animation ends
-        setTimeout(() => {
-          left.classList.remove(inClass);
-          right.classList.remove(inClass);
-          renderPages(); // finalize state & buttons
-        }, 400);
-      }, 260);
-    }
+   function jumpTo(pageIndex) {
+  if (!currentResource) return;
+  if (pageIndex < 0 || pageIndex >= currentResource.pages.length) return;
 
-    function jumpTo(pageIndex) {
-      if (!currentResource) return;
-      if (pageIndex < 0 || pageIndex >= currentResource.pages.length) return;
-      // simple direct jump with small animation
-      const left = document.getElementById('leftPage');
-      left.classList.add('turn-out');
-      setTimeout(() => {
-        currentIndex = pageIndex;
-        renderPages();
-        left.classList.remove('turn-out');
-        left.classList.add('turn-in');
-        setTimeout(() => left.classList.remove('turn-in'), 350);
-      }, 220);
-    }
+  const page = document.getElementById('singlePage');
+  page.classList.add('turn-out');
+  setTimeout(() => {
+    currentIndex = pageIndex;
+    renderPages();
+    page.classList.remove('turn-out');
+    page.classList.add('turn-in');
+    setTimeout(() => page.classList.remove('turn-in'), 350);
+  }, 220);
+}
+
 
     function closeReader() {
       document.getElementById('readerModal').classList.add('hidden');
@@ -573,16 +550,14 @@
     }
 
     // optional: change font size
-    document.getElementById('fontSize')?.addEventListener('change', (e) => {
-      const val = e.target.value;
-      const left = document.getElementById('leftPage');
-      const right = document.getElementById('rightPage');
-      left.classList.remove('text-base','text-lg','text-xl');
-      right.classList.remove('text-base','text-lg','text-xl');
-      if (val === 'base') { left.classList.add('text-base'); right.classList.add('text-base'); }
-      if (val === 'lg') { left.classList.add('text-lg'); right.classList.add('text-lg'); }
-      if (val === 'xl') { left.classList.add('text-xl'); right.classList.add('text-xl'); }
-    });
+   document.getElementById('fontSize')?.addEventListener('change', (e) => {
+  const val = e.target.value;
+  const page = document.getElementById('singlePage');
+  page.classList.remove('text-base','text-lg','text-xl');
+  if (val === 'base') page.classList.add('text-base');
+  if (val === 'lg') page.classList.add('text-lg');
+  if (val === 'xl') page.classList.add('text-xl');
+});
 
     // deep link support (optional)
     (function applyDeepLink() {

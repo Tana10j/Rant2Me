@@ -61,7 +61,7 @@ function attachServiceClicks() {
         location.href = "chat.html#anon";
         return;
       }
-      else if (service === 'resources') {
+      else if (service === 'Resources') {
       window.location.href = 'resource.html';
       }
       // Admin shortcuts (always allowed for admins)

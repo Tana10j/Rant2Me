@@ -14,7 +14,7 @@
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Tailwind theme tweak (matches pay.html) -->
+  <!-- Tailwind theme -->
   <script>
     tailwind.config = {
       theme: {
@@ -50,6 +50,34 @@
       padding: 2rem;
       overflow-y: auto;
     }
+/* 📱 Mobile-friendly reader modal */
+@media (max-width: 768px) {
+  #readerModal .grid {
+    grid-template-columns: 1fr !important; /* stack TOC + reader */
+    max-height: 95vh;
+    overflow-y: auto;
+  }
+
+  #readerModal aside {
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    max-height: none;
+  }
+
+  #readerModal .flex-1.grid {
+    grid-template-columns: 1fr !important; /* single column */
+    gap: 1rem;
+  }
+
+  #readerModal .reader-page {
+    min-height: auto;
+    max-height: 60vh;
+    overflow-y: auto;
+    font-size: 1rem;       /* keep text comfortable */
+    line-height: 1.6;      /* improve readability */
+    word-wrap: break-word; /* prevent text from running off screen */
+  }
+}
 
     /* simple page-turn animation */
     .turn-in {
@@ -66,11 +94,21 @@
       from { transform: none; opacity: 1; }
       to   { transform: translateX(-20px) rotateY(6deg); opacity: 0; }
     }
+    /* 📱 Mobile TOC toggle */
+@media (max-width: 768px) {
+  #tocPanel {
+    display: none; /* hidden by default on mobile */
+  }
+  #tocPanel.active {
+    display: block;
+    border-bottom: 1px solid #e5e7eb;
+  }
+}
   </style>
 </head>
 <body class="bg-gradient-to-b from-white to-slate-50 text-slate-800 min-h-screen">
 
-  <!-- HEADER (same look as pay.html) -->
+  <!-- HEADER -->
   <header class="sticky top-0 z-40 bg-gradient-to-b from-r2m-blue to-r2m-blue-600 text-white shadow-sm">
     <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
       <a href="home.html" class="flex items-center gap-3">
@@ -219,6 +257,10 @@
   <div id="readerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
     <div class="bg-white rounded-xl shadow-r-lg w-full max-w-5xl max-h-[90vh] overflow-hidden grid grid-cols-12">
       <!-- Left column: TOC inside modal -->
+       <!-- TOC Toggle (Mobile only) -->
+<button id="tocToggle" class="md:hidden w-full bg-r2m-sky text-white px-4 py-2 font-semibold rounded-t">
+  Show Contents
+</button>
       <aside class="col-span-3 border-r p-4 bg-slate-50">
         <div class="flex items-center gap-3 mb-4">
           <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />

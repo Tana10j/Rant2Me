@@ -120,15 +120,17 @@
         </div>
       </a>
 
-      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
-        <a href="home.html" class="hover:text-r2m-aqua">Home</a>
-        <a href="chat.html" class="hover:text-r2m-aqua">Chat</a>
-        <a href="help.html" class="hover:text-r2m-aqua">Help Centre</a>
-        <a href="faq.html" class="hover:text-r2m-aqua">FAQ</a>
-        <a href="pay.html" class="hover:text-r2m-aqua">Plans</a>
-        <a href="about.html" class="hover:text-r2m-aqua">About</a>
-        <a href="services.html" class="hover:text-r2m-aqua">Services</a>
-      </nav>
+      <!-- Mobile nav -->
+<nav id="mobileMenu" class="hidden flex-col bg-r2m-blue-600 text-white md:hidden">
+  <a href="home.html" class="px-4 py-2 hover:bg-r2m-blue">Home</a>
+  <a href="chat.html" class="px-4 py-2 hover:bg-r2m-blue">Chat</a>
+  <a href="help.html" class="px-4 py-2 hover:bg-r2m-blue">Help Centre</a>
+  <a href="faq.html" class="px-4 py-2 hover:bg-r2m-blue">FAQ</a>
+  <a href="pay.html" class="px-4 py-2 hover:bg-r2m-blue">Plans</a>
+  <a href="about.html" class="px-4 py-2 hover:bg-r2m-blue">About</a>
+  <a href="services.html" class="px-4 py-2 hover:bg-r2m-blue">Services</a>
+</nav>
+
 
       <div class="flex items-center gap-3">
         <button id="signOutBtnDesktop" class="px-4 py-2 bg-red-500 text-white rounded-lg">Sign Out</button>
@@ -286,9 +288,9 @@
       <!-- Reader pages -->
       <div class="col-span-9 p-6 flex flex-col">
         <button id="closeReaderMobile" 
-  class="md:hidden absolute top-3 right-3 bg-black/60 text-white w-8 h-8 flex items-center justify-center rounded-full z-50">
-  ✕
-</button>
+    class="md:hidden absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-lg z-50">
+    ✕
+  </button>
         <!-- toolbar -->
         <div class="flex items-center justify-between mb-4">
           <div class="flex gap-3 items-center">
@@ -547,13 +549,14 @@
   }, 220);
 }
 
+document.getElementById('closeReaderMobile').addEventListener('click', closeReader);
 
-    function closeReader() {
-      document.getElementById('closeReaderMobile').addEventListener('click', closeReader);
-      document.getElementById('readerModal').classList.add('hidden');
-      currentResource = null;
-      currentIndex = 0;
-    }
+function closeReader() {
+  document.getElementById('readerModal').classList.add('hidden');
+  currentResource = null;
+  currentIndex = 0;
+}
+
 
     // optional: change font size
    document.getElementById('fontSize')?.addEventListener('change', (e) => {
@@ -665,6 +668,9 @@
 
   // ✅ Init
   loadResources();
+  document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+  document.getElementById('mobileMenu').classList.toggle('hidden');
+});
 </script>
 <script type="module">
   import { protectPage } from "./auth-guard.js";

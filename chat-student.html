@@ -10,6 +10,7 @@
 </head>
 <body>
   <button onclick="window.location.href='home.html'" class="home-btn">🏠 Home</button>
+  <button id="signOutBtnDesktop" class="px-4 py-2 bg-red-500 text-white rounded-lg">Sign Out</button>
   <div class="chat-container">
     <div class="chat-header">Chat with Chidera</div>
 
@@ -227,5 +228,19 @@
     }[tag]));
   }
 </script>
+<script type="module">
+  import { protectPage } from "./auth-guard.js";
+  import { initSignOut } from "./auth.js";
+
+  // Kick out unauthorized users
+  protectPage();
+
+  // Enable logout buttons
+  initSignOut();
+</script>
+<!-- Toast Notification -->
+<div id="toast" class="hidden fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500">
+  ✅ Signed out successfully
+</div>
 </body>
 </html>

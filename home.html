@@ -63,7 +63,7 @@
       </nav>
 
       <div class="flex items-center gap-3">
-        <a href="index.html" class="hidden md:inline-block px-4 py-2 bg-white text-r2m-blue rounded-md font-semibold shadow-sm">Login</a>
+        <button id="signOutBtnDesktop" class="hidden md:inline-block px-4 py-2 bg-white text-r2m-blue rounded-md font-semibold shadow-sm">Sign out</button>
         <button id="mobileMenuBtn" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Open menu">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -92,7 +92,7 @@
         <a href="pay.html" class="px-3 py-2 rounded hover:bg-slate-50">Plans</a>
         <a href="about.html" class="px-3 py-2 rounded hover:bg-slate-50">About</a>
         <a href="services.html" class="px-3 py-2 rounded hover:bg-slate-50">Services</a>
-        <a href="index.html" class="mt-4 inline-block px-4 py-2 bg-r2m-aqua text-white rounded-md text-center">Login / Sign up</a>
+       <button id="signOutBtnMobile" class="mt-4 inline-block w-full px-4 py-2 bg-r2m-aqua text-white rounded-md text-center">Sign out</button>
       </nav>
     </aside>
   </div>
@@ -336,23 +336,12 @@
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { auth, db } from "./firebase.js";
+  import { initSignOut } from "./auth.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+  import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
-  authDomain: "rant2me-ab36b.firebaseapp.com",
-  projectId: "rant2me-ab36b",
-  storageBucket: "rant2me-ab36b.appspot.com",
-  messagingSenderId: "245661393279",
-  appId: "1:245661393279:web:b31483f57a40cf2c807a4a"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+  initSignOut();
 
 function showMoodModalIfNeeded(user) {
   const today = new Date().toISOString().split('T')[0];
@@ -394,25 +383,38 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
-
 // Show modal after auth state is ready
 onAuthStateChanged(auth, user => {
   showMoodModalIfNeeded(user);
 });
- // Drawer toggle logic
-    const hamburgerBtn = document.getElementById("hamburgerBtn");
-    const drawer = document.getElementById("drawer");
-    const overlay = document.getElementById("drawerOverlay");
+// Remove this
+// const hamburgerBtn = document.getElementById("hamburgerBtn");
+// const drawer = document.getElementById("drawer");
+// const overlay = document.getElementById("drawerOverlay");
 
-    hamburgerBtn.addEventListener("click", () => {
-      drawer.classList.toggle("open");
-      overlay.classList.toggle("show");
-    });
+// hamburgerBtn.addEventListener("click", () => {
+//   drawer.classList.toggle("open");
+//   overlay.classList.toggle("show");
+// });
 
-    overlay.addEventListener("click", () => {
-      drawer.classList.remove("open");
-      overlay.classList.remove("show");
-    });
+// overlay.addEventListener("click", () => {
+//   drawer.classList.remove("open");
+//   overlay.classList.remove("show");
+// });
 </script>
+<script type="module">
+  import { protectPage } from "./auth-guard.js";
+  import { initSignOut } from "./auth.js";
+
+  // Kick out unauthorized users
+  protectPage();
+
+  // Enable logout buttons
+  initSignOut();
+</script>
+<!-- Toast Notification -->
+<div id="toast" class="hidden fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500">
+  ✅ Signed out successfully
+</div>
 </body>
 </html>

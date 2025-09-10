@@ -131,7 +131,7 @@
       </nav>
 
       <div class="flex items-center gap-3">
-        <a href="index.html" class="hidden md:inline-block px-4 py-2 bg-white text-r2m-blue rounded-md font-semibold shadow-sm">Login</a>
+        <button id="signOutBtnDesktop" class="px-4 py-2 bg-red-500 text-white rounded-lg">Sign Out</button>
         <button id="mobileMenuBtn" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Open menu">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
@@ -285,6 +285,10 @@
 
       <!-- Reader pages -->
       <div class="col-span-9 p-6 flex flex-col">
+        <button id="closeReaderMobile" 
+  class="md:hidden absolute top-3 right-3 bg-black/60 text-white w-8 h-8 flex items-center justify-center rounded-full z-50">
+  ✕
+</button>
         <!-- toolbar -->
         <div class="flex items-center justify-between mb-4">
           <div class="flex gap-3 items-center">
@@ -545,6 +549,7 @@
 
 
     function closeReader() {
+      document.getElementById('closeReaderMobile').addEventListener('click', closeReader);
       document.getElementById('readerModal').classList.add('hidden');
       currentResource = null;
       currentIndex = 0;
@@ -661,6 +666,19 @@
   // ✅ Init
   loadResources();
 </script>
+<script type="module">
+  import { protectPage } from "./auth-guard.js";
+  import { initSignOut } from "./auth.js";
 
+  // Kick out unauthorized users
+  protectPage();
+
+  // Enable logout buttons
+  initSignOut();
+</script>
+<!-- Toast Notification -->
+<div id="toast" class="hidden fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500">
+  ✅ Signed out successfully
+</div>
 </body>
 </html>

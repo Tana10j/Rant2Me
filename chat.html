@@ -83,7 +83,7 @@
 
       <!-- mobile menu / login -->
       <div class="flex items-center gap-3">
-        <a href="index.html" class="hidden md:inline-block px-4 py-2 bg-white text-r2m-blue rounded-md font-semibold shadow-sm">Login</a>
+        <button id="signOutBtnDesktop" class="px-4 py-2 bg-red-500 text-white rounded-lg">Sign Out</button>
         <button id="mobileMenuBtn" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Open menu">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
@@ -110,7 +110,7 @@
         <a href="pay.html" class="px-3 py-2 rounded hover:bg-slate-50">Plans</a>
         <a href="about.html" class="px-3 py-2 rounded hover:bg-slate-50">About</a>
         <a href="services.html" class="px-3 py-2 rounded hover:bg-slate-50">Services</a>
-        <a href="index.html" class="mt-4 inline-block px-4 py-2 bg-r2m-aqua text-white rounded-md text-center">Login / Sign up</a>
+       <button id="signOutBtnMobile" class="px-3 py-2 bg-red-500 text-white rounded-lg">Sign Out</button>
       </nav>
     </aside>
   </div>
@@ -223,6 +223,23 @@
             <div>
               <h3 class="text-lg font-semibold">Chidera</h3>
               <p class="text-sm text-slate-500 mt-1">Practical tips, life guidance & friendly check-ins.</p>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <div class="text-sm text-slate-600">Avg. response time: <strong>mins</strong></div>
+            <div>
+              <button class="px-3 py-1 rounded bg-r2m-aqua text-white text-sm">Select</button>
+            </div>
+          </div>
+        </article>
+
+        <!--New Listener -->
+        <article class="service-card bg-white rounded-r-lg p-6 shadow-r-sm hover:shadow-r-md transition transform hover:-translate-y-1" data-service="listener" role="button" tabindex="0">
+          <div class="flex items-start gap-4">
+            <img src="images/wizard-phone-4923702_1920.png" alt="Bello" class="w-16 h-16 rounded-full object-cover border-2 border-r2m-aqua" />
+            <div>
+              <h3 class="text-lg font-semibold">Bello</h3>
+              <p class="text-sm text-slate-500 mt-1">Marriage Counsellor and Therapist. Book a session Here.</p>
             </div>
           </div>
           <div class="mt-4 flex items-center justify-between">
@@ -436,5 +453,19 @@
   <script type="module" src="./firebase.js"></script>
   <script type="module" src="./chat-page.js"></script>
 <script src="script.js"></script>
+<script type="module">
+  import { protectPage } from "./auth-guard.js";
+  import { initSignOut } from "./auth.js";
+
+  // Kick out unauthorized users
+  protectPage();
+
+  // Enable logout buttons
+  initSignOut();
+</script>
+<!-- Toast Notification -->
+<div id="toast" class="hidden fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500">
+  ✅ Signed out successfully
+</div>
 </body>
 </html>

@@ -5,18 +5,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Nutrition Chat — Dorcas</title>
+  <title>Listener — Bello</title>
   <link rel="stylesheet" href="chat-style.css" />
 </head>
 <body>
-  <button onclick="window.location.href='home.html'" class="home-btn">🏠 Home</button>
+<button onclick="window.location.href='home.html'" class="home-btn">🏠 Home</button>
   <div class="chat-container">
-    <div class="chat-header">Chat with Dorcas</div>
+    <div class="chat-header">Chat with Bello</div>
 
     <div class="chat-messages" id="chat-box">
       <div class="message bot">
-        <img src="assets/avatars/Dorcas.png" class="avatar" />
-        <div class="bubble">Hello — I'm Dorcas, a certified Nutritionist. How can I help you?</div>
+        <img src="assets/avatars/wizard-phone-4923702_1920.png" class="avatar" />
+        <div class="bubble">Hi I'm Bello, what's on your mind?</div>
       </div>
     </div>
 
@@ -34,8 +34,8 @@
     query, orderBy, onSnapshot, doc, setDoc, getDoc
   } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-  const SECTION = "nutrition";
-  const ADMIN_NAME = "Dorcas";
+  const SECTION = "listener";
+  const ADMIN_NAME = "Bello";
 
   const chatBox = document.getElementById('chat-box');
   const input = document.getElementById('userInput');
@@ -54,7 +54,7 @@
     const ok = await hasAccess(currentUid, SECTION);
     if (!ok) {
       alert("Please purchase a plan to access this chat.");
-      window.location.href = "pay.html#nutrition";
+      window.location.href = "pay.html#listener";
       return;
     }
 

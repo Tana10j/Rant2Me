@@ -78,6 +78,10 @@ function attachServiceClicks() {
         location.href = "admin-student.html";
         return;
       }
+      if (service === 'listener' && (userRole === "listener" || userEmail === "atejuolabello@gmail.com")) {
+        location.href = "admin-student.html";
+        return;
+      }
 
       // Regular user path
       if (!currentUser) {
@@ -91,6 +95,7 @@ function attachServiceClicks() {
         if (service === 'counselling') location.href = "chat-counselling.html";
         if (service === 'nutrition')   location.href = "chat-nutrition.html";
         if (service === 'student')     location.href = "chat-student.html";
+        if (service === 'listener')     location.href = "chat-listener.html";
       } else {
         // Always force redirect to pay if no entitlement
         location.href = "pay.html#" + service;

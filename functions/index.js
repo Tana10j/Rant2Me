@@ -374,6 +374,84 @@ exports.createPayment = functions.region(REGION).https.onRequest((req, res) => {
       return res.status(500).json({ error: e.message || 'Server error' });
     }
   });
+  // Utility: load banned words into memory (consider caching)
+async function loadBannedWords() {
+  const snap = await db.collection('bannedWords').get();
+  return snap.docs.map(d => (d.data().word || '').toLowerCase()).filter(Boolean);
+}
+
+// Trigger: on new community message -> check banned words -> create a flag automatically
+exports.autoFlagCommunityMessage = functions.firestore
+  .document('community_messages/{msgId}')
+  .onCreate(async (snap, ctx) => {
+    const data = snap.data();
+    if (!data || !data.text) return null;
+
+    const text = (data.text || '').toLowerCase();
+    const banned = await loadBannedWords();
+    const matched = banned.find(w => text.includes(w));
+    if (matched) {
+      // create a flag for admin review
+      await db.collection('flags').add({
+        postId: snap.id,
+        collection: 'community_messages',
+        reason: 'banned-word',
+        matchedWord: matched,
+        excerpt: data.text.slice(0, 400),
+        fullText: data.text,
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      // optional: you might also auto-remove or mark for deletion. Be conservative: usually flag and let admin decide.
+    }
+    return null;
+  });
+
+// Trigger: on new confession -> check banned words similarly
+exports.autoFlagConfession = functions.firestore
+  .document('confessions/{id}')
+  .onCreate(async (snap, ctx) => {
+    const data = snap.data();
+    if (!data || !data.text) return null;
+    const text = (data.text || '').toLowerCase();
+    const banned = await loadBannedWords();
+    const matched = banned.find(w => text.includes(w));
+    if (matched) {
+      await db.collection('flags').add({
+        postId: snap.id,
+        collection: 'confessions',
+        reason: 'banned-word',
+        matchedWord: matched,
+        excerpt: data.text.slice(0, 400),
+        fullText: data.text,
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    return null;
+  });
+exports.cleanUpConfessions = functions.pubsub
+  .schedule("every 1 minutes") // runs every minute
+  .onRun(async (context) => {
+    const now = admin.firestore.Timestamp.now();
+
+    const expired = await db
+      .collection("confessions")
+      .where("expireAt", "<=", now)
+      .get();
+
+    if (expired.empty) {
+      console.log("No expired confessions to delete.");
+      return null;
+    }
+
+    const batch = db.batch();
+    expired.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+
+    console.log(`Deleted ${expired.size} expired confessions.`);
+    return null;
+  });
+
 });
   });
 });

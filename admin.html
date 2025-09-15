@@ -116,6 +116,12 @@
         <div><strong>Only</strong> allowed: tana10j@gmail.com, edukdorcas@gmail.com</div>
         <div class="mt-2">Data from <code>supportMessages</code> & <code>shares</code> merged here.</div>
       </div>
+
+      <button class="w-full text-left px-3 py-2 rounded hover:bg-slate-50 flex items-center gap-2" data-tab="moderation">
+  <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none"><path d="M12 2l4 7h6l-5 4 2 8-7-4-7 4 2-8-5-4h6z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  Moderation
+</button>
+
     </aside>
 
     <!-- MAIN PANEL -->
@@ -147,6 +153,60 @@
           <div class="text-sm text-slate-500" id="feedStatus">Loading...</div>
         </div>
       </div>
+
+<!-- Moderation Panel (hidden by default — shown when Moderation tab selected) -->
+<div id="moderationPanel" class="bg-white rounded-lg shadow p-4 hidden">
+  <div class="flex items-center justify-between">
+    <h3 class="text-lg font-semibold">Moderation - Flags & Banned Words</h3>
+    <div class="flex items-center gap-2">
+      <button id="refreshModerationBtn" class="px-3 py-1 border rounded">Refresh</button>
+      <button id="openBannedWordsBtn" class="px-3 py-1 border rounded">Banned words</button>
+    </div>
+  </div>
+
+  <div class="mt-4 grid md:grid-cols-3 gap-4">
+    <div class="md:col-span-2">
+      <h4 class="font-semibold text-sm">Flags (newest first)</h4>
+      <div id="flagList" class="mt-2 space-y-3 max-h-[50vh] overflow-auto text-sm text-slate-700">
+        <div class="text-slate-400">Loading flags…</div>
+      </div>
+    </div>
+
+    <aside class="md:col-span-1">
+      <h4 class="font-semibold text-sm">Quick Actions</h4>
+      <div class="mt-2 space-y-2">
+        <button id="btnBanWord" class="w-full px-3 py-2 bg-rose-500 text-white rounded">Ban selected word</button>
+        <button id="btnBanUser" class="w-full px-3 py-2 bg-red-600 text-white rounded">Ban user (email)</button>
+        <button id="btnResolveFlag" class="w-full px-3 py-2 bg-emerald-500 text-white rounded">Mark flag resolved</button>
+      </div>
+      <div class="mt-4">
+        <h5 class="font-semibold text-sm">Banned words (preview)</h5>
+        <div id="bannedWordsList" class="text-xs text-slate-500 mt-2">Loading…</div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Flag detail modal (simple) -->
+  <div id="flagDetailModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50">
+    <div class="bg-white rounded-lg p-4 w-full max-w-2xl">
+      <div class="flex items-start justify-between">
+        <div>
+          <h4 id="flagTitle" class="font-semibold">Flag detail</h4>
+          <div id="flagMeta" class="text-xs text-slate-500 mt-1"></div>
+        </div>
+        <div class="flex gap-2 items-center">
+          <button id="flagDeletePostBtn" class="px-3 py-1 bg-rose-500 text-white rounded">Delete Post</button>
+          <button id="flagResolveBtn" class="px-3 py-1 bg-emerald-500 text-white rounded">Resolve</button>
+          <button id="flagCloseBtn" class="px-3 py-1 border rounded">Close</button>
+        </div>
+      </div>
+      <div class="mt-3">
+        <h5 class="text-sm font-semibold">Post / Confession</h5>
+        <pre id="flagPostContent" class="text-sm text-slate-700 whitespace-pre-wrap"></pre>
+      </div>
+    </div>
+  </div>
+</div>
 
       <!-- Feed + detail column (stacked on mobile) -->
       <div class="grid md:grid-cols-3 gap-6">
@@ -243,7 +303,7 @@
     import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
     import {
       collection, query, orderBy, onSnapshot, getDocs,
-      doc, deleteDoc, updateDoc, where, limit
+      doc, deleteDoc, updateDoc, where, limit, addDoc, serverTimestamp
     } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 
     // DOM
@@ -818,6 +878,285 @@
         refreshBtn.click();
       }
     });
+
+    // ---------------- Moderation helpers ----------------
+import { collection as collRef, getDocs as getDocsFn, query as qFn, orderBy as orderByFn, limit as limitFn, doc as docFn, deleteDoc as deleteDocFn, addDoc as addDocFn, updateDoc as updateDocFn, getDoc} from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
+
+// ---------------- Moderation helpers ----------------
+// DOM refs for moderation UI
+const moderationPanel = document.getElementById('moderationPanel');
+const flagListEl = document.getElementById('flagList');
+const bannedWordsListEl = document.getElementById('bannedWordsList');
+const refreshModerationBtn = document.getElementById('refreshModerationBtn');
+const openBannedWordsBtn = document.getElementById('openBannedWordsBtn');
+
+const flagDetailModal = document.getElementById('flagDetailModal');
+const flagTitle = document.getElementById('flagTitle');
+const flagMeta = document.getElementById('flagMeta');
+const flagPostContent = document.getElementById('flagPostContent');
+const flagDeletePostBtn = document.getElementById('flagDeletePostBtn');
+const flagResolveBtn = document.getElementById('flagResolveBtn');
+const flagCloseBtn = document.getElementById('flagCloseBtn');
+
+let currentFlag = null;
+
+// show modal helper (ensures currentFlag is used)
+function showFlagModal(flagObj, postText) {
+  currentFlag = flagObj;
+  flagTitle.innerText = `Flag: ${flagObj.reason || 'No reason'}`;
+  const created = flagObj.createdAt?.toDate ? flagObj.createdAt.toDate().toLocaleString()
+                 : (flagObj.createdAt ? new Date(flagObj.createdAt).toLocaleString() : '');
+  flagMeta.innerText = `Collection: ${flagObj.collection || ''} • Flagged at: ${created} • id:${flagObj.id || ''}`;
+  flagPostContent.innerText = postText || '(no post found)';
+  flagDetailModal.classList.remove('hidden');
+  flagDetailModal.classList.add('flex');
+}
+
+// Close modal button
+flagCloseBtn.addEventListener('click', () => {
+  currentFlag = null;
+  flagDetailModal.classList.add('hidden');
+  flagDetailModal.classList.remove('flex');
+});
+
+// Modal-level Resolve
+flagResolveBtn.addEventListener('click', async () => {
+  if (!currentFlag) return showToast('No flag selected');
+  try {
+    await updateDoc(doc(db, 'flags', currentFlag.id), { resolved: true, resolvedAt: serverTimestamp(), resolvedBy: auth.currentUser?.uid || null });
+    showToast('Flag marked resolved');
+    flagDetailModal.classList.add('hidden');
+  } catch (err) {
+    console.error('resolve flag err', err);
+    showToast('Could not resolve flag', 3000);
+  }
+});
+
+// Modal-level Delete (delete the flagged post and then resolve/delete flag)
+flagDeletePostBtn.addEventListener('click', async () => {
+  if (!currentFlag) return showToast('No flag selected');
+  if (!confirm('Delete the flagged post from its collection?')) return;
+  try {
+    if (currentFlag.collection && currentFlag.postId) {
+      // delete the actual post
+      await deleteDoc(doc(db, currentFlag.collection, currentFlag.postId));
+    }
+    // mark flag resolved / delete flag
+    await updateDoc(doc(db, 'flags', currentFlag.id), { resolved: true, resolvedAt: serverTimestamp(), resolvedBy: auth.currentUser?.uid || null });
+    showToast('Post deleted and flag resolved');
+    flagDetailModal.classList.add('hidden');
+  } catch (err) {
+    console.error('delete flagged post error', err);
+    showToast('Could not delete post', 3000);
+  }
+});
+
+// Click handlers for moderation tab toggle (keep your existing wiring)
+document.querySelectorAll('button[data-tab]').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const tab = btn.getAttribute('data-tab');
+    document.querySelectorAll('#moderationPanel').forEach(el => el.classList.add('hidden'));
+    if (tab === 'moderation') {
+      moderationPanel.classList.remove('hidden');
+      subscribeToFlags();     // live subscription
+      loadBannedWords();      // load banned words preview
+    }
+  });
+});
+
+// Live subscription for flags (single source of truth)
+let flagsUnsub = null;
+function subscribeToFlags() {
+  // unsubscribe existing
+  if (typeof flagsUnsub === 'function') { try { flagsUnsub(); } catch(_){} flagsUnsub = null; }
+
+  // Ensure we show unresolved flags only (requires flags to be created with resolved:false)
+  const flagsQ = query(collection(db, 'flags'), where('resolved','==', false), orderBy('createdAt', 'desc'));
+  flagsUnsub = onSnapshot(flagsQ, async (snap) => {
+    flagListEl.innerHTML = '';
+    if (snap.empty) {
+      flagListEl.innerHTML = '<div class="text-slate-400">No flagged posts</div>';
+      return;
+    }
+
+    // Build the list; await post fetches sequentially so ordering stays intact
+    for (const docSnap of snap.docs) {
+      const f = docSnap.data();
+      const id = docSnap.id;
+
+      // fetch flagged post content (best-effort)
+      let flaggedText = "(post not found)";
+      try {
+        if (f.collection && f.postId) {
+          const postRef = doc(db, f.collection, f.postId);
+          const postSnap = await getDoc(postRef);
+          if (postSnap.exists()) {
+            const pd = postSnap.data();
+            // prefer common fields
+            flaggedText = pd.text || pd.message || pd.userMessage || JSON.stringify(pd, null, 2);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching flagged post:', err);
+      }
+
+      const card = document.createElement('div');
+      card.className = 'p-2 border rounded mb-2';
+      const created = f.createdAt?.toDate ? f.createdAt.toDate().toLocaleString()
+                    : (f.createdAt ? new Date(f.createdAt).toLocaleString() : '');
+      card.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="font-semibold">${escapeHtml(f.reason || 'flag')}</div>
+            <div class="text-xs text-slate-500">${escapeHtml(f.collection || '')} • ${escapeHtml(created)}</div>
+          </div>
+          <div class="text-xs text-slate-400">id:${id}</div>
+        </div>
+        <div class="mt-2 text-sm text-slate-700">${escapeHtml((f.excerpt || '').slice(0,200))}</div>
+        <div class="p-2 bg-gray-100 rounded mt-2 mb-2 text-sm">${escapeHtml(flaggedText)}</div>
+        <div class="flex gap-2">
+          <button data-id="${id}" class="viewBtn px-2 py-1 border rounded">View</button>
+          <button data-id="${id}" class="resolveBtn px-2 py-1 bg-green-500 text-white rounded">Mark resolved</button>
+          <button data-id="${id}" data-post="${f.postId || ''}" data-col="${f.collection || ''}" class="deleteBtn px-2 py-1 bg-red-500 text-white rounded">Delete post</button>
+        </div>
+      `;
+      // add card to list
+      flagListEl.appendChild(card);
+
+      // attach listeners for this card (scoped)
+      const viewBtn = card.querySelector('.viewBtn');
+      const resolveBtn = card.querySelector('.resolveBtn');
+      const deleteBtn = card.querySelector('.deleteBtn');
+
+      viewBtn?.addEventListener('click', async () => {
+        // open modal using flag data and the fetched post text
+        showFlagModal({ id, ...f }, flaggedText);
+      });
+
+      resolveBtn?.addEventListener('click', async (ev) => {
+        try {
+          await updateDoc(doc(db, 'flags', id), { resolved: true, resolvedAt: serverTimestamp(), resolvedBy: auth.currentUser?.uid || null });
+          showToast('Flag resolved');
+        } catch (err) {
+          console.error('resolve error', err);
+          showToast('Could not resolve', 3000);
+        }
+      });
+
+      deleteBtn?.addEventListener('click', async (ev) => {
+        if (!confirm('Delete the flagged post from public collection?')) return;
+        try {
+          const postId = ev.currentTarget.getAttribute('data-post');
+          const col = ev.currentTarget.getAttribute('data-col');
+          if (col && postId) {
+            await deleteDoc(doc(db, col, postId));
+          }
+          // mark flag resolved / delete flag
+          await updateDoc(doc(db, 'flags', id), { resolved: true, resolvedAt: serverTimestamp(), resolvedBy: auth.currentUser?.uid || null });
+          showToast('Post deleted and flag resolved');
+        } catch (err) {
+          console.error('delete post error', err);
+          showToast('Could not delete post', 3000);
+        }
+      });
+    }
+  }, (err) => {
+    console.error('flags onSnapshot error', err);
+    flagListEl.innerHTML = '<div class="text-red-500">Failed to load flags.</div>';
+  });
+}
+
+// wire refresh button to re-subscribe (optional)
+refreshModerationBtn?.addEventListener('click', () => { subscribeToFlags(); loadBannedWords(); });
+
+// initial subscribe (if moderation panel visible now)
+if (!moderationPanel.classList.contains('hidden')) {
+  subscribeToFlags();
+  loadBannedWords();
+}
+
+// load banned words preview
+async function loadBannedWords() {
+  bannedWordsListEl.textContent = 'Loading…';
+  try {
+    const snap = await getDocsFn(qFn(collRef(db, 'bannedWords'), orderByFn('createdAt', 'desc'), limitFn(50)));
+    if (snap.empty) {
+      bannedWordsListEl.textContent = '(none)';
+      return;
+    }
+    bannedWordsListEl.innerHTML = '';
+    snap.forEach(d => {
+      const val = d.data().word || d.id;
+      const el = document.createElement('div');
+      el.className = 'text-xs';
+      el.textContent = val;
+      bannedWordsListEl.appendChild(el);
+    });
+  } catch (err) {
+    console.error('banned words load err', err);
+    bannedWordsListEl.textContent = 'Failed to load';
+  }
+}
+
+// open banned words modal (simple prompt)
+openBannedWordsBtn.addEventListener('click', async () => {
+  const w = prompt('Enter a word or regex to ban (case-insensitive substring match):');
+  if (!w) return;
+  try {
+    await addDocFn(collRef(db, 'bannedWords'), { word: w, createdAt: serverTimestamp(), createdBy: auth.currentUser.uid });
+    showToast('Banned word added');
+    loadBannedWords();
+  } catch (err) {
+    console.error('add banned word err', err);
+    showToast('Could not add banned word', 3000);
+  }
+});
+
+// Ban a user (by email) — prompt for email and write into bannedUsers
+document.getElementById('btnBanUser')?.addEventListener('click', async () => {
+  const email = prompt('Enter email to ban (exact):');
+  if (!email) return;
+  try {
+    await addDocFn(collRef(db, 'bannedUsers'), { email: email.toLowerCase(), createdAt: serverTimestamp(), createdBy: auth.currentUser.uid });
+    showToast('User banned');
+  } catch (err) {
+    console.error('ban user err', err);
+    showToast('Could not ban user', 3000);
+  }
+});
+
+// Ban a word (button)
+document.getElementById('btnBanWord')?.addEventListener('click', async () => {
+  await addDoc(collection(db, "bannedWords"), {
+  word: selectedWord,
+  createdAt: serverTimestamp()
+});
+  const w = prompt('Enter word to ban:');
+  if (!w) return;
+  try {
+    await addDocFn(collRef(db, 'bannedWords'), { word: w, createdAt: serverTimestamp(), createdBy: auth.currentUser.uid });
+    showToast('Banned word added');
+    loadBannedWords();
+  } catch (err) {
+    console.error('ban word err', err);
+    showToast('Could not add banned word', 3000);
+  }
+});
+
+// refresh moderation view
+refreshModerationBtn.addEventListener('click', () => {
+  loadFlags();
+  loadBannedWords();
+});
+
+// initial load on admin area open (if admin tab is default, call these once)
+if (!moderationPanel.classList.contains('hidden')) {
+  loadFlags();
+  loadBannedWords();
+}
+
+
+
   </script>
   
 </body>

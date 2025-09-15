@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rant2Me - Wellness Dashboard</title>
+
+  <!-- favicon -->
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tailwind theme (same palette as pay.html) -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'r2m-blue': '#0d1b2a',
+            'r2m-blue-600': '#1b263b',
+            'r2m-aqua': '#00b4d8',
+            'r2m-sky': '#0077b6',
+            'r2m-gold': '#F5C542'
+          },
+          borderRadius: { 'r-lg': '14px' },
+          boxShadow: {
+            'r-lg': '0 18px 40px rgba(0,43,85,.18)',
+            'r-md': '0 10px 24px rgba(0,43,85,.14)',
+            'r-sm': '0 6px 14px rgba(0,43,85,.10)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+    h1.brand { font-family: "Cinzel Decorative", serif; }
+    .pill { border-radius: 999px; padding: .4rem .8rem; }
+    .emoji-btn { font-size: 1.35rem; line-height:1; }
+    /* small visual niceties */
+    .card { background: white; border-radius: .75rem; box-shadow: 0 8px 24px rgba(6,23,70,0.06); }
+    
+    /* Mobile optimization */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 10px;
+    grid-template-columns: 1fr; /* collapse to single column */
+  }
+
+  .card, .feature-box {
+    margin-bottom: 15px;
+    font-size: 14px;
+  }
+
+  nav ul {
+    flex-direction: column;
+  }
+}
+
+  </style>
+</head>
+<body class="bg-gradient-to-b from-white to-slate-50 text-slate-800 min-h-screen">
+
+  <!-- HEADER (match existing style) -->
+  <header class="sticky top-0 z-40 bg-gradient-to-b from-r2m-blue to-r2m-blue-600 text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="home.html" class="flex items-center gap-3">
+        <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
+        <div>
+          <h1 class="brand text-2xl leading-tight">Rant<span class="text-r2m-aqua">2</span>Me</h1>
+          <div class="text-xs opacity-80 -mt-1">Wellness dashboard</div>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
+        <a href="home.html" class="hover:text-r2m-aqua">Home</a>
+        <a href="chat.html" class="hover:text-r2m-aqua">Chat</a>
+        <a href="resources.html" class="hover:text-r2m-aqua">Resources</a>
+        <a href="pay.html" class="hover:text-r2m-aqua">Plans</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <button id="signOutBtn" class="px-4 py-2 bg-red-500 text-white rounded-lg">Sign Out</button>
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Open menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+
+    <!-- Greeting & summary -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+      <div class="card p-6 col-span-2">
+        <h2 id="greeting" class="text-2xl font-extrabold text-r2m-blue">Welcome back 👋</h2>
+        <p id="userEmail" class="text-sm text-slate-600 mt-1">Loading your profile…</p>
+        <div class="mt-4 flex flex-wrap gap-3">
+          <div class="pill bg-slate-100 text-slate-700">Private Journal</div>
+          <div class="pill bg-slate-100 text-slate-700">Daily Mood</div>
+          <div class="pill bg-slate-100 text-slate-700">Self-care Tools</div>
+        </div>
+      </div>
+
+      <div class="card p-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <div class="text-sm text-slate-500">This week</div>
+            <div id="weekSummary" class="text-xl font-semibold mt-1">Loading…</div>
+          </div>
+          <div>
+            <button id="shareLink" class="px-3 py-2 bg-r2m-aqua text-white rounded-md">Share</button>
+          </div>
+        </div>
+        <div class="text-xs text-slate-400 mt-3">Share a referral link or invite friends.</div>
+      </div>
+    </section>
+
+    <!-- Top area: Mood check + quick suggestion -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Mood quick-check -->
+      <div class="card p-4">
+        <h3 class="font-semibold mb-2">Quick mood check-in</h3>
+        <p class="text-sm text-slate-500 mb-3">Tap an emoji to log how you're feeling right now.</p>
+
+        <div class="flex items-center gap-2">
+          <button class="emoji-btn px-3 py-2 rounded-md bg-slate-50" data-mood="happy" title="Happy">😊</button>
+          <button class="emoji-btn px-3 py-2 rounded-md bg-slate-50" data-mood="neutral" title="Okay">😐</button>
+          <button class="emoji-btn px-3 py-2 rounded-md bg-slate-50" data-mood="sad" title="Sad">😔</button>
+          <button class="emoji-btn px-3 py-2 rounded-md bg-slate-50" data-mood="angry" title="Angry">😡</button>
+          <button class="emoji-btn px-3 py-2 rounded-md bg-slate-50" data-mood="anxious" title="Anxious">😰</button>
+        </div>
+
+        <textarea id="moodNote" placeholder="Add a short note (optional)" class="mt-3 w-full border rounded-md p-2 text-sm"></textarea>
+        <div class="mt-3 flex gap-2">
+          <button id="submitMood" class="px-3 py-2 bg-r2m-sky text-white rounded-md">Log mood</button>
+          <button id="suggestBtn" class="px-3 py-2 bg-white border rounded-md">Get suggestion</button>
+        </div>
+        <div id="suggestion" class="mt-3 text-sm text-slate-700"></div>
+      </div>
+
+      <!-- Mood trends chart -->
+      <div class="card p-4 md:col-span-2">
+        <div class="flex justify-between items-center">
+          <h3 class="font-semibold">Mood trend (last 7 days)</h3>
+          <div class="text-sm text-slate-400">Tap bars to see notes</div>
+        </div>
+       <canvas id="moodChart" width="600" height="160" class="w-full mt-3"></canvas>
+
+        <div class="mt-3 flex items-center justify-between">
+        <div id="chartNote" class="text-sm text-slate-500">No data yet - log a mood to start tracking.</div>
+        <button id="exportCSV" class="px-3 py-1 text-sm border rounded-md">Export CSV</button>
+</div>
+
+      </div>
+    </section>
+
+    <!-- Journal + gratitude -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="card p-4 md:col-span-2">
+        <h3 class="font-semibold mb-3">Private journal</h3>
+        <input id="journalTitle" placeholder="Title (optional)" class="w-full border rounded-md p-2 mb-2 text-sm" />
+        <textarea id="journalBody" placeholder="Write a private entry... (this stays in your account)" class="w-full border rounded-md p-3 h-36 text-sm"></textarea>
+        <div class="mt-3 flex gap-2">
+          <button id="saveJournal" class="px-4 py-2 bg-r2m-aqua text-white rounded-md">Save entry</button>
+          <button id="clearJournal" class="px-4 py-2 border rounded-md">Clear</button>
+        </div>
+        <div id="journalSaved" class="mt-2 text-sm text-green-600 hidden">Saved ✓</div>
+      </div>
+
+      <div class="card p-4">
+        <h3 class="font-semibold mb-3">Daily gratitude</h3>
+        <input id="gratitude" placeholder="One thing you're thankful for today" class="w-full border rounded-md p-2 text-sm" />
+        <button id="saveGratitude" class="mt-3 px-3 py-2 bg-r2m-gold rounded-md">Save gratitude</button>
+        <div id="gratitudeMsg" class="mt-2 text-sm text-slate-600"></div>
+      </div>
+    </section>
+
+
+<div class="breathing-widget">
+  <div class="circle"></div>
+  <p id="breathingText">Breathe In</p>
+</div>
+
+<style>
+.breathing-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
+}
+.circle {
+  width: 100px;
+  height: 100px;
+  background: #4F46E5;
+  border-radius: 50%;
+  animation: breathe 8s infinite;
+}
+@keyframes breathe {
+  0%   { transform: scale(1);   }
+  25%  { transform: scale(1.5); }
+  50%  { transform: scale(1);   }
+  75%  { transform: scale(0.8); }
+  100% { transform: scale(1);   }
+}
+</style>
+
+<script>
+  const text = document.getElementById("breathingText");
+  let cycle = ["Breathe In", "Hold", "Breathe Out", "Hold"];
+  let i = 0;
+
+  setInterval(() => {
+    text.textContent = cycle[i];
+    i = (i + 1) % cycle.length;
+  }, 4000);
+</script>
+
+    <!-- Feedback & community highlights -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="card p-4">
+        <h3 class="font-semibold">Feedback</h3>
+        <div id="starRating" class="flex gap-1 mt-2"></div>
+        <select id="feedbackSection" class="w-full border rounded-md p-2 mt-2 text-sm">
+          <option value="chat">Chat</option>
+          <option value="resources">Resources</option>
+          <option value="listeners">Listeners</option>
+          <option value="website">Website</option>
+          <option value="wellness">Wellness</option>
+        </select>
+        <textarea id="feedbackText" class="w-full border rounded-md p-2 mt-2 text-sm" placeholder="Your feedback..."></textarea>
+        <div class="mt-2 flex gap-2">
+          <button id="sendFeedback" class="px-3 py-2 bg-r2m-blue-600 text-white rounded-md">Send</button>
+          <button id="clearFeedback" class="px-3 py-2 border rounded-md">Clear</button>
+        </div>
+        <div id="feedbackMsg" class="mt-2 text-sm text-green-600 hidden">Thanks - feedback saved.</div>
+      </div>
+
+      <div class="card p-4">
+  <div class="flex justify-between items-center">
+    <h3 class="font-semibold">Community highlights</h3>
+    <div class="text-sm text-slate-400">From community chats</div>
+  </div>
+  <div id="communityHighlights" class="mt-3 text-slate-700">
+    Loading…
+  </div>
+</div>
+    </section>
+    <!-- Entries Section -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+  <!-- Journal Entries -->
+  <div class="card p-4">
+    <h3 class="font-semibold mb-3">Your Journal Entries</h3>
+    <ul id="journalList" class="space-y-3 text-sm text-slate-700">
+      <li class="text-slate-400">No entries yet.</li>
+    </ul>
+  </div>
+
+  <!-- Gratitude Entries -->
+  <div class="card p-4">
+    <h3 class="font-semibold mb-3">Your Gratitude Logs</h3>
+    <ul id="gratitudeList" class="space-y-2 text-sm text-slate-700">
+      <li class="text-slate-400">No gratitude saved yet.</li>
+    </ul>
+  </div>
+</section>
+
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center py-6 text-sm text-slate-500">
+    &copy; 2025 Rant2Me • <a href="about.html" class="text-r2m-aqua">About</a> • <a href="help.html" class="text-r2m-aqua">Support</a>
+  </footer>
+
+  <!-- Toast message -->
+  <div id="toast" class="hidden fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300"></div>
+
+  <!-- Module script: Firebase + logic -->
+  <script type="module">
+    // Firebase v10 (matches other pages you posted)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, query, where, orderBy, getDocs, limit, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Replace with your config (same as other pages)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
+      authDomain: "rant2me-ab36b.firebaseapp.com",
+      projectId: "rant2me-ab36b",
+      storageBucket: "rant2me-ab36b.appspot.com",
+      messagingSenderId: "245661393279",
+      appId: "1:245661393279:web:b31483f57a40cf2c807a4a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // UI refs
+    const greeting = document.getElementById('greeting');
+    const userEmailEl = document.getElementById('userEmail');
+    const signOutBtn = document.getElementById('signOutBtn');
+    const toastEl = document.getElementById('toast');
+    const weekSummaryEl = document.getElementById('weekSummary');
+    const moodChartCanvas = document.getElementById('moodChart');
+    const chartNote = document.getElementById('chartNote');
+
+    // track the last drawn dayScores so export / tests can use them
+    let _lastDayScores = [];
+
+    // small helper toast
+    function showToast(msg, timeout = 2000) {
+      toastEl.textContent = msg;
+      toastEl.classList.remove('hidden');
+      setTimeout(() => toastEl.classList.add('opacity-100'), 10);
+      setTimeout(() => {
+        toastEl.classList.remove('opacity-100');
+        setTimeout(()=> toastEl.classList.add('hidden'), 400);
+      }, timeout);
+    }
+
+    // Auth guard & load user data
+    let currentUser = null;
+    onAuthStateChanged(auth, async (user) => {
+    console.log('[auth] signed in:', user.uid, user.email);
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+      currentUser = user;
+      greeting.textContent = `Welcome back, ${user.displayName || user.email.split('@')[0]} 👋`;
+      userEmailEl.textContent = user.email;
+      await loadMoodData();      // build chart
+      await loadWeekSummary();   // small text summary
+      await loadJournals(); // after saving journal
+      await loadGratitude(); // after saving gratitude
+      await loadCommunityHighlights(); // small community stats
+    });
+
+    // Sign out
+    signOutBtn.addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    });
+
+    // ---------- Mood logging ----------
+    // map moods to scores for chart (higher=positive)
+    const MOOD_SCORE = { 'happy': 5, 'neutral': 3, 'sad': 2, 'angry': 1, 'anxious': 1.5 };
+
+    // mood buttons
+    document.querySelectorAll('[data-mood]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // mark active visually
+        document.querySelectorAll('[data-mood]').forEach(b => b.classList.remove('ring-2','ring-r2m-aqua'));
+        btn.classList.add('ring-2','ring-r2m-aqua');
+        // store mood selection on a data attr for submit
+        btn.dataset.selected = "true";
+        // quick suggestion
+        suggestForMood(btn.dataset.mood);
+      });
+    });
+
+    document.getElementById('submitMood').addEventListener('click', async () => {
+      const selectedBtn = Array.from(document.querySelectorAll('[data-mood]')).find(b => b.dataset.selected === "true");
+      const note = document.getElementById('moodNote').value.trim();
+      if (!selectedBtn) { showToast("Pick an emoji first"); return; }
+      const mood = selectedBtn.dataset.mood;
+      try {
+        await addDoc(collection(db, 'moodChecks'), {
+          userId: currentUser.uid,
+          mood,
+          note: note || '',
+          createdAt: serverTimestamp()
+        });
+        // clear UI
+        document.getElementById('moodNote').value = '';
+        document.querySelectorAll('[data-mood]').forEach(b => { b.dataset.selected = ""; b.classList.remove('ring-2','ring-r2m-aqua'); });
+        showToast('Mood saved ✓');
+        await loadMoodData(); // refresh chart
+      } catch (err) {
+        console.error('save mood err', err);
+        showToast('Could not save mood');
+      }
+    });
+
+    document.getElementById('suggestBtn').addEventListener('click', () => {
+      // if a mood selected, suggest; otherwise generic
+      const selectedBtn = Array.from(document.querySelectorAll('[data-mood]')).find(b => b.dataset.selected === "true");
+      suggestForMood(selectedBtn ? selectedBtn.dataset.mood : null);
+    });
+
+    function suggestForMood(mood) {
+      const suggestionEl = document.getElementById('suggestion');
+      const suggestions = {
+        happy: "You're doing well - keep it up! Try sharing gratitude or a quick breathing break.",
+        neutral: "Try a 2-minute grounding: breathe in 4s, out 6s. Small reset helps.",
+        sad: "A short walk or 5-min journaling can help. Would you like a calming resource?",
+        angry: "Try box breathing (4-4-4-4) and a brief timeout. Consider writing the trigger down privately.",
+        anxious: "Try grounding: name 5 things you see, 4 you can touch, 3 you hear. Breathe slowly."
+      };
+      suggestionEl.textContent = (mood && suggestions[mood]) ? suggestions[mood] : "Try a 1-minute breathing exercise - inhale 4s, exhale 6s.";
+    }
+
+    // call this after currentUser is set
+async function loadCommunityHighlights() {
+  const highlightsEl = document.getElementById('communityHighlights');
+  if (!highlightsEl) return;
+
+  try {
+    const q = query(
+      collection(db, 'community_messages'),
+      orderBy('createdAt', 'desc'),
+      limit(5)
+    );
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      highlightsEl.textContent = "No recent community activity.";
+      return;
+    }
+
+    highlightsEl.innerHTML = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      const text = d.text || "(no text)";
+      const author = d.author || "Anonymous";
+      highlightsEl.innerHTML += `
+        <div class="mb-2 p-2 border rounded bg-slate-50">
+          <div class="text-sm font-semibold">${author}</div>
+          <div class="text-sm">${text}</div>
+        </div>
+      `;
+    });
+  } catch (err) {
+    console.error("loadCommunityHighlights error", err);
+    highlightsEl.textContent = "Could not load highlights.";
+  }
+}
+
+
+    // ---------- Mood trend chart (simple canvas drawing) ----------
+    async function loadMoodData() {
+        console.log('[loadMoodData] currentUser.uid =', currentUser ? currentUser.uid : null);
+      // fetch last 14 mood checks for this user and collapse to last 7 days averages
+      try {
+        const q = query(collection(db, 'moodChecks'), where('userId','==', currentUser.uid), orderBy('createdAt','desc'), limit(50));
+        const snap = await getDocs(q);
+        if (snap.empty) {
+          chartNote.textContent = 'No mood data yet - log a mood to start tracking.';
+          drawMoodChart([]); return;
+        }
+        // map createdAt to date string and average scores per day
+        const rows = [];
+        snap.forEach(doc => {
+          const d = doc.data();
+          const ts = d.createdAt ? (d.createdAt.seconds ? new Date(d.createdAt.seconds*1000) : d.createdAt.toDate()) : new Date();
+          const day = ts.toISOString().slice(0,10);
+          rows.push({ day, mood: d.mood, note: d.note || '' });
+        });
+        // group by day (last 7 days)
+        const days = [];
+        for (let i=6;i>=0;i--) {
+          const dt = new Date(); dt.setDate(dt.getDate()-i);
+          days.push(dt.toISOString().slice(0,10));
+        }
+        const dayScores = days.map(day => {
+          const items = rows.filter(r => r.day === day);
+          if (!items.length) return { day, score: 0, notes: [] };
+          const mean = items.reduce((s, it) => s + (MOOD_SCORE[it.mood] || 0), 0) / items.length;
+          const notes = items.map(it => it.note).filter(Boolean);
+          return { day, score: mean, notes };
+        });
+        drawMoodChart(dayScores);
+        // keep data for CSV export
+        _lastDayScores = dayScores || [];
+        chartNote.textContent = '';
+      } catch (err) {
+        console.error('loadMoodData err', err);
+        chartNote.textContent = 'Unable to load mood chart.';
+      }
+    }
+
+    function drawMoodChart(dayScores) {
+      const canvas = moodChartCanvas;
+      const ctx = canvas.getContext('2d');
+      // clear and responsive scale
+      const DPR = window.devicePixelRatio || 1;
+      const width = canvas.clientWidth;
+      const height = 180;
+      canvas.width = Math.floor(width * DPR);
+      canvas.height = Math.floor(height * DPR);
+      canvas.style.height = height + 'px';
+      ctx.scale(DPR, DPR);
+      ctx.clearRect(0,0,width,height);
+
+      // if no data, show placeholder
+      if (!dayScores || !dayScores.length || dayScores.every(d => d.score === 0)) {
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fillRect(0,0,width,height);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '14px system-ui';
+        ctx.fillText('No mood data yet - log a mood to start tracking', 12, height/2);
+        return;
+      }
+
+      // draw bars
+      const margin = 12;
+      const availableW = width - margin*2;
+      const barW = Math.min(48, availableW / dayScores.length - 8);
+      const gap = (availableW - barW * dayScores.length) / Math.max(1, dayScores.length - 1);
+      const maxScore = 5; // scale
+      dayScores.forEach((d, i) => {
+        const x = margin + i * (barW + gap);
+        const h = (d.score / maxScore) * (height - 40);
+        const y = height - 24 - h;
+        // color by score
+        let color = '#fde68a'; // neutral
+        if (d.score >= 4.5) color = '#86efac';
+        else if (d.score >= 3.5) color = '#c7f9ef';
+        else if (d.score >= 2.5) color = '#fef3c7';
+        else color = '#fecaca';
+        // bar
+        ctx.fillStyle = color;
+        roundedRect(ctx, x, y, barW, h, 6);
+        ctx.fill();
+        // day label
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px system-ui';
+        const label = new Date(d.day).toLocaleDateString(undefined, { weekday: 'short' });
+        ctx.fillText(label, x, height - 6);
+        // store clickable region for notes (attach to canvas dataset)
+      });
+
+      // store dayScores for click interactions
+      canvas._dayScores = dayScores;
+      // attach click handler
+      canvas.onclick = (ev) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = ev.clientX - rect.left;
+        const DPR = window.devicePixelRatio || 1;
+        const widthPx = canvas.clientWidth;
+        const margin = 12;
+        const availableW = widthPx - margin*2;
+        const barW = Math.min(48, availableW / dayScores.length - 8);
+        const gap = (availableW - barW * dayScores.length) / Math.max(1, dayScores.length - 1);
+        const clickedIndex = Math.floor((x - margin) / (barW + gap));
+        if (clickedIndex >= 0 && clickedIndex < dayScores.length) {
+          const info = dayScores[clickedIndex];
+          const note = (info.notes && info.notes.length) ? info.notes.join('; ') : '(no notes)';
+          document.getElementById('chartNote').textContent = `${new Date(info.day).toLocaleDateString()}: ${note}`;
+        }
+      };
+    }
+
+    function roundedRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+
+
+    // ---------- Journal ----------
+    document.getElementById('saveJournal').addEventListener('click', async () => {
+      const title = document.getElementById('journalTitle').value.trim();
+      const body = document.getElementById('journalBody').value.trim();
+      if (!body) { showToast('Write something first'); return; }
+      try {
+        await addDoc(collection(db, 'journals'), {
+          userId: currentUser.uid,
+          title,
+          body,
+          createdAt: serverTimestamp()
+        });
+        document.getElementById('journalBody').value = '';
+        document.getElementById('journalTitle').value = '';
+        document.getElementById('journalSaved').classList.remove('hidden');
+        setTimeout(()=> document.getElementById('journalSaved').classList.add('hidden'), 2200);
+        showToast('Journal saved ✓');
+      } catch (err) {
+        console.error('save journal', err);
+        showToast('Could not save journal');
+      }
+    });
+    document.getElementById('clearJournal').addEventListener('click', () => {
+      document.getElementById('journalBody').value = '';
+      document.getElementById('journalTitle').value = '';
+    });
+
+    // ---------- Gratitude ----------
+    document.getElementById('saveGratitude').addEventListener('click', async () => {
+      const g = document.getElementById('gratitude').value.trim();
+      if (!g) { document.getElementById('gratitudeMsg').textContent = 'Write something first.'; return; }
+      try {
+        await addDoc(collection(db, 'journals'), {
+          userId: currentUser.uid,
+          title: 'Gratitude',
+          body: g,
+          tags: ['gratitude'],
+          createdAt: serverTimestamp()
+        });
+        document.getElementById('gratitude').value = '';
+        document.getElementById('gratitudeMsg').textContent = 'Saved ✓';
+        setTimeout(()=> document.getElementById('gratitudeMsg').textContent = '', 2200);
+        showToast('Gratitude saved ✓');
+      } catch (err) {
+        console.error('save gratitude', err);
+        showToast('Could not save gratitude');
+      }
+    });
+
+    // ---------- Feedback ----------
+    let selectedStars = 0;
+    const starRatingEl = document.getElementById('starRating');
+    for (let i=1;i<=5;i++) {
+      const s = document.createElement('span');
+      s.textContent = '★';
+      s.className = 'text-gray-300 text-2xl cursor-pointer';
+      s.dataset.value = i;
+      s.addEventListener('click', () => {
+        selectedStars = i;
+        Array.from(starRatingEl.children).forEach((el, idx) => {
+          el.className = idx < i ? 'text-yellow-400 text-2xl cursor-pointer' : 'text-gray-300 text-2xl cursor-pointer';
+        });
+      });
+      starRatingEl.appendChild(s);
+    }
+
+    document.getElementById('sendFeedback').addEventListener('click', async () => {
+      const section = document.getElementById('feedbackSection').value;
+      const text = document.getElementById('feedbackText').value.trim();
+      if (!text && !selectedStars) { showToast('Write feedback or pick stars'); return; }
+      try {
+        await addDoc(collection(db, 'feedback'), {
+          user: currentUser.email,
+          stars: selectedStars,
+          section,
+          text,
+          createdAt: serverTimestamp()
+        });
+        document.getElementById('feedbackText').value = '';
+        selectedStars = 0;
+        Array.from(starRatingEl.children).forEach(el => el.className = 'text-gray-300 text-2xl cursor-pointer');
+        document.getElementById('feedbackMsg').classList.remove('hidden');
+        setTimeout(()=> document.getElementById('feedbackMsg').classList.add('hidden'), 2200);
+        showToast('Feedback sent ✓');
+      } catch (err) {
+        console.error('feedback err', err);
+        showToast('Could not send feedback');
+      }
+    });
+    document.getElementById('clearFeedback').addEventListener('click', () => {
+      document.getElementById('feedbackText').value = '';
+      selectedStars = 0;
+      Array.from(starRatingEl.children).forEach(el => el.className = 'text-gray-300 text-2xl cursor-pointer');
+    });
+
+    // ---------- Share + copy ----------
+    document.getElementById('shareLink').addEventListener('click', () => {
+      const url = location.href;
+      if (navigator.share) {
+        navigator.share({ title: 'Rant2Me', text: 'Check out my Rant2Me wellness dashboard', url }).catch(()=>{});
+      } else {
+        navigator.clipboard.writeText(url).then(()=> showToast('Link copied ✓'));
+      }
+    });
+
+    // ---------- Small summary (e.g., count of moods this week) ----------
+    async function loadWeekSummary() {
+    console.log('[loadWeekSummary] currentUser.uid =', currentUser ? currentUser.uid : null);
+      try {
+        const q = query(collection(db, 'moodChecks'), where('userId','==', currentUser.uid), orderBy('createdAt','desc'), limit(50));
+        const snap = await getDocs(q);
+        if (snap.empty) {
+          weekSummaryEl.textContent = 'No logs yet';
+          return;
+        }
+        const now = new Date();
+        const daysAgo7 = new Date(); daysAgo7.setDate(now.getDate()-6);
+        let counts = 0, positive = 0;
+        snap.forEach(doc => {
+          const d = doc.data();
+          const ts = d.createdAt ? (d.createdAt.seconds ? new Date(d.createdAt.seconds*1000) : d.createdAt.toDate()) : new Date();
+          if (ts >= daysAgo7) {
+            counts++;
+            if ((MOOD_SCORE[d.mood] || 0) >= 4) positive++;
+          }
+        });
+        weekSummaryEl.textContent = `${counts} check-ins • ${positive} positive`;
+      } catch (err) {
+        console.error('week summary', err);
+        weekSummaryEl.textContent = 'Summary unavailable';
+      }
+    }
+
+    // ---------- Misc: keyboard accessibility for emojis (space/enter) ----------
+    document.querySelectorAll('.emoji-btn').forEach(b => {
+      b.setAttribute('tabindex', '0');
+      b.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          b.click();
+        }
+      });
+    });
+
+    // initial resize to draw chart if needed
+    window.addEventListener('resize', () => {
+      if (currentUser) loadMoodData();
+    });
+
+// Export CSV using the last dayScores
+document.addEventListener('DOMContentLoaded', () => {
+  const exportBtn = document.getElementById('exportCSV');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      if (!_lastDayScores.length) { showToast('No chart data to export'); return; }
+      let csv = 'Date,Score,Notes\n';
+      _lastDayScores.forEach(d => {
+        const date = d.day;
+        const score = d.score ?? '';
+        const notes = (d.notes && d.notes.length) ? d.notes.join('; ').replace(/"/g, '""') : '';
+        csv += `"${date}",${score},"${notes}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'mood-trends.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  }
+});
+
+// -------- Load Journal Entries --------
+async function loadJournals() {
+  const journalList = document.getElementById('journalList');
+  journalList.innerHTML = '<li class="text-slate-400">Loading...</li>';
+
+  try {
+    const q = query(
+      collection(db, 'journals'),
+      where('userId', '==', currentUser.uid),
+      orderBy('createdAt', 'desc'),
+      limit(10)
+    );
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      journalList.innerHTML = '<li class="text-slate-400">No entries yet.</li>';
+      return;
+    }
+
+    journalList.innerHTML = '';
+    snap.forEach(doc => {
+      const d = doc.data();
+      const date = d.createdAt?.toDate().toLocaleDateString() || 'Unknown';
+      const li = document.createElement('li');
+      li.className = 'border-b pb-2';
+      li.innerHTML = `
+        <div class="font-semibold">${d.title || '(Untitled)'}</div>
+        <div class="text-slate-600">${d.body}</div>
+        <div class="text-xs text-slate-400">${date}</div>
+      `;
+      journalList.appendChild(li);
+    });
+  } catch (err) {
+    console.error('load journals', err);
+    journalList.innerHTML = '<li class="text-red-500">Failed to load journals.</li>';
+  }
+}
+
+// -------- Load Gratitude Entries --------
+async function loadGratitude() {
+  const gratitudeList = document.getElementById('gratitudeList');
+  gratitudeList.innerHTML = '<li class="text-slate-400">Loading...</li>';
+
+  try {
+    const q = query(
+      collection(db, 'gratitude'),
+      where('userId', '==', currentUser.uid),
+      orderBy('createdAt', 'desc'),
+      limit(10)
+    );
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      gratitudeList.innerHTML = '<li class="text-slate-400">No gratitude saved yet.</li>';
+      return;
+    }
+
+    gratitudeList.innerHTML = '';
+    snap.forEach(doc => {
+      const d = doc.data();
+      const date = d.createdAt?.toDate().toLocaleDateString() || 'Unknown';
+      const li = document.createElement('li');
+      li.className = 'border-b pb-1';
+      li.innerHTML = `
+        <div>${d.text}</div>
+        <div class="text-xs text-slate-400">${date}</div>
+      `;
+      gratitudeList.appendChild(li);
+    });
+  } catch (err) {
+    console.error('load gratitude', err);
+    gratitudeList.innerHTML = '<li class="text-red-500">Failed to load gratitude.</li>';
+  }
+}
+
+  </script>
+
+<script>
+// Example: toggle mobile menu
+document.addEventListener("DOMContentLoaded", () => {
+  const menuBtn = document.getElementById("mobile-menu-btn");
+  const nav = document.getElementById("nav-links");
+
+  if (menuBtn && nav) {
+    menuBtn.addEventListener("click", () => {
+      nav.classList.toggle("open");
+    });
+  }
+});
+</script>
+
+</body>
+</html>

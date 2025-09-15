@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rant2Me — Community</title>
+
+  <link rel="icon" type="image/png" href="images/Rant2Me Favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'r2m-blue': '#0d1b2a',
+            'r2m-blue-600': '#1b263b',
+            'r2m-aqua': '#00b4d8',
+            'r2m-sky': '#0077b6',
+            'r2m-gold': '#F5C542'
+          },
+          borderRadius: { 'r-lg': '14px' },
+          boxShadow: {
+            'r-lg': '0 18px 40px rgba(0,43,85,.18)',
+            'r-md': '0 10px 24px rgba(0,43,85,.14)',
+            'r-sm': '0 6px 14px rgba(0,43,85,.10)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+    h1.brand { font-family: "Cinzel Decorative", serif; }
+    /* small helpers */
+    .card { background: white; border-radius: .75rem; box-shadow: 0 8px 24px rgba(6,23,70,0.06); }
+    @media (max-width: 768px) {
+      /* reduce vertical spacing on mobile */
+      main { padding-top: 1rem; padding-bottom: 2rem; }
+      .confession-feed { max-height: 36vh; }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-b from-white to-slate-50 text-slate-800 min-h-screen">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-40 bg-gradient-to-b from-r2m-blue to-r2m-blue-600 text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="home.html" class="flex items-center gap-3">
+        <img src="images/Rant2Me Favicon.png" alt="Rant2Me" class="w-10 h-10 rounded" />
+        <div>
+          <h1 class="brand text-2xl leading-tight">Rant<span class="text-r2m-aqua">2</span>Me</h1>
+          <div class="text-xs opacity-80 -mt-1">Community (anonymous)</div>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
+        <a href="home.html" class="hover:text-r2m-aqua">Home</a>
+        <a href="chat.html" class="hover:text-r2m-aqua">Chat</a>
+        <a href="dashboard-wellness.html" class="hover:text-r2m-aqua">Dashboard</a>
+        <a href="pay.html" class="hover:text-r2m-aqua">Plans</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <button id="signOutBtn" class="px-4 py-2 bg-red-500 text-white rounded-lg">Sign Out</button>
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Open menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-10">
+    <div class="grid md:grid-cols-4 gap-6">
+
+      <!-- LEFT: Topics -->
+      <aside class="md:col-span-1 space-y-4">
+        <div class="card p-4">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <h3 class="font-semibold text-lg mb-1">Weekly Topics</h3>
+              <div class="text-xs text-slate-500">Click to pick a topic</div>
+            </div>
+
+            <!-- ADMIN: Create topic button (hidden until admin signed in) -->
+            <div class="hidden" id="createTopicWrap">
+              <button id="createTopicBtn" class="px-3 py-2 bg-r2m-aqua text-white rounded-md text-sm">Create topic</button>
+            </div>
+          </div>
+
+          <div id="topicsList" class="mt-3 space-y-3 text-sm text-slate-700">
+            <div class="text-slate-400">Loading topics...</div>
+          </div>
+        </div>
+
+        <div class="card p-4">
+          <h4 class="font-semibold text-sm mb-2">Your anon handle</h4>
+          <p class="text-sm text-slate-500 mb-3">Public posts show this short handle — keeps identity private.</p>
+          <div class="flex gap-2">
+            <input id="anonHandle" class="flex-1 border rounded-md p-2 text-sm" />
+            <button id="regenHandle" class="px-3 py-2 bg-r2m-sky text-white rounded-md">Regenerate</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTER: Posts feed -->
+      <section class="md:col-span-2 space-y-4">
+        <div class="card p-4">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h3 id="topicTitle" class="font-semibold text-xl">Community</h3>
+              <div id="topicDesc" class="text-sm text-slate-500">Pick a topic to view and post anonymously.</div>
+            </div>
+
+            <div class="text-sm text-slate-400 self-start">Everyone is anonymous • Be kind</div>
+          </div>
+
+          <!-- Create post -->
+          <div class="mt-4">
+            <textarea id="postText" rows="3" placeholder="Share your thought anonymously..." class="w-full border rounded-md p-3 text-sm resize-none"></textarea>
+            <div class="mt-3 flex flex-col sm:flex-row sm:items-center sm:gap-3">
+              <div class="flex gap-2 items-center">
+                <button id="postBtn" class="px-4 py-2 bg-r2m-aqua text-white rounded-md shadow hover:scale-[1.01]">Post anonymously</button>
+                <button id="replyModeBtn" class="px-3 py-2 border rounded-md text-sm">Reply mode: off</button>
+              </div>
+              <div id="postMsg" class="text-sm text-red-500 mt-2 sm:mt-0"></div>
+            </div>
+          </div>
+
+          <!-- feed -->
+          <div id="postsFeed" class="mt-6 space-y-4 max-h-[60vh] overflow-auto">
+            <div class="text-slate-400">Select a topic to load posts.</div>
+          </div>
+        </div>
+
+        <!-- Manage my posts -->
+        <div class="card p-4">
+          <h4 class="font-semibold mb-2">My posts (private — only you)</h4>
+          <div id="myPosts" class="text-sm text-slate-700 space-y-2">
+            <div class="text-slate-400">Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Confession Booth + trending -->
+      <aside class="md:col-span-1 space-y-4">
+        <div class="card p-4">
+          <div class="flex items-center justify-between">
+            <h4 class="font-semibold">Confession Booth</h4>
+            <div class="text-xs text-slate-400">Auto-deletes in 5 min</div>
+          </div>
+
+          <p class="text-sm text-slate-500 mt-2">Confessions are public but anonymous.</p>
+          <textarea id="confessText" rows="2" placeholder="Drop a short confession..." class="w-full border rounded-md p-2 text-sm resize-none mt-2"></textarea>
+          <div class="mt-2 flex gap-2 items-center">
+            <button id="confessBtn" class="px-3 py-2 bg-r2m-gold rounded-md shadow">Confess</button>
+            <div id="confessMsg" class="text-sm text-green-600"></div>
+          </div>
+
+          <hr class="my-3" />
+          <h5 class="font-semibold text-sm">Live confessions</h5>
+          <div id="confessionFeed" class="confession-feed text-sm text-slate-700 mt-2 space-y-2 max-h-40 overflow-auto">
+            <div class="text-slate-400">No confessions yet.</div>
+          </div>
+        </div>
+
+        <div class="card p-4">
+          <h4 class="font-semibold">Trending Topics</h4>
+          <div id="trendingBox" class="text-sm text-slate-700 mt-2">Loading…</div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="text-center py-6 text-sm text-slate-500">
+    &copy; 2025 Rant2Me • <a href="about.html" class="text-r2m-aqua">About</a> • <a href="help.html" class="text-r2m-aqua">Support</a>
+  </footer>
+
+  <!-- Create Topic Modal (admin-only) -->
+  <div id="createTopicModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+    <div class="bg-white rounded-lg w-full max-w-lg p-6">
+      <div class="flex items-center justify-between">
+        <h4 class="font-semibold">Create Topic</h4>
+        <button id="closeCreateTopic" class="text-slate-500 px-2 py-1 rounded hover:bg-slate-100">✕</button>
+      </div>
+
+      <div class="mt-4 space-y-3">
+        <input id="newTopicTitle" placeholder="Topic title" class="w-full border rounded-md p-2 text-sm" />
+        <textarea id="newTopicDesc" placeholder="Short description (optional)" rows="3" class="w-full border rounded-md p-2 text-sm"></textarea>
+
+        <div class="flex gap-2">
+          <label class="flex-1">
+            <div class="text-xs text-slate-500 mb-1">Start at</div>
+            <input id="newTopicStart" type="datetime-local" class="w-full border rounded-md p-2 text-sm" />
+          </label>
+
+          <label class="w-36">
+            <div class="text-xs text-slate-500 mb-1">Active</div>
+            <select id="newTopicActive" class="w-full border rounded-md p-2 text-sm">
+              <option value="true" selected>Yes</option>
+              <option value="false">No</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="flex justify-end gap-2">
+          <button id="cancelCreateTopic" class="px-3 py-2 border rounded-md">Cancel</button>
+          <button id="submitCreateTopic" class="px-4 py-2 bg-r2m-sky text-white rounded-md">Create topic</button>
+        </div>
+
+        <div id="createTopicMsg" class="text-sm text-red-500"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firestore + logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore, collection, addDoc, serverTimestamp,
+      query, where, orderBy, getDocs, onSnapshot, limit,
+      doc, updateDoc, deleteDoc, increment, Timestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // your firebase config (use your existing)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
+      authDomain: "rant2me-ab36b.firebaseapp.com",
+      projectId: "rant2me-ab36b",
+      storageBucket: "rant2me-ab36b.appspot.com",
+      messagingSenderId: "245661393279",
+      appId: "1:245661393279:web:b31483f57a40cf2c807a4a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // UI refs
+    const topicsList = document.getElementById('topicsList');
+    const topicTitle = document.getElementById('topicTitle');
+    const topicDesc = document.getElementById('topicDesc');
+    const postsFeed = document.getElementById('postsFeed');
+    const postText = document.getElementById('postText');
+    const postBtn = document.getElementById('postBtn');
+    const anonHandleInput = document.getElementById('anonHandle');
+    const regenHandle = document.getElementById('regenHandle');
+    const myPostsEl = document.getElementById('myPosts');
+    const replyModeBtn = document.getElementById('replyModeBtn');
+    const confessText = document.getElementById('confessText');
+    const confessBtn = document.getElementById('confessBtn');
+    const confessionFeed = document.getElementById('confessionFeed');
+
+    // ADMIN UI elements
+    const createTopicWrap = document.getElementById('createTopicWrap');
+    const createTopicBtn = document.getElementById('createTopicBtn');
+    const createTopicModal = document.getElementById('createTopicModal');
+    const closeCreateTopic = document.getElementById('closeCreateTopic');
+    const cancelCreateTopic = document.getElementById('cancelCreateTopic');
+    const submitCreateTopic = document.getElementById('submitCreateTopic');
+    const newTopicTitle = document.getElementById('newTopicTitle');
+    const newTopicDesc = document.getElementById('newTopicDesc');
+    const newTopicStart = document.getElementById('newTopicStart');
+    const newTopicActive = document.getElementById('newTopicActive');
+    const createTopicMsg = document.getElementById('createTopicMsg');
+
+    // simple banned-words list (expand as needed)
+    const bannedWords = ['nigga', 'fag', 'Nigga', 'bastard']; // replace with actual list
+
+    // runtime state
+    let currentUser = null;
+    let currentTopicId = null;
+    let replyToPost = null;
+    let ownedPostIds = new Set(); // from userPosts/{uid}/posts
+    let postsUnsubscribe = null;
+    let confessionsUnsubscribe = null;
+
+    // Admin emails (only these can create topics)
+    const TOPIC_CREATORS = ['tana10j@gmail.com'];
+
+    // small helpers
+    function randomHandle() {
+      return 'anon-' + Math.random().toString(36).slice(2,8);
+    }
+    function showToast(msg, colorClass = 'bg-green-600') {
+      const t = document.createElement('div');
+      t.textContent = msg;
+      t.className = `fixed bottom-5 right-5 text-white px-4 py-2 rounded ${colorClass} shadow`;
+      document.body.appendChild(t);
+      setTimeout(()=> { t.remove(); }, 2200);
+    }
+
+    // anon handle persistence
+    if (!localStorage.getItem('r2mAnonHandle')) localStorage.setItem('r2mAnonHandle', randomHandle());
+    anonHandleInput.value = localStorage.getItem('r2mAnonHandle');
+
+    regenHandle.addEventListener('click', () => {
+      const h = randomHandle();
+      anonHandleInput.value = h;
+      localStorage.setItem('r2mAnonHandle', h);
+      showToast('Handle regenerated');
+    });
+    anonHandleInput.addEventListener('change', () => {
+      localStorage.setItem('r2mAnonHandle', anonHandleInput.value.trim() || randomHandle());
+    });
+
+    // Auth state
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        currentUser = null;
+        // hide admin UI if not signed in
+        createTopicWrap.classList.add('hidden');
+        return;
+      }
+      currentUser = user;
+
+      // show admin UI only to allowed topic creators
+      const email = (user.email || '').toLowerCase();
+      if (TOPIC_CREATORS.includes(email)) {
+        createTopicWrap.classList.remove('hidden');
+      } else {
+        createTopicWrap.classList.add('hidden');
+      }
+
+      // load private pointers
+      loadMyPostPointers();
+    });
+
+    // Load topics (active ones first)
+    async function loadTopics() {
+      topicsList.innerHTML = '<div class="text-slate-400">Loading topics…</div>';
+      try {
+        const q = query(collection(db, 'topics'), where('active','==', true), orderBy('startAt','desc'));
+        const snap = await getDocs(q);
+        if (snap.empty) {
+          topicsList.innerHTML = '<div class="text-slate-400">No active topics.</div>';
+        } else {
+          topicsList.innerHTML = '';
+          snap.forEach(docSnap => {
+            const d = docSnap.data();
+            const id = docSnap.id;
+            const el = document.createElement('div');
+            el.className = 'p-2 rounded hover:bg-slate-50 cursor-pointer';
+            el.innerHTML = `<div class="font-semibold">${d.title}</div><div class="text-xs text-slate-500">${d.description || ''}</div>`;
+            el.addEventListener('click', () => selectTopic(id, d.title, d.description));
+            topicsList.appendChild(el);
+          });
+          // auto-select first
+          const first = snap.docs[0];
+          if (first) {
+            selectTopic(first.id, first.data().title, first.data().description);
+          }
+        }
+      } catch (err) {
+        console.error('load topics err', err);
+        topicsList.innerHTML = '<div class="text-red-500">Failed to load topics.</div>';
+      }
+    }
+
+    // select a topic and subscribe to posts
+    async function selectTopic(topicId, title, desc) {
+      currentTopicId = topicId;
+      topicTitle.textContent = title || 'Community';
+      topicDesc.textContent = desc || '';
+      // unsubscribe previous
+      if (postsUnsubscribe) postsUnsubscribe();
+      postsFeed.innerHTML = '<div class="text-slate-400">Loading posts…</div>';
+
+      const postsQ = query(collection(db, 'community_messages'), where('topicId','==', topicId), orderBy('createdAt','desc'), limit(200));
+      postsUnsubscribe = onSnapshot(postsQ, (snap) => {
+        postsFeed.innerHTML = '';
+        if (snap.empty) {
+          postsFeed.innerHTML = '<div class="text-slate-400">Be the first to post.</div>';
+          return;
+        }
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const id = docSnap.id;
+          const created = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleString() : '';
+          const reactions = d.reactions || {};
+          const handle = d.anonHandle || 'anon';
+          const li = document.createElement('div');
+          li.className = 'border rounded p-3 bg-white';
+          const bodyHtml = `
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="text-sm font-semibold">${handle}</div>
+                <div class="text-slate-600 text-sm mt-1">${escapeHtml(d.text)}</div>
+                <div class="text-xs text-slate-400 mt-2">${created}</div>
+              </div>
+              <div class="text-right">
+                ${ ownedPostIds.has(id) ? '<button data-id="'+id+'" class="deletePostBtn text-xs text-red-500">Delete</button>' : '' }
+              </div>
+            </div>
+            <div class="mt-2 flex gap-2 items-center text-sm">
+              <button data-emoji="👍" data-id="${id}" class="reactBtn px-2 py-1 border rounded">👍 ${reactions['👍'] || 0}</button>
+              <button data-emoji="😂" data-id="${id}" class="reactBtn px-2 py-1 border rounded">😂 ${reactions['😂'] || 0}</button>
+              <button data-emoji="🔥" data-id="${id}" class="reactBtn px-2 py-1 border rounded">🔥 ${reactions['🔥'] || 0}</button>
+              <button data-reply="${id}" class="replyBtn px-2 py-1 border rounded text-xs">Reply</button>
+              <button data-flag="${id}" class="flagBtn px-2 py-1 border rounded text-xs text-red-500">🚩 Flag</button>
+            </div>
+          `;
+          li.innerHTML = bodyHtml;
+          postsFeed.appendChild(li);
+        });
+
+        // attach event handlers (delegated)
+        postsFeed.querySelectorAll('.reactBtn').forEach(btn => {
+          btn.onclick = handleReact;
+        });
+        postsFeed.querySelectorAll('.deletePostBtn').forEach(b => b.onclick = handleDeletePost);
+        postsFeed.querySelectorAll('.replyBtn').forEach(b => {
+          b.onclick = (ev) => {
+            replyToPost = ev.currentTarget.getAttribute('data-reply');
+            replyModeBtn.textContent = 'Reply mode: ON';
+            replyModeBtn.classList.add('bg-slate-100');
+            postText.focus();
+          };
+        });
+
+        postsFeed.querySelectorAll('.flagBtn').forEach(b => b.onclick = handleFlag);
+
+      }, err => {
+        console.error('posts snapshot err', err);
+        postsFeed.innerHTML = '<div class="text-red-500">Could not load posts.</div>';
+      });
+    }
+
+    // simple escape
+    function escapeHtml(str) {
+      return (str || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+    }
+
+    // post creation (anonymous public doc + private pointer)
+    postBtn.addEventListener('click', async () => {
+      const text = postText.value.trim();
+      if (!text) return showToast('Write something first','bg-red-600');
+      if (!currentTopicId) return showToast('Select a topic first','bg-red-600');
+
+      // basic banned-words filtering
+      const lower = text.toLowerCase();
+      for (const w of bannedWords) {
+        if (lower.includes(w)) {
+          return showToast('Your post contains disallowed language','bg-red-600');
+        }
+      }
+
+      // create public message (no UID)
+      try {
+        const anonHandle = (anonHandleInput.value || localStorage.getItem('r2mAnonHandle') || randomHandle());
+        const postRef = await addDoc(collection(db, 'community_messages'), {
+          topicId: currentTopicId,
+          text,
+          anonHandle,
+          replyTo: replyToPost || null,
+          createdAt: serverTimestamp(),
+          reactions: {} // optional starter map
+        });
+
+        // create private pointer for the owner so they can manage the post
+        if (currentUser) {
+          await addDoc(collection(db, 'userPosts', currentUser.uid, 'posts'), {
+            postId: postRef.id,
+            topicId: currentTopicId,
+            createdAt: serverTimestamp()
+          });
+          // reload pointers
+          await loadMyPostPointers();
+        }
+
+        postText.value = '';
+        replyToPost = null;
+        replyModeBtn.textContent = 'Reply mode: off';
+        replyModeBtn.classList.remove('bg-slate-100');
+        showToast('Posted anonymously ✓');
+      } catch (err) {
+        console.error('post err', err);
+        showToast('Could not post','bg-red-600');
+      }
+    });
+
+    // handle reaction (atomic increment on map field)
+    async function handleReact(ev) {
+      if (!currentUser) { showToast('Sign in to react','bg-red-600'); return; }
+      const btn = ev.currentTarget;
+      const emoji = btn.getAttribute('data-emoji');
+      const postId = btn.getAttribute('data-id');
+      try {
+        const postDocRef = doc(db, 'community_messages', postId);
+        const updateObj = {};
+        updateObj[`reactions.${emoji}`] = increment(1);
+        await updateDoc(postDocRef, updateObj);
+      } catch (err) {
+        console.error('react err', err);
+         showToast('Could not react (permission?)','bg-red-600');
+      }
+    }
+
+    async function handleFlag(ev) {
+  if (!currentUser) { showToast('Sign in to flag','bg-red-600'); return; }
+  const postId = ev.currentTarget.getAttribute('data-flag');
+  try {
+    await addDoc(collection(db, "flags"), {
+  postId: postId,
+  collection: "community_messages",
+  reason: "inappropriate",  // or whatever
+  createdAt: serverTimestamp(),
+  reportedBy: auth.currentUser.uid,
+  resolved: false
+});
+
+
+    showToast('Post flagged ✓', 'bg-yellow-600');
+  } catch (err) {
+    console.error('flag err', err);
+    showToast('Could not flag','bg-red-600');
+  }
+}
+
+    // load private pointers: userPosts/{uid}/posts
+    async function loadMyPostPointers() {
+      if (!currentUser) { myPostsEl.innerHTML = '<div class="text-slate-400">Sign in to manage posts</div>'; return; }
+      myPostsEl.innerHTML = '<div class="text-slate-400">Loading…</div>';
+      try {
+        const q = query(collection(db, 'userPosts', currentUser.uid, 'posts'), orderBy('createdAt','desc'), limit(50));
+        const snap = await getDocs(q);
+        ownedPostIds.clear();
+        myPostsEl.innerHTML = '';
+        if (snap.empty) {
+          myPostsEl.innerHTML = '<div class="text-slate-400">You have no posts yet.</div>';
+        } else {
+          snap.forEach(docSnap => {
+            const d = docSnap.data();
+            const postId = d.postId;
+            ownedPostIds.add(postId);
+            const li = document.createElement('div');
+            li.className = 'flex justify-between items-center';
+            const created = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString() : '';
+            li.innerHTML = `<div class="text-xs text-slate-600">${d.topicId} • ${created}</div>
+                            <div><button data-id="${postId}" class="deletePointerBtn text-sm text-red-500">Delete</button></div>`;
+            myPostsEl.appendChild(li);
+          });
+          myPostsEl.querySelectorAll('.deletePointerBtn').forEach(b => b.onclick = handleDeletePointer);
+        }
+      } catch (err) {
+        console.error('load my posts err', err);
+        myPostsEl.innerHTML = '<div class="text-red-500">Failed to load your posts.</div>';
+      }
+    }
+
+    // deleting a post (user chooses to remove their public post)
+    async function handleDeletePointer(ev) {
+      const postId = ev.currentTarget.getAttribute('data-id');
+      if (!confirm('Delete this post from public feed?')) return;
+      try {
+        const userPostsCol = collection(db, 'userPosts', currentUser.uid, 'posts');
+        const snap = await getDocs(query(userPostsCol, where('postId','==', postId), limit(1)));
+        snap.forEach(docSnap => { deleteDoc(doc(db, 'userPosts', currentUser.uid, 'posts', docSnap.id)); });
+        await deleteDoc(doc(db, 'community_messages', postId));
+        ownedPostIds.delete(postId);
+        await loadMyPostPointers();
+        showToast('Deleted post');
+      } catch (err) {
+        console.error('delete post err', err);
+        showToast('Could not delete post','bg-red-600');
+      }
+    }
+
+    // also allow delete by inline delete button
+    async function handleDeletePost(ev) {
+      const postId = ev.currentTarget.getAttribute('data-id');
+      if (!confirm('Delete this post from public feed?')) return;
+      await handleDeletePointer({ currentTarget: ev.currentTarget });
+    }
+
+    // reply mode toggle
+    replyModeBtn.addEventListener('click', () => {
+      if (replyToPost) {
+        replyToPost = null;
+        replyModeBtn.textContent = 'Reply mode: off';
+        replyModeBtn.classList.remove('bg-slate-100');
+      } else {
+        replyModeBtn.textContent = 'Reply mode: ON (click a Reply button on a post)';
+        replyModeBtn.classList.add('bg-slate-100');
+      }
+    });
+
+    // Confessions: create with expireAt = now + 5 minutes
+    confessBtn.addEventListener('click', async () => {
+      const text = confessText.value.trim();
+      if (!text) return showToast('Write something first','bg-red-600');
+      const lower = text.toLowerCase();
+      for (const w of bannedWords) if (lower.includes(w)) return showToast('Your confession contains disallowed language','bg-red-600');
+
+      try {
+        const expireAt = Timestamp.fromMillis(Date.now() + 5 * 60 * 1000); // 5 min
+        await addDoc(collection(db, 'confessions'), {
+          text,
+          anonHandle: localStorage.getItem('r2mAnonHandle') || randomHandle(),
+          createdAt: serverTimestamp(),
+          expireAt: Timestamp.fromDate(new Date(Date.now() + 5 * 60 * 1000)) // 5 mins ahead
+        });
+        confessText.value = '';
+        showToast('Confession posted (auto-deletes in 5 minutes)');
+      } catch (err) {
+        console.error('confess err', err);
+        showToast('Could not post confession','bg-red-600');
+      }
+    });
+
+    // subscribe confessions
+    function subscribeConfessions() {
+      if (confessionsUnsubscribe) confessionsUnsubscribe();
+      const q = query(collection(db, 'confessions'), orderBy('createdAt','desc'), limit(30));
+      confessionsUnsubscribe = onSnapshot(q, (snap) => {
+        confessionFeed.innerHTML = '';
+        if (snap.empty) { confessionFeed.innerHTML = '<div class="text-slate-400">No confessions yet.</div>'; return; }
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const created = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleTimeString() : '';
+          const el = document.createElement('div');
+          el.className = 'p-2 border rounded bg-[rgba(0,0,0,0.03)]';
+          el.innerHTML = `<div class="text-xs text-slate-500">${d.anonHandle} • ${created}</div>
+                          <div class="text-sm text-slate-700">${escapeHtml(d.text)}</div>`;
+          confessionFeed.appendChild(el);
+        });
+      }, err => {
+        console.error('confession snap err', err);
+        confessionFeed.innerHTML = '<div class="text-red-500">Could not load confessions.</div>';
+      });
+    }
+
+    // trending topics
+    async function loadTrending() {
+      try {
+        const q = query(collection(db, 'topics'), where('active','==', true), orderBy('startAt','desc'), limit(5));
+        const snap = await getDocs(q);
+        const box = document.getElementById('trendingBox');
+        box.innerHTML = '';
+        if (snap.empty) { box.innerHTML = '<div class="text-slate-400">No trending topics.</div>'; return; }
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const el = document.createElement('div');
+          el.className = 'p-2 rounded hover:bg-slate-50 cursor-pointer';
+          el.innerHTML = `<div class="font-medium">${d.title}</div><div class="text-xs text-slate-500">${(d.description||'').slice(0,60)}</div>`;
+          el.addEventListener('click', () => selectTopic(docSnap.id, d.title, d.description));
+          box.appendChild(el);
+        });
+      } catch (err) {
+        console.error('trending err', err);
+      }
+    }
+
+    // initial bootstrap
+    (async function init() {
+      await loadTopics();
+      subscribeConfessions();
+      await loadTrending();
+    })();
+
+    // sign out
+    document.getElementById('signOutBtn').addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = 'index.html';
+    });
+
+    /* --------------------------
+       ADMIN: Create Topic handlers
+       -------------------------- */
+    // show modal
+    createTopicBtn?.addEventListener('click', () => {
+      createTopicMsg.textContent = '';
+      newTopicTitle.value = '';
+      newTopicDesc.value = '';
+      // set default start to now
+      const nowLocal = new Date().toISOString().slice(0,16);
+      newTopicStart.value = nowLocal;
+      newTopicActive.value = 'true';
+      createTopicModal.classList.remove('hidden');
+      createTopicModal.classList.add('flex');
+    });
+
+    // hide modal
+    closeCreateTopic?.addEventListener('click', () => {
+      createTopicModal.classList.add('hidden');
+      createTopicModal.classList.remove('flex');
+    });
+    cancelCreateTopic?.addEventListener('click', () => {
+      createTopicModal.classList.add('hidden');
+      createTopicModal.classList.remove('flex');
+    });
+
+    // submit create
+    submitCreateTopic?.addEventListener('click', async () => {
+      // server-side rules should still enforce only allowed admin can write to topics,
+      // but we'll gate UI too (only visible to TOPIC_CREATORS).
+      if (!currentUser) {
+        createTopicMsg.textContent = 'Sign in as admin to create topics.';
+        return;
+      }
+      const email = (currentUser.email || '').toLowerCase();
+      if (!TOPIC_CREATORS.includes(email)) {
+        createTopicMsg.textContent = 'You are not authorized to create topics.';
+        return;
+      }
+
+      const title = newTopicTitle.value.trim();
+      const description = newTopicDesc.value.trim();
+      const startVal = newTopicStart.value;
+      const active = newTopicActive.value === 'true';
+
+      if (!title) { createTopicMsg.textContent = 'Title is required.'; return; }
+
+      try {
+        const startAt = startVal ? Timestamp.fromMillis(new Date(startVal).getTime()) : serverTimestamp();
+        await addDoc(collection(db, 'topics'), {
+          title,
+          description: description || '',
+          active,
+          startAt: startAt,
+          createdBy: currentUser.uid,
+          createdAt: serverTimestamp()
+        });
+        createTopicModal.classList.add('hidden');
+        createTopicModal.classList.remove('flex');
+        showToast('Topic created ✓');
+        await loadTopics();
+      } catch (err) {
+        console.error('create topic err', err);
+        createTopicMsg.textContent = 'Could not create topic.';
+      }
+    });
+
+    // mobile menu toggle (tiny)
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+      // simple mobile behaviour placeholder
+      alert('Open mobile menu (implement separately)');
+    });
+
+  </script>
+</body>
+</html>

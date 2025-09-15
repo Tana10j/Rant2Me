@@ -32,6 +32,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
   apiKey: "AIzaSyAEVKUuUn0rypPGTzJ2UsVIy9HGYUBHLhI",
@@ -44,10 +45,23 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
+    const auth = getAuth(app);
     const form = document.getElementById("resourceForm");
     const list = document.getElementById("resourceList");
 
+ // ✅ Check if user is already logged in
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      console.log("Logged in as:", user.email);
+
+      // Optional: enforce that only admins can use this page
+      const adminEmails = ["tana10j@gmail.com", "edukdorcas@gmail.com"];
+      if (!adminEmails.includes(user.email)) {
+        alert("Access denied: you are not an admin.");
+        window.location.href = "index.html"; // redirect non-admins
+        return;
+      }
+    
     async function loadResources() {
       const snapshot = await getDocs(collection(db, "resources"));
       list.innerHTML = "";
@@ -84,6 +98,8 @@
     };
 
     loadResources();
+    }
+  });
   </script>
 </body>
 </html>

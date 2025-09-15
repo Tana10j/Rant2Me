@@ -283,6 +283,7 @@ function redirectToSection(section) {
   const target =
     section === 'counselling' ? 'chat-counselling.html' :
     section === 'nutrition'   ? 'chat-nutrition.html' :
+    section === 'listener'   ? 'chat-listener.html' :
     'chat-student.html';
 
   setTimeout(() => { window.location.href = target; }, 600);
